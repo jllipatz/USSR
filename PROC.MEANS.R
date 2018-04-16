@@ -1,15 +1,9 @@
 # Version 2 du 12/4/2018
 
-require("Hmisc")
-require("dplyr")
-require("replyr")
-require("tidyr")
-require("purrr")
-
 PROC.MEANS <- function(.DATA,.VARS,.CLASSES=NULL,.WEIGHT
 			,.N,.MIN,.MAX,.SUM,.MEAN,.VAR,.STD,.MEDIAN
 			,.REORDER=TRUE)
-#' Produces various statistics on selected columns
+#' Produces various weighted statistics on selected columns
 #'
 #' \code{PROC.MEANS} was inspired by the SAS MEANS procedure.
 #' @param .DATA    a data frame
@@ -23,11 +17,17 @@ PROC.MEANS <- function(.DATA,.VARS,.CLASSES=NULL,.WEIGHT
 #' Only statistics for which a prefix has been given are produced.
 #' @param .REORDER when true, the statistical results are ordered by source variable, else by statistic.
 #' @return a data frame
+#' @importFrom stats median var
+#' @importFrom Hmisc wtd.mean wtd.var wtd.quantile
+#' @import dplyr
+#' @import replyr
+#' @import tidyr
+#' @import purrr
 #' @export
 #'
 #' @examples
-#'
-#' PROC.MEANS(.DATA=a,.VARS=c("v1","v2"),.CLASSES=c("g1","g2"),.MIN="min",.MAX="max",.MEAN="")
+#' a<-data.frame(w=1:10,v=1,g=1:2)
+#' PROC.MEANS(.DATA=a,.VARS="v",.CLASSES="g",.WEIGHT="w",.MIN="min",.MAX="max",.MEAN="")
 	{
 
 	f2 <- function(.ldf,.stat)
@@ -105,7 +105,7 @@ PROC.MEANS <- function(.DATA,.VARS,.CLASSES=NULL,.WEIGHT
 			select(c(.CLASSES,.WEIGHT,.VARS)) %>%
 			rename_at(.WEIGHT,function(.) ".__W__")
 		g(df1,f2
-			,.N,purrr:compose(sum,function(.v,.w) !is.na(.v)*.w)
+			,.N,purrr::compose(sum,function(.v,.w) !is.na(.v)*.w)
 			,.MIN,purrr::compose(min,function(.v,.w) .v)
 			,.MAX,purrr::compose(max,function(.v,.w) .v)
 			,.SUM,purrr::compose(sum,`*`)
