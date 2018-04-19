@@ -29,6 +29,8 @@ PROC.MEANS <- function(.DATA,.VARS,.CLASSES=NULL,.WEIGHT
 #' a<-data.frame(w=1:10,v=1,g=1:2)
 #' PROC.MEANS(.DATA=a,.VARS="v",.CLASSES="g",.WEIGHT="w",.MIN="min",.MAX="max",.MEAN="")
 	{
+	MIN <- purrr::partial(min,na.rm=TRUE)
+	MAX <- purrr::partial(max,na.rm=TRUE)
 
 	f2 <- function(.ldf,.stat)
 		purrr::map(.ldf,function(.df) .stat(.df$.__V__,.df$.__W__))
@@ -92,8 +94,8 @@ PROC.MEANS <- function(.DATA,.VARS,.CLASSES=NULL,.WEIGHT
 			select(c(.CLASSES,.VARS))
 		g(df1,f1	# %>% pertuberait le fonctionnement de 'missing'
 			,.N,purrr::compose(sum,`!`,is.na)
-			,.MIN,min
-			,.MAX,max
+			,.MIN,MIN
+			,.MAX,MAX
 			,.SUM,sum
 			,.MEAN,mean
 			,.VAR,var
@@ -106,8 +108,8 @@ PROC.MEANS <- function(.DATA,.VARS,.CLASSES=NULL,.WEIGHT
 			rename_at(.WEIGHT,function(.) ".__W__")
 		g(df1,f2
 			,.N,purrr::compose(sum,function(.v,.w) !is.na(.v)*.w)
-			,.MIN,purrr::compose(min,function(.v,.w) .v)
-			,.MAX,purrr::compose(max,function(.v,.w) .v)
+			,.MIN,purrr::compose(MIN,function(.v,.w) .v)
+			,.MAX,purrr::compose(MAX,function(.v,.w) .v)
 			,.SUM,purrr::compose(sum,`*`)
 			,.MEAN,Hmisc::wtd.mean
 			,.VAR,Hmisc::wtd.var
