@@ -43,9 +43,23 @@ df$champ <- schema$champ
 return(tmp)
 }
 
+ges_r2 <- Import_Eurostat(schema = schema)
+str(ges_r2)
+
 #---------------------------------#
 # II. Mise en forme des données   #
 #---------------------------------#
+
+
+
+
+
+
+
+
+
+
+
 
 
 
