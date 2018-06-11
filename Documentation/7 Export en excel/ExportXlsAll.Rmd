@@ -39,7 +39,7 @@ library(XLConnect)
 
 ### I.1.1. Import des données
 
-L'import des données se fait en deux étapes. Dans un premier temps, il faut charger le classeur. Ensuite, il faut charger les données d'une feuille. Curieusement, le chargement des données du classeur est relativement long compte tenu de la taille modeste du fichier de test.
+L'import des données se fait en deux étapes. Dans un premier temps, il faut charger le classeur. Ensuite, il faut charger les données d'une feuille. Curieusement, le chargement des données du classeur est relativement long compte tenu de la taille modeste du fichier de test. 
 
 ```{r}
 wb <- loadWorkbook("testXlsx.xlsx", create = TRUE)
