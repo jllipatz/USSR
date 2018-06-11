@@ -1,0 +1,188 @@
+---
+title: "Export vers un tableur"
+author: "Nicolas Kempf"
+date: "11 juin 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# setwd(dir=dirname(rstudioapi::getActiveDocumentContext()$path))
+# getwd()
+
+```
+
+Création d'une data.frame fictive :
+
+```{r}
+df <- data.frame(var1 = c("var1","art","rétr"),var2 = c(1, 1.2,-4),var3 = as.Date(c("2018/01/01","2018/05/03","2018/06/07")))
+df
+```
+
+
+
+# I. Export vers Excel (.xlsx)
+
+R dispose de nombreux packages pour lire et ecrire en excel. Après quelques recherches, les packages "XLConnect" et "xslx" sont les plus utilisés par la communauté. Ces package se démarquent : ils gèrent plusieurs formats notamment le format date. Ils permettent d'écrire des formules excel à partir de R. Il est possible de construire une sortie comportant plusieurs tableaux par feuilles. Les données exportées doivent être de type data.frame. 
+L'inconvenient majeur est la dépendance de ces packages à une installation java. 
+
+Si le groupe USSR souhaite proposer un export des données en excel. Il semble qu'il faille choisir entre un de ces deux packages.
+
+## I.1. XlConnect
+
+Le principal inconvénient de ce package est sa dépendance avec une intallation java. De plus, il peut être lent sur des gros fichiers.
+
+```{r}
+library(XLConnect)
+```
+
+
+### I.1.1. Import des données
+
+L'import des données se fait en deux étapes. Dans un premier temps, il faut charger le classeur. Ensuite, il faut charger les données d'une feuille. Curieusement, le chargement des données du classeur est relativement long compte tenu de la taille modeste du fichier de test.
+
+```{r}
+wb <- loadWorkbook("testXlsx.xlsx", create = TRUE)
+
+data <- readWorksheet(wb,sheet = 1,  startRow = 0, endRow = 10,
+                     startCol = 0, endCol = 0)
+data
+```
+
+### I.1.2 Export des données
+
+L'export se fait généralement en plusieurs étapes. Il faut créer un classeur. Ensuite, créer une feuille puis y ajouter des données. Enfin, il faut enregistrer les modifcations. Cette façon de faire permet de contrôler finement le contenu du classeur. Il est possible d'exporter dans les formats .xlsx et .xls.
+
+```{r}
+wb <- loadWorkbook("ExportXLConnect.xlsx",create=T)
+createSheet(wb,"data")
+writeWorksheet(wb,df,"data")
+saveWorkbook(wb)
+```
+
+### I.1.3. A faire
+
+Tester l'écriture des formules excel. 
+
+Pour plus de détails, quelques articles intéressants : 
+
+* <http://www.milanor.net/blog/steps-connect-r-excel-xlconnect/> ;
+* <http://www.sthda.com/english/articles/2-r/4-xlconnect-read-write-and-manipulate-microsoft-excel-files-from-within-r/> ;
+* <http://altons.github.io/rstats/2015/02/13/quick-intro-to-xlconnect/>.
+
+
+## I.2. Xlsx
+
+Plus rapide qu'XlConnect sur les gros fichiers mais nécessite comme XLConnect une installation de java.  
+
+* Voici un tutoriel en français ancien mais pratique : <http://www.sthda.com/french/wiki/xlsx-le-meilleur-package-pour-connecter-excel-avec-le-logiciel-r>.
+
+```{r}
+library(xlsx)
+```
+
+
+### I.2.1 Import des données
+
+Import d'un fichier xls
+
+```{r}
+read.xlsx(file = "testXls.xls",sheetIndex = 1)
+```
+
+Import d'un fichier xlsx
+
+```{r}
+read.xlsx(file = "testXlsx.xlsx",sheetIndex = 1)
+```
+
+Ce package permet de lire des fichiers .xls et .xlsx. De plus, il reconnait le format date des données. La fonction renvoie une data.frame.
+
+### I.2.2. Export des données. 
+
+Export des données
+
+```{r}
+write.xlsx(x = df,file = "ExportXlsx.xlsx",sheetName = "data")
+```
+
+L'export des données se déroule correctement même le format date est conservé dans le fichier en sortie. 
+
+## I.3. openxslx
+
+Ce package n'a pas de dépendance avec java. Cependant, sous Windows, il faut installer RTools ce qui peut être compliqué sur les ordinateurs de l'Insee. Un membre de réseau LS² a rencontré ce problème. 
+
+## I.4. excel.link
+
+## I.5. writeXl
+
+L'avantage de ce package réside dans son indépendance à la librairie java et au package Rtools. Il est très rapide pour lire et ecrite des data.frame. Le principal inconvénient est qu'il n'est pas possible de construire des rapports complexes.
+
+## I.6. RODBC 
+
+Ancien et il existe de meilleurs packages. 
+
+## I.7. RJDBC 
+
+## I.8. readXl
+
+N'a pas dependance avec Java. Rapide.
+
+## I.9. dataframes2xls 
+
+## I.10. WriteXLS 
+
+Necessite une installation de PERL.
+
+## I.11. RExcel
+
+## I.12. xlsReadWrite
+
+## I.13. gdata
+
+Une installation PERL est requise pour le faire fonctionner. 
+
+## I.X. Articles 
+
+* Une comparaison des 4 principaux packages datant de 2015 :  <https://www.r-bloggers.com/r-the-excel-connection/>.
+* un autre article interessant datant de 2014 : <https://www.r-bloggers.com/a-million-ways-to-connect-r-and-excel/>.
+
+## II. Export vers Calc
+
+Je n'ai trouvé qu'un seul package : readODS
+
+```{r}
+library(readODS)
+```
+
+
+### II.1. Import des données
+
+```{r}
+readODS::read.ods(file = "testCalc.ods")
+```
+
+Ne dispose pas d'options pour indiquer que les libellés des variables se trouve en premiere ligne. 
+
+### II.2. Export des données
+
+```{r}
+readODS::write_ods(x = df,path = "export.ods")
+```
+ 
+Ne fonctionne pas.
+
+Un fil de discussion sur stackoverflow : <https://stackoverflow.com/questions/47547082/how-to-export-from-r-to-a-calc-ods-file-in-multiple-sheets>.
+
+## III. Export vers googlesheets
+
+Il existe le package "googlesheet". 
+
+Article décrivant la marche à suivre : <https://datascienceplus.com/how-to-use-googlesheets-to-connect-r-to-google-sheets/>.
+
+
+# IV. Rio package
+
+Ce package est prometteur. Il tente d'unifier le chargement et l'export dans différents formats afin de faciliter la vie 
+des utilisateurs. Voici le lien vers la vignette : <https://cran.r-project.org/web/packages/rio/vignettes/rio.html>).
+
