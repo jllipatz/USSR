@@ -1,0 +1,120 @@
+---
+title: "Expressions régulières"
+author: "JLL"
+date: "14 juin 2018"
+output:
+  html_document:
+    theme: united
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# La problématique : recherche textuelle sur motif
+
+Les expressions régulières sont un outil puissant issu du langage PERL pour faire de la recherche textuelle, c'est à dire pour chercher dans un texte donné l'apparition de certaines chaînes de caractères. L'originalité des expressions régulières c'est qu'elles s'apparentent à de la reconnaissance de forme. On se contente de décrire ce qu'on cherche - le *motif* ('pattern') - à l'aide d'une syntaxe spécifique et le moteur de recherche associé aux expressions régulières se charge de traduire ce *motif* en des itérations, des tests, des reprises après echec, etc. soit au final un véritable petit programme qui aurait nécessité plusieurs, voire de nombreuses instructions sans les expressions régulières.
+
+Concrètement une expression régulière est une chaîne de caractères. La nécessité d'une syntaxe pour décrire des *motifs* un peu compliqués comme par exemple "une suite de chiffres terminés par une virgule", se concrétise dans le fait que certains caractères ne se représentent pas eux mêmes mais prennent un sens particulier pour guider la recherche. Pour l'exemple cité on dira notamment "\\\\d+," : la séquence '\\\\d' n'est pas à prendre littéralement mais représente un chiffre décimal quelconque, de même le '+' signifie que ce qui précède (un chiffre décimal) peut être repété, tandis que le ',' signifie bien qu'on cherche à trouver une virgule.
+
+# Les expressions régulières en R
+
+En R les expressions régulières apparaissent principalement dans les fonctions de recherche de la famille 'grep', ou de substitution d'un motif par un autre avec les fonctions de la famille 'gsub'. Mais elles sont aussi mobilisables sur d'autres composantes de l'éco-système R et sont reconnues dans des fonctions telles que celles qui permettent de selectionner des colonnes d'une table. Par ailleurs, beaucoup de fonctions SAS sur les chaînes de caractères n'ont pas leur équivalent en R,  mais le recours aux expressions régulières comble le vide avec un outil plus général.
+
+Il faut noter que certaines de ces fonctions sur les chaînes de caractères fonctionnent spontanément sur une syntaxe simplifiée et ne reconnaisent pas toute la syntaxe issue de PERL. Il est donc parfois utile de rajouter 'perl=TRUE' pour bénéficier de l'intégralité des fonctionnalités.
+
+Enfin les chaînes de caractères en R comportent une particularité le '\\' est interprété à la lecture même du programme pour encoder certains caractères spéciaux (tabulation, saut à la ligne, etc.). Ceci nécessite déjà de redoubler le '\\' pour qu'il ne soit pas interprété autrement quand on fournit des chemins d'accès à des fichiers sous Windows. Pour les expressions régulières il faudra faire la même chose.
+
+# Elements de syntaxe
+
+Pour montrer l'effet de la reconnaissance de motif on va utiliser 'gsub' dans les exemples suivants. La fonction remplace dans le troisième paramètre, partout où elle le trouve le motif fourni par le premier paramètre par ce qui est fourni en second paramètre (ici '\<TRUC\>'). 
+<br> Ce qui suit ne porte que sur les éléments les plus utilisés.
+
+## Débuts et fins de chaîne
+```{r}
+# Le métacaractère ^ : un 'a' mais seulement en DEBUT DE CHAINE
+gsub("^a","<TRUC>","anormale")
+
+# Le métacaractère $ : un 'e' mais seuelement en FIN DE CHAINE
+gsub("e$","<TRUC>","elementaire")
+
+```
+
+## Joker
+```{r}
+# Le métacaractère . : un 'e' suivi de n'importe quel caractère
+gsub("e.","<TRUC>","elementaire")
+
+```
+
+## Familles de caractères
+```{r}
+# La séquence \d : un chiffre décimal
+gsub("\\d","<TRUC>","2C534")
+# La séquence \D : tout sauf un chiffre décimal
+gsub("\\D","<TRUC>","2C534")
+# Les métacaractères [] : une liste de caractères
+gsub("[oe]","","Concrètement")
+# Les métacaractères [] : une plage de caractères (plus une liste d'un caractère)
+gsub("[a-nè]","","Concrètement")
+# ...et leur négation : tout sauf la plage et la liste
+gsub("[^a-nè]","","Concrètement")
+```
+
+## Répétitions
+```{r}
+# Le métacaractère ? : un 'a' suivi de ZERO OU UNE OCCURRENCE d'un 'l'
+gsub("al?","<TRUC>","anormale")
+
+# Le métacaractère * : un 'e' suivi de ZERO OU PLUSIEURS OCCURRENCE d'un 's'
+gsub("es*","<TRUC>","expression")
+
+# Le métacaractère + : un 'e' suivi d'UNE OU PLUSIEURS OCCURRENCE d'un 's'
+gsub("es+","<TRUC>","expression")
+
+```
+Le métacaractère '*' est "gourmand" : il cherche à attraper autant qu'il peut, ce qui peut parfois être génant. Un contournement est l'utilisation de la répétition "paresseuse" qui attrape le minimum nécessaire à la réalisation du motif.
+```{r}
+# Version gourmande : .* attrape tout jusqu'au 'e' final, y compris les 'e' intermédiaires.
+gsub(".*e","<TRUC>","elementaire")
+
+# Version paresseuse : .*? attrape jusqu'à ce qu'elle trouve un 'e'
+gsub(".*?e","<TRUC>","elementaire")
+```
+
+## Groupes
+Il est possible d'indiquer que la reconnaissance d'une partie d'un motif constitue une fin en soi et que le résultat doit être mémorisé par le moteur de recherche pour un usage ultérieur. Ceci est utile soit pour faire porter un métacaractère de répétition sur plus d'un caractère, soit pour faire référence au sous-motif quelque part ailleurs. 
+```{r}
+# un 'r' éventuellement suivi de 'ac'
+gsub("r(ac)?","<TRUC>","metacaractere")
+
+# n'importe quel caractère (sous-motif numéro 1) mais redoublé
+gsub("(.)\\1","<TRUC>","expression")
+
+# Un exemple complexe :
+#   Les [] permettent aussi de désactiver la significaton de certains metacaractères
+#   Le (?1) permet de faire référence au premier sous-motif (pas sa valeur contrairement à \1)
+#   ...depuis l'interieur même du sous-motif : la recherche est donc recursive
+gsub("([a-z][(]([a-z]|(?1))[)])","<TRUC>","f(g(h))",perl=TRUE)
+```
+
+## Alternatives
+```{r}
+# un 'ac' ou un 'er
+gsub("ac|er","<TRUC>","metacaractere")
+
+```
+
+## Anticipations
+Lors du processus de recherche le moteur positionne un curseur qui suit suit l'tat d'avancement dans le texte. Il est possible de tester si ce qui sera lu plus tard correspondra ou non à un certain sous-motif, mais sans que le curseur soit positionné sur ce sous-motif, c'est à dire sans que ce sous-motif soit consommé pour produire le résultat.
+```{r}
+# un 'a' suivi par 'ct' : 'ct' n'est pas inclu dans la substitution
+gsub("a(?=ct)","<TRUC>","metacaractere",perl=TRUE)
+# un 'a' qui n'est pas suivi par 'ct'
+gsub("a(?!ct)","<TRUC>","metacaractere",perl=TRUE)
+```
+
+
