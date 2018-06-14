@@ -1,0 +1,116 @@
+---
+title: "Stockage intermédiaire en format spécifique SAS"
+author: "JLL"
+date: "12 juin 2018"
+output:
+  html_document:
+    theme: united
+    toc: yes
+    toc_depth: 2
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Problématique
+
+Ecrire sur support permanent des données produites sous R et les relire éventuellement partiellement lors d’un traitement R ultérieur. La fonctionnalité majeure recherchée consiste à pouvoir sélectionner un ensemble de variables ou un ensemble d’observations spécifié par une condition quelconque sur les variables. Il s’agit donc de disposer de fonctionnalités similaires à celles offertes en SAS par les bases SAS ou plus généralement par les SGBD, mais sans dépendre de SAS ni d’un SGBD.
+
+# Solution retenue
+
+Le package **fst** offre les fonctionnalités souhaitées avec des performances inégalées. Le package **fstplyr** apporte de son coté la possibilité de travailler dans la logique du package ‘dplyr’ sans avoir recours à la syntaxe du R de base.
+
+# Niveau d'intégration à l'USSR
+
+## Développements préconisés
+
+Encapsulation des appels aux deux packages afin de rendre transparent la solution technique utilisée et permettre une éventuelle évolution vers une autre solution. En outre il y a une lègère dissymétrie entre l'accès via 'fst' (noms de fichiers complets) et 'fstplyr' (noms de fichiers sans suffixe, sans répertoire) : ceci pourrait être unifié.
+
+## Points de vigilance
+
+Le package **fst** est relativement récent et n’est pas maintenu pas un acteur majeur dans la constitution de package R. Par ailleurs les évolutions récentes du logiciel R (bit ALTREP) ou les travaux en cours sur les fichiers APACHE ARROW laissent supposer que d’autres alternatives offrant les mêmes fonctionnalités pourraient voir le jour.
+A l’inverse le développeur envisage de compléter le logiciel dans plusieurs directions intéressantes : l’intégration à la logique ‘data.table’ (hors sujet USSR), mais surtout une réduction de l’empreinte mémoire avec un utilitaire de transformation de fichiers texte en fichiers 'fst' ainsi que la possibilité d’introduire certains calculs lors de la phase de lecture des données.
+
+# Intégration au dispositif de formation
+
+Les outils préconisés ne demandent pas de formation spécifique pour être maîtrisés. Les deux packages sont évoqués dans la formation Insee « Prise en main rapide de R ».
+
+# Particularités de syntaxe
+
+Aucune.
+
+# Exemples
+
+## Ecriture sur disque de l'intégralité d'une table R.
+
+ATTENTION : les noms des lignes (row.names : dans l'exemple de la table 'mtcars', le nom des voitures) ne sont pas copiées. Si ces noms sont importants il faut les copier dans une colonne spécifique (deuxième exemple).
+
+```{r init,echo=FALSE,message=FALSE}
+library("dplyr")
+library("fst")
+library("fstplyr")
+```
+
+```{r new,warning=FALSE}
+# Créer un  répertoire pour les fichiers, le répertoire est créé dans le répertoire courant.
+dir.create("Essais")
+# Ecrire la table dans le répertoire. Ne pas oublier de spécifier le suffixe.
+write_fst(mtcars,"Essais/mtcars.fst")
+
+# Ecrire la table dans le répertoire, sans perdre les noms des lignes.
+mtcars2 <- mtcars
+mtcars2$noms <- row.names(mtcars)
+write_fst(mtcars2,"Essais/mtcars2.fst")
+```
+
+## Lecture en mémoire de l'intégralité d'un fichier.
+
+```{r}
+a <- read_fst("Essais/mtcars.fst")
+
+# Lecture de la table avec les noms et recréation des noms des lignes
+b <- read_fst("Essais/mtcars2.fst")
+row.names(b) <- b$nom
+```
+
+## Exploration du contenu d'un fichier (sans le charger)
+
+```{r}
+metadata_fst("Essais/mtcars.fst")
+```
+
+## Exploration du contenu d'un répertoire
+
+La fonction ***src_fst*** établit une "connexion" entre R et le répertoire qui contient les fichiers fst. Il joue le même rôle que le ***libname*** de SAS, mais le résultat de l'appel de la fonction contient également les noms des fichiers présents dans le répertoire.
+
+```{r}
+base <- src_fst("Essais")
+base
+```
+
+## Accès au contenu d'un fichier du répertoire sans le charger entièrement
+
+La fonction ***tbl*** établit une connexion entre un fichier du répertoire et R. Le nom du fichier est à spécifier sans le suffixe 'fst', tel que listé dans l'exemple précédent.
+
+```{r}
+c <- tbl(base,"mtcars")
+# Recupèrer les seules variables 'cyl' et 'mpg'.
+c1 <- c %>% select(cyl,mpg)
+c1
+
+#
+# Récupèrer l'ensemble des données des voitures à 8 cylindres
+c2 <- c %>% filter(cyl==8)
+c2
+```
+
+# Solutions viables non retenues
+
+Aucune.
+<br> D'autres formats spécifiques à R sont néanmoins envisageables (en particulier le format RDS : **saveRDS** et **readRDS**) dès lors que la fonctionnalité d'accès partiel n'est pas requise et que le critère de vitesse n'est pas déterminant.
+
+# Solutions à ne pas utiliser
+
+feather: Le package ***feather*** a été le pionnier sur ce sujet et offre les mêmes fonctionnalités à l’exception de l’intégration au monde 'dplyr'. Ce dernier point est une première raison de ne pas utiliser ‘feather’, le second étant que le développeur lui-même a reconnu ne pas vouloir investir sur ‘feather’ (bugs non corrigés) au profit d’une autre solution (APACH ARROW).
