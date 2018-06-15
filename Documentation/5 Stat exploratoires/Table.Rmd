@@ -1,0 +1,498 @@
+---
+title: "Inventaire des fonctions de tabulation"
+author: 'USSR: Pascal Eusebio'
+date: "5 juin 2018"
+output:
+  html_document:
+    highlight: tango
+    theme: united
+    toc: yes
+    toc_depth: 2
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '2'
+---
+
+```{r, echo=FALSE, warning=FALSE}
+library(dplyr)
+```
+
+# Tableau de comptage (Proc Freq)
+
+Avec les packages base et stats, on peut d?terminer les fr?quences par modalit?s d'une variable
+L'?criture est simple par contre pour ajouter des totaux ou des pourcentage, l'?criture est assez lourde. Il faut encapsuler l'objet table ou xtabs avec les fonctions margin.table ou prop.table.
+
+
+## Tableau de contingence ? 1 dimension
+```{r}
+table(iris$Species)
+xtabs(~Species,data=iris)
+```
+
+
+## Tableau de contingence ? 2 dimensions ou plus
+```{r}
+table(iris$Species,iris$Sepal.Length>5,iris$Sepal.Width>3,dnn=c("Esp?ce","Longueur de plus de 5","Largeur de plus de 3"))
+xtabs(~Species+(Sepal.Length>5)+(Sepal.Width>3),data=iris)
+```
+
+
+Pour les sorties, 
+L'objet renvoy? par la fonction xtabs() est un objet xtabs (une liste). Si c'est un croisement de 2 variable, on peut exporter la table avec la fonction kable(). Si c'est un croisement de plus de 2 variables, il faut utiliser d'autres packages comme kableExtra.
+
+
+```{r, results='asis'}
+library(knitr)
+tab<-xtabs(~Species+(Sepal.Length>5),data=iris)
+kable(tab)
+```
+
+
+## Package flextable
+
+**Param?tre pond?ration**: Non 
+
+**Fonctions stat**: Les fonctions stat sont N, mean, median,iqr, range, medianrange, et ses propres fonctions.
+
+**Utilisation**: ?criture simpliste 
+
+**Sortie**: l'objet en sortie est une liste mais possibilit? d'avoir un data.frame ou affichage html (datatable avec boutton copie ou export vers excel).
+
+**Conclusion**: transformer des xtable en flextable avant export. 
+
+```{r, echo=FALSE, warning=FALSE}
+library(flextable)
+```
+```{r}
+iris %>% 
+  group_by(Species) %>% 
+  summarise(N=n(),"Longueur moyen du p?tal" = mean(Sepal.Length)) %>% 
+  regulartable()
+```
+
+
+## Package desctable
+
+**Param?tre pond?ration**: Non 
+
+**Fonctions stat**: Les fonctions stat sont N, mean, median,iqr, range, medianrange, et ses propres fonctions.
+
+**Utilisation**: ?criture simple avec dplyr  
+
+**Sortie**: l'objet en sortie est une liste mais possibilit? d'avoir un data.frame ou affichage html (datatable avec boutton copie ou export vers excel).
+
+**Conclusion**: ?criture simple avec dplyr. Par contre, limit? ? la description de variables. Pas de possibilit? de croiser les donn?es; Attention ? l'ordre des packages ? charger si on utilise le package DT. 
+
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(desctable)
+```
+```{r, results='asis'}
+iris %>% 
+  desctable(stats = list("N"      = length,
+                         "%/Mean" = mean,
+                         "sd"     = sd,
+                         "Med"    = median,
+                         "IQR"    = is.normal ~ NA | IQR)) %>% 
+  datatable()
+```
+
+
+
+
+
+## Package ezsummary
+
+**Param?tre pond?ration**: Non 
+
+**Fonctions stat**: Les fonctions stat sont mean, med, n   
+
+**Utilisation**: fonctionne avec dplyr pour simplifier la creation de tableau stat    
+
+**Sortie**: l'objet en sortie est un dataframe.  
+
+**Conclusion**: transformer des xtable en flextable avant export. 
+
+```{r, echo=FALSE, warning=FALSE}
+library(knitr)
+library(ezsummary)
+```
+```{r, message=FALSE, message=FALSE}
+iris  %>%
+  ezsummary(n = T) %>%
+  kable()
+```
+
+## Package gmodels ou descr
+
+**Param?tre pond?ration**: Non 
+
+**Fonctions stat**: Les fonctions stat sont mean, med, n   
+
+**Utilisation**: fonctionne avec dplyr pour simplifier la creation de tableau stat    
+
+**Sortie**: l'objet en sortie est une sortie liste $t donnee $prop.row $prop.col $prop.tbl.  
+
+**Conclusion**: transformer des xtable en flextable avant export. 
+
+```{r, echo=FALSE, warning=FALSE}
+library(gmodels)
+```
+```{r, message=FALSE, warning=FALSE}
+CrossTable(cut(iris$Sepal.Length,4,labels = paste("Longueur",1:4)),iris$Species, expected = TRUE, format="SAS", dnn=c("Longueur de p?tale","Esp?ce"))
+```
+
+
+
+
+## Package stargazer
+
+**Param?tre pond?ration**: Non 
+
+**Fonctions stat**: Les fonctions stat sont n,min,max,med,moy,1er et 3eme quartile   
+
+**Utilisation**: fonctionne avec dplyr pour simplifier la creation de tableau stat    
+
+**Sortie**: sortie PDF, html ou texte.  
+
+**Conclusion**: transformer des xtable en flextable avant export. 
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(stargazer)
+```
+```{r, results='asis'}
+stargazer(iris,summary=T,type = 'html')
+```
+
+
+## Package tableone
+
+**Param?tre pond?ration**: Non 
+
+**Fonctions stat**: Les fonctions stat sont n miss p.miss mean  sd median p25 p75 min max skew  kurt  
+
+**Utilisation**: fonctionne avec dplyr pour simplifier la creation de tableau stat    
+
+**Sortie**: sortie csv ou excel.  
+
+**Conclusion**: G?n?re des stat auto sur des variables eventuellement par modalit?s. 
+
+```{r, echo=FALSE, warning=FALSE}
+library(tableone)
+```
+```{r}
+summary(CreateTableOne(data = iris, strata="Species"))
+```
+
+
+
+## Package doBy
+
+**Param?tre pond?ration**: Non 
+
+**Fonctions stat**: Les fonctions stat sont w.sd; w.var;w.ad;w.cv;w.skewness;w.kurtosis...   
+
+**Utilisation**: fonctionne avec dplyr pour simplifier la creation de tableau stat    
+
+**Sortie**: sortie dataframe pour le summaryBy et list pour l'aggregate.  
+
+**Conclusion**: equivalent de aggregate, descstat() pour un vecteur
+
+```{r, echo=FALSE, warning=FALSE}
+library(doBy)
+```
+```{r}
+summaryBy(Sepal.Length ~ Species, iris, FUN=mean)
+sumfun <- function(x, ...){
+  c(m=mean(x, na.rm=TRUE, ...), v=var(x, na.rm=TRUE, ...), l=length(x))
+}
+summaryBy(cbind(Sepal.Length, Petal.Length) ~ Species, data=iris, FUN=sumfun )
+
+```
+
+
+
+
+
+# Tableau de statistiques descriptives (Proc Means)
+
+## Package arsenal
+
+**Param?tre pond?ration**: Oui  
+
+**Fonctions stat**: Les fonctions stat sont pr?d?finies en fonctions des objets qu'on utilise. Par exemple, pour des variables num?riques, on ajoute le param?tre numeric.stats qui contient les fonctions: N, Nmiss, Nmiss2, mean, meansd, median, q1q3, medianq1q3, iqr, range, medianrange.
+
+**Utilisation**: le code repose sur un objet formule, simple ? utiliser mais formula ? l'envers !!!
+
+**Sortie**: l'objet en sortie est une liste mais il existe une fonction equivalente de ods pour extraire  vers pdf, html et doc.
+
+**Conclusion**: Relativement simple ? utiliser. Ne s'int?gre pas directement avec dplyr (param?tre data apr?s la formaule), il faut utiliser le "." . La pr?sentation n'est pas tout ? fait celle qu'on peut attendre. Limit? sur les statistiques mais l'essentiel y est.
+
+```{r, echo=FALSE, warning=FALSE}
+library(arsenal)
+```
+```{r}
+tab <- tableby(Species ~ Sepal.Length, data=iris,numeric.stats = c("Nmiss", "meansd", "range","iqr"))
+```
+```{r, results='asis'}
+summary(tab, labelTranslations = list(Sepal.Length="Longueur de P?tale"), text=TRUE)
+```
+
+```{r}
+#avec le poids
+iris$weight<- sample(1:10,nrow(iris),replace = T)
+```
+```{r, results='asis'}
+iris %>%  
+  tableby(Species ~ Sepal.Length, data=.,numeric.stats = c("Nmiss", "meansd", "range","iqr")) %>% 
+  summary(labelTranslations = list(Sepal.Length="Longueur de P?tale"), text=TRUE)
+```
+```{r, results='hide', message=FALSE, eval=FALSE}
+## Sortie en HTML document
+write2html(tab, "~/arsenal.html")
+## Sortie en document Word mais ne fonctionne pas avec writer
+write2word(tab, "~/arsenal.doc", title="Mon tableau dans word")
+```
+
+
+## Package expss
+
+**Param?tre pond?ration**: Oui 
+
+**Fonctions stat**: Les fonctions stat sont _mean, _median, _se, _sum, _min, _max, _sd, _n, tab_stat_fun, w_mean, w_sd, w_n, w_mean, w_sd, w_var, w_se, w_median, w_mad, w_sum, w_n w_cov, w_pearson, w_spearman  
+
+**Utilisation**: ?criture dplyr   
+
+**Sortie**: l'objet en sortie est un dataframe.  
+
+**Conclusion**: transformer des xtable en flextable avant export. 
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(expss, warn.conflicts = FALSE, quietly=TRUE)
+```
+```{r}
+iris %>% 
+tab_cells("Longueur de p?tale"=cut(Sepal.Length,4,labels = 1:4)) %>% 
+tab_cols(total(), Species) %>% 
+tab_stat_cpct(total_row_position = "above",
+total_label = "Total",
+total_statistic = "u_cases") %>% 
+tab_pivot()
+```
+
+
+
+## Package Weighted.Desc.Stat
+
+**Param?tre pond?ration**: Oui 
+
+**Fonctions stat**: Les fonctions stat sont w.sd; w.var;w.ad;w.cv;w.skewness;w.kurtosis...   
+
+**Utilisation**: fonctionne avec dplyr pour simplifier la creation de tableau stat    
+
+**Sortie**: sortie .  
+
+**Conclusion**: Pas de m?diane ou quantile. Fonctionne uniquement sur des vecteurs atomiques
+
+```{r, echo=FALSE, warning=FALSE}
+library(Weighted.Desc.Stat)
+```
+```{r, message=FALSE}
+x <- c(1:10)
+mu <- c(0.9, 0.7, 0.8, 0.7, 0.6, 0.4, 0.2, 0.3, 0.0, 0.1)
+w.mean(iris$Sepal.Length, iris$weight)
+```
+
+
+
+## Package Epi
+
+**Param?tre pond?ration**: Oui 
+
+**Fonctions stat**: Les fonctions stat sont count mean weighted.mean sum quantile median IQR max min ratio percent sd...   
+
+**Utilisation**: fonctionne avec dplyr pour simplifier la creation de tableau stat    
+
+**Sortie**: sortie html ou pdf.  
+
+**Conclusion**: Tableau de fr?quence (simple, cumul?e, pourcentage)
+
+```{r, echo=FALSE, warning=FALSE}
+library(Epi)
+```
+```{r}
+Epi::stat.table(index=list(Species,Sepal.Length>5),
+                contents=list(count(),mean(Sepal.Length),percent(Species)),
+                data=iris,margin=c(T,T))
+```
+
+
+## Package skimr
+
+**Param?tre pond?ration**: Oui 
+
+**Fonctions stat**: Les fonctions stat sont missing complete  n mean   sd  p0  p25  p50  p75 p100 et hist.   
+
+**Utilisation**: fonctionne avec dplyr pour simplifier la creation de tableau stat    
+
+**Sortie**: sortie: utilisation de kable pour sortir en html ou pdf.  
+
+**Conclusion**: ecriture simple avec dplyr  
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(skimr, warn.conflicts = FALSE, quietly=TRUE)
+```
+```{r}
+dplyr::group_by(iris, Species) %>% 
+  skim()
+```
+
+## Package sjmisc et sjPlot
+
+**Param?tre pond?ration**: Oui 
+
+**Fonctions stat**: Les fonctions stat sont n NA.prc mean   sd   se md trimmed   range  skew.   
+
+**Utilisation**: fonctionne avec dplyr pour simplifier la creation de tableau stat    
+
+**Sortie**: sortie: utilisation de kable pour sortir en html ou pdf.  
+
+**Conclusion**: ecriture simple avec dplyr
+  frq() pour la proc freq, desc() pour la proc means  
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(sjmisc, warn.conflicts = FALSE, quietly=TRUE)
+library(sjPlot, warn.conflicts = FALSE, quietly=TRUE)
+```
+```{r}
+iris %>% 
+  group_by(Species) %>% 
+  frq(Sepal.Length,Sepal.Width,weight.by = weight,out="viewer")
+iris %>% 
+  group_by(Species) %>% 
+  descr(contains("Sepal"))
+
+iris %>%
+  group_by(Species) %>%
+  select(Sepal.Length) %>%
+  flat_table()
+```
+
+```{r, results='asis', message=FALSE, warning=FALSE}
+# tableau crois?
+data(efc)
+sjt.xtab(
+  efc$e16sex,
+  efc$e42dep,
+  var.labels = c("Elder's gender", "Elder's dependency"),
+  show.exp = TRUE,
+  show.cell.prc = T,
+  show.col.prc = T,
+  show.row.prc = T,
+  show.legend = T,
+  show.na = T,
+  use.viewer = T,
+  file="test_sj.html"
+)
+
+```
+
+
+# Mise en forme de tableau (Proc Tabulate)
+
+## Tableau crois? ou tableau pond?r?
+```{r}
+xtabs(Petal.Length~Species+(Sepal.Length>5)+(Sepal.Width>3),data=iris)
+```
+
+## Package tables
+
+**Param?tre pond?ration**: Oui 
+
+**Fonctions stat**: Les fonctions stat sont toutes les fonctions qui s'appliquent ? un vecteur...   
+
+**Utilisation**: fonctionne avec dplyr pour simplifier la creation de tableau stat    
+
+**Sortie**: sortie html ou pdf.  
+
+**Conclusion**: equivalent de proc tabulate ponderee
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(tables)
+library(Weighted.Desc.Stat)
+```
+```{r, results='asis', message=FALSE}
+tabular((Species + 1) ~ (n=1) + Format(digits=2)*
+           (Sepal.Length + Sepal.Width)*(w.mean+w.var)*Arguments(weight), data=iris )
+# tempDir <- tempfile()
+# dir.create(tempDir)
+# htmlFile <- file.path(tempDir, "test.html")
+# con <- file(htmlFile, "wt")
+# html(tab, con, options=htmloptions(head=TRUE, table=T))
+# close(con)
+# rstudioapi::viewer(htmlFile)
+```
+
+
+
+## Package survey
+
+**Param?tre pond?ration**: Oui 
+
+**Fonctions stat**: mean, quantile, chisq   
+
+**Utilisation**: pas simple    
+
+**Sortie**:  
+
+**Conclusion**: 
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(questionr)
+library(survey)
+
+d<-data.frame(sexe=rep(1:2,each=50),age=sample(0:100,100),poids=sample(1:5,100,replace = T))
+d$age_tr<-cut(d$age,4)
+```
+
+On d?finit un design
+
+```{r}
+dw <- svydesign(ids = ~1, data = d, weights = ~d$poids)
+
+
+svymean(~age, dw)
+svyquantile(~age, dw, quantile = c(0.25, 0.5, 0.75), ci = TRUE)
+svytable(~sexe, dw)
+svytable(~sexe + age_tr, dw)
+freq(svytable(~sexe, dw), total=T)
+lprop(svytable(~sexe + age_tr, dw))
+cprop(svytable(~sexe + age_tr, dw))
+svyby(~age,~sexe, dw, svymean)
+summary(svytable(~sexe + age_tr, dw))
+```
+
+
+A faire Hmisc/questionr
+
+
+<!-- #mise en forme / export -->
+<!-- # kableextra -->
+<!-- # huxtable -->
+<!-- # ascii  -->
+<!-- # Hmisc::latex -->
+<!-- # htmlTable -->
+<!-- # janitor -->
+<!-- # pander	 -->
+<!-- # pixiedust	 -->
+<!-- # ReporteRs	 -->
+<!-- # texreg (regression)	  -->
+<!-- # Gtable avec grid.draw, grid.table et tableGrob -->
+<!-- # condformat -->
+<!-- # formattable -->
+<!-- # tangram -->
+<!-- # Ztable -->
+<!-- # xtable -->
+
