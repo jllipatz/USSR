@@ -2,4 +2,199 @@
 
 ## Fichiers texte avec séparateurs
 
-blablabla
+
+# Probl?matique
+
+Lire et ?crire des fichiers texte o? chaque enregistrement appara?t sur sa propre ligne et dont les champs sont s?par?s par un caract?re unique appel? d?limiteur. Ce dernier peut correspondre ? n'importe quel caract?re absent des valeurs des champs, tel qu'une virgule ou un point-virgule (fichiers CSV), des espaces, ou un autre d?limiteur.
+<!-- http://www.thibault.laurent.free.fr/cours/R_avance/chapitre_1_avance.html#repertoires-et-fichiers -->
+
+<!-- Note : pour les fichiers format?s (de longueur fixe ?), ?a correspond peut etre au formatted input p 74 du livre learning sas by example --> 
+
+#### Solution retenue {-}
+
+Le package **readr** offre un ensemble de fonctions permettant de lire les donn?es d'un fichier d?limit?. 
+
+#### Niveau d'int?gration ? l'USSR {-}
+
+##### D?veloppements pr?conis?s {-}
+
+Aucun.
+
+##### Points de vigilance {-}
+
+Aucun.
+
+#### Int?gration au dispositif de formation {-}
+
+La question est abord?e dans la formation "Prise en main rapide de R".
+
+<!-- A v?rifier -->
+
+#### Particularit? de syntaxe {-}
+
+Contrairement ? SAS o? le backslash \\ indique le s?parateur de r?pertoire, en R le s?parateur de r?pertoire est indiqu? par un slash / (pour tous les syst?mes d'exploitations) ou par un double backslash \\\\ (sous Windows uniquement)
+
+<!--Ce n'est pas vraiment une sp?cificit? du package mais une sp?cificit? de R, cependant ?a me semble pas mal d'attirer l'attention dessus comme le fonctionnement par rapport ? SAS est diff?rent et qu'il faut se m?fier des copier-coller hatifs des chemins des r?pertoires. Voir si on garde ou pas -->
+
+#### Exemples {-}
+
+##### Fichier avec s?parateur quelconque : cas g?n?ral {-}
+
+###### Importation {-}
+
+En SAS, l'importation de fichiers avec un s?parateur peut s'effectuer au moyen d'une ?tape DATA avec l'instruction INFILE ou bien avec la PROC IMPORT. 
+Dans cet exemple, le fichier lu est au format csv. 
+
+```{r delim_csv_sas, engine="sas", eval=FALSE}
+data donnees;
+  infile 'repertoire\fichier.csv' dlm=","
+  input variable1 ... variablek ;
+run;
+```
+
+```{r delim_csv_sas2, engine="sas", eval=FALSE}
+proc import datafile="repertoire\fichier"
+  out = ds dbms="csv";
+  delimiter=",";
+  getnames="yes";
+run;
+```
+
+La fonction la plus g?n?rale pour lire des fichiers d?limit? est **read_delim**. 
+
+```{r delim_gen_r, eval=FALSE}
+library(readr) 
+# Lecture d'un fichier CSV (s?parateur : "," et d?cimales ".")
+donnees<-read_delim("repertoire/fichier.csv", delim=",")
+# Lecture d'un fichier CSV (s?parateur : ";" et d?cimales ",")
+donnees<-read_delim("repertoire/fichier.csv", delim=";")
+# Lecture d'un fichier d?limit? par tabulation
+donnees<-read_delim("repertoire/fichier.csv", delim="\t")
+# Lecture d'un fichier d?limit? par des espaces
+donnees<-read_delim("repertoire/fichier.csv", delim=" ")
+```
+
+Cette fonction et les autres fonctions du package de la forme **read_*** d?terminent automatiquement le type des colonnes ? partir des 1000 premi?res lignes du fichier. Il est toutefois possible de pr?ciser des param?tres suppl?mentaires, notamment concernant le type des colonnes.
+
+Supposons dans cet exemple que nous souhaitons lire un jeu de donn?es contenant 5 variables : une variable de type num?rique, trois variables de type caract?re et une variable de type date. Nous souhaiterions nommer nos variables "A", "B", "C", "D" et "E", lire les donn?es ? partir de la 4?me ligne et ne lire que 10 lignes et indiquer qu'un espace et la cha?ne de caract?re NA correspondent ? une valeur manquante. 
+
+```{r delim_r2, eval=FALSE}
+library(readr)
+# Lecture d'un fichier CSV (s?parateur : "," et d?cimales ".")
+donnees <- read_delim("repertoire/fichier.csv", col_names=c("A", "B", "C", "D", "E", col_types = "cnnnD", skip=3, n_max=10, na=c(" ", "NA"))
+```
+Examinons de plus pr?s les param?tres utilis?s :
+
+* col\_names : permet de sp?cifier les noms des variables qui seront utilis?es si on utilise on vecteur caract?r?. Si col\_names=TRUE (valeur par d?faut), alors la premi?re ligne du fichier sera utilis?e pour nommer les variables. Si col\_names = FALSE, le nom des colonnes sera g?n?r? automatiquement. 
+* col_type : permet de sp?cifier le type des colonnes. Ici, nous avons repr?sent? une repr?sentation compacte o? chaque lettre repr?sente une colonne : c pour le type caract?re, n pour un nombre, et D pour une date. D'autres raccourcis existent : l pour un bool?en, i pour un integer (entier), d pour un double. 
+* skip : le nombre de lignes que l'on souhaite ignorer avant de lire les donn?es
+* n_max : le nombre maximum de lignes ? lire
+* na : permet d'indiquer les caract?res ? interpr?ter comme des valeurs manquantes
+
+###### Exportation  {-}
+
+Sous SAS, l'exportation s'effectue avec la PROC EXPORT : 
+```{r delimx_sas, engine="sas", eval=FALSE}
+proc export data=ds outfile='chemin_et_nom_du_fichier' 
+  dbms=csv; /* CSV (comma-separated values) */
+  dbms=tab; /* Tabulation */ 
+  dbms=dlm; /* s?parateur arbitraire; par d?faut un espace, pour un autre s?parateur utiliser l'option delimiter= */
+```
+
+En R, la fonction **write_delim** permet d'?crire un fichier d?limit?. 
+```{r out_delim, eval=FALSE}
+library(readr)
+# Exportation d'un fichier CSV 
+write_delim(donnees, "repertoires/fichier_sortie.csv", delim=",")
+# Exportation d'un fichier d?limit? par tabulation
+write_delim(donnees, "repertoires/fichier_sortie.csv", delim="\t")
+# Exportation d'un fichier d?limit? par un espace
+write_delim(donnees, "repertoires/fichier_sortie.csv", delim=" ")
+
+```
+
+
+##### Fichiers CSV {-}
+
+Un des formats les plus courants de fichier texte avec s?parateur est le format csv (comma-separated values). Ce format utilise comme s?parateur des virgules ou des points virgules. 
+
+Avec le package **readr**, les fonctions read\_csv et read\_csv2 permettent de lire des fichiers au format csv selon le s?parateur utilis? (respectivement virgule ou point-virgule). 
+
+```{r delim_csv_r, eval=FALSE}
+library(readr) 
+# Lecture d'un fichier CSV (s?parateur : "," et d?cimales ".")
+donnees<-read_csv("repertoire/fichier.csv")
+# Lecture d'un fichier CSV (s?parateur : ";" et d?cimales ",")
+donnees<-read_csv2("repertoire/fichier.csv")
+```
+
+Les options sont les m?mes que pour la fonction **read_delim**.
+
+```{r delim_csv_r2, eval=FALSE}
+library(readr)
+# Lecture d'un fichier CSV (s?parateur : "," et d?cimales ".")
+donnees <- read_csv("repertoire/fichier.csv", col_names=c("A", "B", "C", "D", "E", col_types = "cnnnD", skip=3, n_max=10, na=c(" ", "NA"))
+# Lecture d'un fichier CSV (s?parateur : ";" et d?cimales ",")
+donnees <- read_csv("repertoire/fichier.csv", col_names=c("A", "B", "C", "D", "E", col_types = "cnnnD", skip=3, n_max=10, na=c(" ", "NA"))
+```
+
+##### Fichier s?par? avec tabulation {-}
+
+Les fonctions **read_tsv** et **write_tsv** sont un raccourci de **read_delim** et **write_delim** pour lire des fichiers s?par?s par tabulation. Les options sont les m?mes que pr?c?d?mment. 
+
+#### Solutions viables non retenues {-}
+
+##### Le package data.table {-}
+
+La fonction **fread** du package **data.table** est efficace en termes de performances. Cette fonction permet une lecture des fichiers beaucoup plus rapide que les fonctions de R de base, notamment lorsque la taille du fichier augmente.
+
+Toutefois, cette solution a ?t? ?cart?e en raison d'incompatibilit?s avec le reste des outils pr?conis?s. 
+
+```{r delim data.table, eval=FALSE}
+library(data.table)
+# Lecture d'un fichier CSV (s?parateur : ",")
+donnees<-fread("repertoire/fichier.csv", sep=",")
+# Lecture d'un fichier CSV avec des options suppl?mentaires
+donnees<-fread("repertoire/fichiers.csv", sep=",", header=TRUE, colClasses=, skip=3, nrows=10, na.strings=c(" ", "NA"))
+# Exportation d'un fichier CSV (s?parateur : ",")
+fwrite(donnees, "repertoire/fichier_sortie.csv")
+```
+
+
+##### R de base {-}
+
+R dispose par d?faut de plusieurs fonctions pour lire des fichiers d?limit?s, la plus g?n?rale ?tant read.table. Les fonctions read.csv et read.csv2 sont un raccourci de read.table et permettent de lire des fichiers CSV. 
+
+```{r delim rbase, eval=FALSE}
+# Lecture d'un fichier CSV (s?parateur : "," et d?cimales : ".")
+donnees<-read.table("C:/repertoire/fichier.txt", sep=",", dec=".", stringsAsFactors = FALSE)
+# Lecture d'un fichier CSV avec plus d'options
+donnees<-read.table("C:/repertoire/fichier.txt", sep=",", dec=".", stringsAsFactors = FALSE, col.names=c("A", "B", "C", "D", "E"), colClasses=c("numeric", "character", "character", "character", "Date"), skip=3, nrows=10, na.strings = c(" ", "NA"))
+```
+
+L'option stringAsFactors = FALSE permet d'emp?cher la cr?ation automatique de facteurs lors de la lecture de variables caract?res. Les facteurs correspondent en r?alit? ? des variables num?riques avec des labels, dans l'optique de gagner de la place en m?moire. Par exemple, pour une variable avec les valeurs "homme" et "femme", R stocke les valeurs 1 et 2 et leur attribue le label correspondant.
+
+Contrairement aux fonctions des packages **readr** et **data.table**, les fonctions de R de base parcourent les colonnes enti?rement pour d?terminer son type (et non uniquement les premi?res valeurs), ce qui peut entraver les performances lors de la lecture de gros fichiers. Pour am?liorer les performances, il est conseill? de sp?cifier ? l'avance le type des colonnes ainsi que le nombre de lignes ? lire. Toutefois, m?me en sp?cifiant ces param?tres, ces fonctions sont moins performantes pour les gros fichiers que les fonctions du package **readr** et **data.table**.
+
+##### Le package rio {-}
+
+Le package rio est un "meta package" permettant de lire et d'?crire des donn?es dans un large ?ventail de formats. La philosophie du package est de simplifier la lecture et l'?criture de fichiers dans R ? travers deux fonctions : import() et export(). Le format du fichier est automatiquement d?termin? ? partir de son extension. 
+
+```{r delim_rio, eval=FALSE}
+library(rio)
+# Lecture d'un fichier s?par? par des tabulations
+donnees <- import("repertoire/fichier_importe.tsv")
+# ?criture d'un fichier CSV (s?parateur : ",")
+export(donnees, "fichier_sortie.csv")
+```
+
+Malgr? sa facilit? d'utilisation, il a ?t? ?cart? pour plusieurs raisons : 
+
+* il s'appuie sur la fonction fread du package data.table pour la lecture de fichiers avec s?parateurs (ou les fonctions de R de base lorsqu'on utilise l'option fread= FALSE pour la fonction import)
+* lors de la lecture d'un fichier, lorsqu'on souhaite utiliser des arguments suppl?mentaires (pour par exemple sp?cifier le type des colonnes), il faut utiliser ceux de la fonction sous-jacente utilis?e par la fonction import. Il faut donc d'une part consulter l'aide de la fonction import pour conna?tre le package et la fonction utilis?e pour la lecture d'un type de fichier donn?, et consulter l'aide de cette fonction pour ajouter les arguments n?cessaires. 
+
+<!-- ## Package ff ? -->
+
+#### Solutions ? ne pas utiliser {-}
+
+Aucune. 
