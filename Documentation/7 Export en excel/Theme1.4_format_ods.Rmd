@@ -1,0 +1,64 @@
+---
+title: "Theme1.4_format_ods"
+author: "Nicolas Kempf & Simon Gaillard"
+date: "25 juin 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Problématique
+
+TO DO (SG)
+
+## Solution retenue
+
+TO DO (SG + NK)
+
+Package candidat : readODS
+Solution alternative : package openxlsx
+
+## Niveau d'intégration à l'USSR
+
+### Développements préconisés
+
+Le package readODS semble ne plus être maintenu (dernière MAJ : 27.11.2016). On pourrait repartir du travail existant et développer de nouvelles fonctionnalités sur le modèle des fonctionnalités du package **openxlsx** qui présente une syntaxe "plutôt simple". 
+
+### Points de vigilance
+
+Ce package ne permet pas que de lire et ecrire des fichiers simples (une data.frame par onglet).
+
+## Intégration au dispositif de formation
+
+TO DO (SG  + NK)
+
+## Particularité de syntaxe
+
+Pour l'instant, aucune. 
+
+## Exemples
+
+TO DO (NK)
+
+
+### Écriture
+
+```{r}
+library(openxlsx)
+
+write.xlsx(iris, file = "writeXLSX1.xlsx")
+```
+
+### Lecture
+
+TO DO (NK)
+
+## Solutions viables non retenues
+
+Les packages **openxlsx**, **xlsx** et **XLConnect** sont une alternive efficace. L'inconvenient majeur est qu'ils ne permettent pas de lire et d'écrire au format **ods**. Ils ne peuvent enregistrer qu'au format **xlsx** ce qui peut introduire des problèmes convertions une fois chargée dans Calc.
+
+## Solutions à ne pas utiliser
+
+TO DO (NK + SG)
