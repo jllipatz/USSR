@@ -3,7 +3,7 @@
 ## Fichiers texte avec séparateurs
 
 
-# Probl?matique
+#### Probl?matique {-}
 
 Lire et ?crire des fichiers texte o? chaque enregistrement appara?t sur sa propre ligne et dont les champs sont s?par?s par un caract?re unique appel? d?limiteur. Ce dernier peut correspondre ? n'importe quel caract?re absent des valeurs des champs, tel qu'une virgule ou un point-virgule (fichiers CSV), des espaces, ou un autre d?limiteur.
 <!-- http://www.thibault.laurent.free.fr/cours/R_avance/chapitre_1_avance.html#repertoires-et-fichiers -->
