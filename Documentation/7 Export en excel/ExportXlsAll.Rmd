@@ -151,14 +151,14 @@ Une installation PERL est requise pour le faire fonctionner.
 
 Je n'ai trouvé qu'un seul package : readODS
 
-```{r}
+```{r,eval=FALSE}
 library(readODS)
 ```
 
 
 ### II.1. Import des données
 
-```{r}
+```{r,eval=FALSE}
 readODS::read.ods(file = "testCalc.ods")
 ```
 
@@ -166,7 +166,7 @@ Ne dispose pas d'options pour indiquer que les libellés des variables se trouve
 
 ### II.2. Export des données
 
-```{r}
+```{r,eval=FALSE}
 readODS::write_ods(x = df,path = "export.ods")
 ```
  
@@ -185,4 +185,59 @@ Article décrivant la marche à suivre : <https://datascienceplus.com/how-to-use
 
 Ce package est prometteur. Il tente d'unifier le chargement et l'export dans différents formats afin de faciliter la vie 
 des utilisateurs. Voici le lien vers la vignette : <https://cran.r-project.org/web/packages/rio/vignettes/rio.html>).
+
+# V. Export vers la PAO
+
+Le travail de PAO nécessite de disposer de graphiques au format vectoriel. Il existe plusieurs formats notamment en  **postscript**, **pdf** et **svg**. 
+
+A la Dirag, l'unité en charge de la PAO utilise principalement les logiciels de PAO adobe Illustrator et Corel Draw. L'import des fichiers issus de R dans ces trois formats a été testé sur ces deux logiciels. Le format svg semble être le moins performant autant en terme d'espace disque que la facilité d'exploitation du graphique dans le logiciel de PAO. Le format **postscript** semble le plus performant. Les deux logiciels l'ont correctement interprété et il semble facile à exploiter. Le format **pdf** est aussi une bonne alternative. De plus, il permet de visualiser le graphique avec un logiciel de lecture des pdf. 
+
+Voici un exemple de graphique complexe sous ggplot2 :
+
+```{r}
+options(scipen = 999)
+library(ggplot2)
+library(ggalt)
+midwest_select <- midwest[midwest$poptotal > 350000 & 
+                            midwest$poptotal <= 500000 & 
+                            midwest$area > 0.01 & 
+                            midwest$area < 0.1, ]
+
+# Plot
+ggplot(midwest, aes(x=area, y=poptotal)) + 
+  geom_point(aes(col=state, size=popdensity)) +   # draw points
+  geom_smooth(method="loess", se=F) + 
+  xlim(c(0, 0.1)) + 
+  ylim(c(0, 500000)) +   # draw smoothing line
+  geom_encircle(aes(x=area, y=poptotal), 
+                data=midwest_select, 
+                color="red", 
+                size=2, 
+                expand=0.08) +   # encircle
+  labs(subtitle="Area Vs Population", 
+       y="Population", 
+       x="Area", 
+       title="Scatterplot + Encircle", 
+       caption="Source: midwest")
+```
+
+
+Pour l'exporter en format vectoriel, il suffit de rajouter la ligne suivante : 
+
+```{r,eval=FALSE}
+# postscript
+dev.print(device = postscript, file = "Documentation/7 Export en excel/ggplot2Complex.postscript")
+
+# pdf
+dev.print(device = pdf, file = "Documentation/7 Export en excel/ggplot2Complex.pdf")
+
+# svg
+dev.print(device = svg, file = "Documentation/7 Export en excel/ggplot2Complex.svg",pointsize = 10)
+
+```
+
+
+
+
+
 
