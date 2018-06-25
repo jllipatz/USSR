@@ -14,7 +14,7 @@
   
   
   <meta property="og:description" content="This is a minimal example of using the bookdown package to write a book. The output format for this example is bookdown::gitbook." />
-  <meta name="github-repo" content="rstudio/bookdown-demo" />
+  <meta name="github-repo" content="jllipatz/ussr" />
 
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="A Minimal Book Example" />
@@ -25,7 +25,7 @@
 <meta name="author" content="Insee">
 
 
-<meta name="date" content="2018-06-12">
+<meta name="date" content="2018-06-25">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -33,7 +33,7 @@
   
   
 <link rel="prev" href="elements-de-confort.html">
-
+<link rel="next" href="stockage.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -49,6 +49,43 @@
 
 
 
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
 
 <link rel="stylesheet" href="style.css" type="text/css" />
 </head>
@@ -76,6 +113,35 @@
 <li class="chapter" data-level="3.3" data-path="echange-de-fichiers.html"><a href="echange-de-fichiers.html#fichiers-excel"><i class="fa fa-check"></i><b>3.3</b> Fichiers Excel</a></li>
 <li class="chapter" data-level="3.4" data-path="echange-de-fichiers.html"><a href="echange-de-fichiers.html#fichiers-calc"><i class="fa fa-check"></i><b>3.4</b> Fichiers Calc</a></li>
 </ul></li>
+<li class="chapter" data-level="4" data-path="stockage.html"><a href="stockage.html"><i class="fa fa-check"></i><b>4</b> Stockage</a><ul>
+<li class="chapter" data-level="4.1" data-path="stockage.html"><a href="stockage.html#stockage-intermediaire-en-format-r"><i class="fa fa-check"></i><b>4.1</b> Stockage intermédiaire en format R</a><ul>
+<li class="chapter" data-level="" data-path="stockage.html"><a href="stockage.html#problematique"><i class="fa fa-check"></i>Problématique</a></li>
+<li class="chapter" data-level="" data-path="stockage.html"><a href="stockage.html#solution-retenue-1"><i class="fa fa-check"></i>Solution retenue</a></li>
+<li class="chapter" data-level="" data-path="stockage.html"><a href="stockage.html#niveau-dintegration-a-lussr"><i class="fa fa-check"></i>Niveau d’intégration à l’USSR</a></li>
+<li class="chapter" data-level="" data-path="stockage.html"><a href="stockage.html#integration-au-dispositif-de-formation"><i class="fa fa-check"></i>Intégration au dispositif de formation</a></li>
+<li class="chapter" data-level="" data-path="stockage.html"><a href="stockage.html#particularites-de-syntaxe"><i class="fa fa-check"></i>Particularités de syntaxe</a></li>
+<li class="chapter" data-level="" data-path="stockage.html"><a href="stockage.html#exemples-1"><i class="fa fa-check"></i>Exemples</a></li>
+<li class="chapter" data-level="" data-path="stockage.html"><a href="stockage.html#solutions-viables-non-retenues-1"><i class="fa fa-check"></i>Solutions viables non retenues</a></li>
+<li class="chapter" data-level="" data-path="stockage.html"><a href="stockage.html#solutions-a-ne-pas-utiliser"><i class="fa fa-check"></i>Solutions à ne pas utiliser</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="stockage.html"><a href="stockage.html#jointures-complexes"><i class="fa fa-check"></i><b>4.2</b> Jointures complexes</a><ul>
+<li class="chapter" data-level="" data-path="stockage.html"><a href="stockage.html#problematique-1"><i class="fa fa-check"></i>Problématique</a></li>
+<li class="chapter" data-level="" data-path="stockage.html"><a href="stockage.html#solution-retenue-2"><i class="fa fa-check"></i>Solution retenue</a></li>
+<li class="chapter" data-level="" data-path="stockage.html"><a href="stockage.html#niveau-dintegration-a-lussr-1"><i class="fa fa-check"></i>Niveau d’intégration à l’USSR</a></li>
+<li class="chapter" data-level="" data-path="stockage.html"><a href="stockage.html#integration-au-dispositif-de-formation-1"><i class="fa fa-check"></i>Intégration au dispositif de formation</a></li>
+<li class="chapter" data-level="" data-path="stockage.html"><a href="stockage.html#particularites-de-syntaxe-1"><i class="fa fa-check"></i>Particularités de syntaxe</a></li>
+<li class="chapter" data-level="" data-path="stockage.html"><a href="stockage.html#exemples-2"><i class="fa fa-check"></i>Exemples</a></li>
+<li class="chapter" data-level="" data-path="stockage.html"><a href="stockage.html#solutions-viables-non-retenues-2"><i class="fa fa-check"></i>Solutions viables non retenues</a></li>
+<li class="chapter" data-level="" data-path="stockage.html"><a href="stockage.html#solutions-a-ne-pas-utiliser-1"><i class="fa fa-check"></i>Solutions à ne pas utiliser</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="le-metacaractere-un-a-mais-seulement-en-debut-de-chaine.html"><a href="le-metacaractere-un-a-mais-seulement-en-debut-de-chaine.html"><i class="fa fa-check"></i><b>5</b> Le métacaractère ^ : un ‘a’ mais seulement en DEBUT DE CHAINE</a><ul>
+<li class="chapter" data-level="5.1" data-path="le-metacaractere-un-a-mais-seulement-en-debut-de-chaine.html"><a href="le-metacaractere-un-a-mais-seulement-en-debut-de-chaine.html#expressions-regulieres"><i class="fa fa-check"></i><b>5.1</b> Expressions régulières</a><ul>
+<li class="chapter" data-level="" data-path="le-metacaractere-un-a-mais-seulement-en-debut-de-chaine.html"><a href="le-metacaractere-un-a-mais-seulement-en-debut-de-chaine.html#la-problematique-recherche-textuelle-sur-motif"><i class="fa fa-check"></i>La problématique : recherche textuelle sur motif</a></li>
+<li class="chapter" data-level="" data-path="le-metacaractere-un-a-mais-seulement-en-debut-de-chaine.html"><a href="le-metacaractere-un-a-mais-seulement-en-debut-de-chaine.html#les-expressions-regulieres-en-r"><i class="fa fa-check"></i>Les expressions régulières en R</a></li>
+<li class="chapter" data-level="" data-path="le-metacaractere-un-a-mais-seulement-en-debut-de-chaine.html"><a href="le-metacaractere-un-a-mais-seulement-en-debut-de-chaine.html#elements-de-syntaxe"><i class="fa fa-check"></i>Elements de syntaxe</a></li>
+</ul></li>
+</ul></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
 
@@ -100,8 +166,159 @@
 <h1><span class="header-section-number">Chapter 3</span> Echange de fichiers</h1>
 <div id="fichiers-texte-avec-separateurs" class="section level2">
 <h2><span class="header-section-number">3.1</span> Fichiers texte avec séparateurs</h2>
-<p>blablabla</p>
+<div id="problmatique" class="section level4 unnumbered">
+<h4>Probl?matique</h4>
+<p>Lire et ?crire des fichiers texte o? chaque enregistrement appara?t sur sa propre ligne et dont les champs sont s?par?s par un caract?re unique appel? d?limiteur. Ce dernier peut correspondre ? n’importe quel caract?re absent des valeurs des champs, tel qu’une virgule ou un point-virgule (fichiers CSV), des espaces, ou un autre d?limiteur. <!-- http://www.thibault.laurent.free.fr/cours/R_avance/chapitre_1_avance.html#repertoires-et-fichiers --></p>
+<!-- Note : pour les fichiers format?s (de longueur fixe ?), ?a correspond peut etre au formatted input p 74 du livre learning sas by example -->
+</div>
+<div id="solution-retenue" class="section level4 unnumbered">
+<h4>Solution retenue</h4>
+<p>Le package <strong>readr</strong> offre un ensemble de fonctions permettant de lire les donn?es d’un fichier d?limit?.</p>
+</div>
+<div id="niveau-dintgration-lussr" class="section level4 unnumbered">
+<h4>Niveau d’int?gration ? l’USSR</h4>
+<div id="dveloppements-prconiss" class="section level5 unnumbered">
+<h5>D?veloppements pr?conis?s</h5>
+<p>Aucun.</p>
+</div>
+<div id="points-de-vigilance" class="section level5 unnumbered">
+<h5>Points de vigilance</h5>
+<p>Aucun.</p>
+</div>
+</div>
+<div id="intgration-au-dispositif-de-formation" class="section level4 unnumbered">
+<h4>Int?gration au dispositif de formation</h4>
+<p>La question est abord?e dans la formation “Prise en main rapide de R”.</p>
+<!-- A v?rifier -->
+</div>
+<div id="particularit-de-syntaxe" class="section level4 unnumbered">
+<h4>Particularit? de syntaxe</h4>
+<p>Contrairement ? SAS o? le backslash \ indique le s?parateur de r?pertoire, en R le s?parateur de r?pertoire est indiqu? par un slash / (pour tous les syst?mes d’exploitations) ou par un double backslash \\ (sous Windows uniquement)</p>
+<!--Ce n'est pas vraiment une sp?cificit? du package mais une sp?cificit? de R, cependant ?a me semble pas mal d'attirer l'attention dessus comme le fonctionnement par rapport ? SAS est diff?rent et qu'il faut se m?fier des copier-coller hatifs des chemins des r?pertoires. Voir si on garde ou pas -->
+</div>
+<div id="exemples" class="section level4 unnumbered">
+<h4>Exemples</h4>
+<div id="fichier-avec-sparateur-quelconque-cas-gnral" class="section level5 unnumbered">
+<h5>Fichier avec s?parateur quelconque : cas g?n?ral</h5>
+<div id="importation" class="section level6 unnumbered">
+<h6>Importation</h6>
+<p>En SAS, l’importation de fichiers avec un s?parateur peut s’effectuer au moyen d’une ?tape DATA avec l’instruction INFILE ou bien avec la PROC IMPORT. Dans cet exemple, le fichier lu est au format csv.</p>
+<pre class="sas"><code>data donnees;
+  infile &#39;repertoire\fichier.csv&#39; dlm=&quot;,&quot;
+  input variable1 ... variablek ;
+run;</code></pre>
+<pre class="sas"><code>proc import datafile=&quot;repertoire\fichier&quot;
+  out = ds dbms=&quot;csv&quot;;
+  delimiter=&quot;,&quot;;
+  getnames=&quot;yes&quot;;
+run;</code></pre>
+<p>La fonction la plus g?n?rale pour lire des fichiers d?limit? est <strong>read_delim</strong>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(readr) 
+<span class="co"># Lecture d&#39;un fichier CSV (s?parateur : &quot;,&quot; et d?cimales &quot;.&quot;)</span>
+donnees&lt;-<span class="kw">read_delim</span>(<span class="st">&quot;repertoire/fichier.csv&quot;</span>, <span class="dt">delim=</span><span class="st">&quot;,&quot;</span>)
+<span class="co"># Lecture d&#39;un fichier CSV (s?parateur : &quot;;&quot; et d?cimales &quot;,&quot;)</span>
+donnees&lt;-<span class="kw">read_delim</span>(<span class="st">&quot;repertoire/fichier.csv&quot;</span>, <span class="dt">delim=</span><span class="st">&quot;;&quot;</span>)
+<span class="co"># Lecture d&#39;un fichier d?limit? par tabulation</span>
+donnees&lt;-<span class="kw">read_delim</span>(<span class="st">&quot;repertoire/fichier.csv&quot;</span>, <span class="dt">delim=</span><span class="st">&quot;</span><span class="ch">\t</span><span class="st">&quot;</span>)
+<span class="co"># Lecture d&#39;un fichier d?limit? par des espaces</span>
+donnees&lt;-<span class="kw">read_delim</span>(<span class="st">&quot;repertoire/fichier.csv&quot;</span>, <span class="dt">delim=</span><span class="st">&quot; &quot;</span>)</code></pre></div>
+<p>Cette fonction et les autres fonctions du package de la forme <strong>read_</strong>* d?terminent automatiquement le type des colonnes ? partir des 1000 premi?res lignes du fichier. Il est toutefois possible de pr?ciser des param?tres suppl?mentaires, notamment concernant le type des colonnes.</p>
+<p>Supposons dans cet exemple que nous souhaitons lire un jeu de donn?es contenant 5 variables : une variable de type num?rique, trois variables de type caract?re et une variable de type date. Nous souhaiterions nommer nos variables “A”, “B”, “C”, “D” et “E”, lire les donn?es ? partir de la 4?me ligne et ne lire que 10 lignes et indiquer qu’un espace et la cha?ne de caract?re NA correspondent ? une valeur manquante.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(readr)
+<span class="co"># Lecture d&#39;un fichier CSV (s?parateur : &quot;,&quot; et d?cimales &quot;.&quot;)</span>
+donnees &lt;-<span class="st"> </span><span class="kw">read_delim</span>(<span class="st">&quot;repertoire/fichier.csv&quot;</span>, <span class="dt">col_names=</span><span class="kw">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>, <span class="st">&quot;D&quot;</span>, <span class="st">&quot;E&quot;</span>, <span class="dt">col_types =</span> <span class="st">&quot;cnnnD&quot;</span>, <span class="dt">skip=</span><span class="dv">3</span>, <span class="dt">n_max=</span><span class="dv">10</span>, <span class="dt">na=</span><span class="kw">c</span>(<span class="st">&quot; &quot;</span>, <span class="st">&quot;NA&quot;</span>))</code></pre></div>
+<p>Examinons de plus pr?s les param?tres utilis?s :</p>
+<ul>
+<li>col_names : permet de sp?cifier les noms des variables qui seront utilis?es si on utilise on vecteur caract?r?. Si col_names=TRUE (valeur par d?faut), alors la premi?re ligne du fichier sera utilis?e pour nommer les variables. Si col_names = FALSE, le nom des colonnes sera g?n?r? automatiquement.</li>
+<li>col_type : permet de sp?cifier le type des colonnes. Ici, nous avons repr?sent? une repr?sentation compacte o? chaque lettre repr?sente une colonne : c pour le type caract?re, n pour un nombre, et D pour une date. D’autres raccourcis existent : l pour un bool?en, i pour un integer (entier), d pour un double.</li>
+<li>skip : le nombre de lignes que l’on souhaite ignorer avant de lire les donn?es</li>
+<li>n_max : le nombre maximum de lignes ? lire</li>
+<li>na : permet d’indiquer les caract?res ? interpr?ter comme des valeurs manquantes</li>
+</ul>
+</div>
+<div id="exportation" class="section level6 unnumbered">
+<h6>Exportation</h6>
+<p>Sous SAS, l’exportation s’effectue avec la PROC EXPORT :</p>
+<pre class="sas"><code>proc export data=ds outfile=&#39;chemin_et_nom_du_fichier&#39; 
+  dbms=csv; /* CSV (comma-separated values) */
+  dbms=tab; /* Tabulation */ 
+  dbms=dlm; /* s?parateur arbitraire; par d?faut un espace, pour un autre s?parateur utiliser l&#39;option delimiter= */</code></pre>
+<p>En R, la fonction <strong>write_delim</strong> permet d’?crire un fichier d?limit?.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(readr)
+<span class="co"># Exportation d&#39;un fichier CSV </span>
+<span class="kw">write_delim</span>(donnees, <span class="st">&quot;repertoires/fichier_sortie.csv&quot;</span>, <span class="dt">delim=</span><span class="st">&quot;,&quot;</span>)
+<span class="co"># Exportation d&#39;un fichier d?limit? par tabulation</span>
+<span class="kw">write_delim</span>(donnees, <span class="st">&quot;repertoires/fichier_sortie.csv&quot;</span>, <span class="dt">delim=</span><span class="st">&quot;</span><span class="ch">\t</span><span class="st">&quot;</span>)
+<span class="co"># Exportation d&#39;un fichier d?limit? par un espace</span>
+<span class="kw">write_delim</span>(donnees, <span class="st">&quot;repertoires/fichier_sortie.csv&quot;</span>, <span class="dt">delim=</span><span class="st">&quot; &quot;</span>)</code></pre></div>
+</div>
+</div>
+<div id="fichiers-csv" class="section level5 unnumbered">
+<h5>Fichiers CSV</h5>
+<p>Un des formats les plus courants de fichier texte avec s?parateur est le format csv (comma-separated values). Ce format utilise comme s?parateur des virgules ou des points virgules.</p>
+<p>Avec le package <strong>readr</strong>, les fonctions read_csv et read_csv2 permettent de lire des fichiers au format csv selon le s?parateur utilis? (respectivement virgule ou point-virgule).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(readr) 
+<span class="co"># Lecture d&#39;un fichier CSV (s?parateur : &quot;,&quot; et d?cimales &quot;.&quot;)</span>
+donnees&lt;-<span class="kw">read_csv</span>(<span class="st">&quot;repertoire/fichier.csv&quot;</span>)
+<span class="co"># Lecture d&#39;un fichier CSV (s?parateur : &quot;;&quot; et d?cimales &quot;,&quot;)</span>
+donnees&lt;-<span class="kw">read_csv2</span>(<span class="st">&quot;repertoire/fichier.csv&quot;</span>)</code></pre></div>
+<p>Les options sont les m?mes que pour la fonction <strong>read_delim</strong>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(readr)
+<span class="co"># Lecture d&#39;un fichier CSV (s?parateur : &quot;,&quot; et d?cimales &quot;.&quot;)</span>
+donnees &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;repertoire/fichier.csv&quot;</span>, <span class="dt">col_names=</span><span class="kw">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>, <span class="st">&quot;D&quot;</span>, <span class="st">&quot;E&quot;</span>, <span class="dt">col_types =</span> <span class="st">&quot;cnnnD&quot;</span>, <span class="dt">skip=</span><span class="dv">3</span>, <span class="dt">n_max=</span><span class="dv">10</span>, <span class="dt">na=</span><span class="kw">c</span>(<span class="st">&quot; &quot;</span>, <span class="st">&quot;NA&quot;</span>))
+<span class="co"># Lecture d&#39;un fichier CSV (s?parateur : &quot;;&quot; et d?cimales &quot;,&quot;)</span>
+donnees &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;repertoire/fichier.csv&quot;</span>, <span class="dt">col_names=</span><span class="kw">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>, <span class="st">&quot;D&quot;</span>, <span class="st">&quot;E&quot;</span>, <span class="dt">col_types =</span> <span class="st">&quot;cnnnD&quot;</span>, <span class="dt">skip=</span><span class="dv">3</span>, <span class="dt">n_max=</span><span class="dv">10</span>, <span class="dt">na=</span><span class="kw">c</span>(<span class="st">&quot; &quot;</span>, <span class="st">&quot;NA&quot;</span>))</code></pre></div>
+</div>
+<div id="fichier-spar-avec-tabulation" class="section level5 unnumbered">
+<h5>Fichier s?par? avec tabulation</h5>
+<p>Les fonctions <strong>read_tsv</strong> et <strong>write_tsv</strong> sont un raccourci de <strong>read_delim</strong> et <strong>write_delim</strong> pour lire des fichiers s?par?s par tabulation. Les options sont les m?mes que pr?c?d?mment.</p>
+</div>
+</div>
+<div id="solutions-viables-non-retenues" class="section level4 unnumbered">
+<h4>Solutions viables non retenues</h4>
+<div id="le-package-data.table" class="section level5 unnumbered">
+<h5>Le package data.table</h5>
+<p>La fonction <strong>fread</strong> du package <strong>data.table</strong> est efficace en termes de performances. Cette fonction permet une lecture des fichiers beaucoup plus rapide que les fonctions de R de base, notamment lorsque la taille du fichier augmente.</p>
+<p>Toutefois, cette solution a ?t? ?cart?e en raison d’incompatibilit?s avec le reste des outils pr?conis?s.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(data.table)
+<span class="co"># Lecture d&#39;un fichier CSV (s?parateur : &quot;,&quot;)</span>
+donnees&lt;-<span class="kw">fread</span>(<span class="st">&quot;repertoire/fichier.csv&quot;</span>, <span class="dt">sep=</span><span class="st">&quot;,&quot;</span>)
+<span class="co"># Lecture d&#39;un fichier CSV avec des options suppl?mentaires</span>
+donnees&lt;-<span class="kw">fread</span>(<span class="st">&quot;repertoire/fichiers.csv&quot;</span>, <span class="dt">sep=</span><span class="st">&quot;,&quot;</span>, <span class="dt">header=</span><span class="ot">TRUE</span>, <span class="dt">colClasses=</span>, <span class="dt">skip=</span><span class="dv">3</span>, <span class="dt">nrows=</span><span class="dv">10</span>, <span class="dt">na.strings=</span><span class="kw">c</span>(<span class="st">&quot; &quot;</span>, <span class="st">&quot;NA&quot;</span>))
+<span class="co"># Exportation d&#39;un fichier CSV (s?parateur : &quot;,&quot;)</span>
+<span class="kw">fwrite</span>(donnees, <span class="st">&quot;repertoire/fichier_sortie.csv&quot;</span>)</code></pre></div>
+</div>
+<div id="r-de-base" class="section level5 unnumbered">
+<h5>R de base</h5>
+<p>R dispose par d?faut de plusieurs fonctions pour lire des fichiers d?limit?s, la plus g?n?rale ?tant read.table. Les fonctions read.csv et read.csv2 sont un raccourci de read.table et permettent de lire des fichiers CSV.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Lecture d&#39;un fichier CSV (s?parateur : &quot;,&quot; et d?cimales : &quot;.&quot;)</span>
+donnees&lt;-<span class="kw">read.table</span>(<span class="st">&quot;C:/repertoire/fichier.txt&quot;</span>, <span class="dt">sep=</span><span class="st">&quot;,&quot;</span>, <span class="dt">dec=</span><span class="st">&quot;.&quot;</span>, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)
+<span class="co"># Lecture d&#39;un fichier CSV avec plus d&#39;options</span>
+donnees&lt;-<span class="kw">read.table</span>(<span class="st">&quot;C:/repertoire/fichier.txt&quot;</span>, <span class="dt">sep=</span><span class="st">&quot;,&quot;</span>, <span class="dt">dec=</span><span class="st">&quot;.&quot;</span>, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>, <span class="dt">col.names=</span><span class="kw">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>, <span class="st">&quot;D&quot;</span>, <span class="st">&quot;E&quot;</span>), <span class="dt">colClasses=</span><span class="kw">c</span>(<span class="st">&quot;numeric&quot;</span>, <span class="st">&quot;character&quot;</span>, <span class="st">&quot;character&quot;</span>, <span class="st">&quot;character&quot;</span>, <span class="st">&quot;Date&quot;</span>), <span class="dt">skip=</span><span class="dv">3</span>, <span class="dt">nrows=</span><span class="dv">10</span>, <span class="dt">na.strings =</span> <span class="kw">c</span>(<span class="st">&quot; &quot;</span>, <span class="st">&quot;NA&quot;</span>))</code></pre></div>
+<p>L’option stringAsFactors = FALSE permet d’emp?cher la cr?ation automatique de facteurs lors de la lecture de variables caract?res. Les facteurs correspondent en r?alit? ? des variables num?riques avec des labels, dans l’optique de gagner de la place en m?moire. Par exemple, pour une variable avec les valeurs “homme” et “femme”, R stocke les valeurs 1 et 2 et leur attribue le label correspondant.</p>
+<p>Contrairement aux fonctions des packages <strong>readr</strong> et <strong>data.table</strong>, les fonctions de R de base parcourent les colonnes enti?rement pour d?terminer son type (et non uniquement les premi?res valeurs), ce qui peut entraver les performances lors de la lecture de gros fichiers. Pour am?liorer les performances, il est conseill? de sp?cifier ? l’avance le type des colonnes ainsi que le nombre de lignes ? lire. Toutefois, m?me en sp?cifiant ces param?tres, ces fonctions sont moins performantes pour les gros fichiers que les fonctions du package <strong>readr</strong> et <strong>data.table</strong>.</p>
+</div>
+<div id="le-package-rio" class="section level5 unnumbered">
+<h5>Le package rio</h5>
+<p>Le package rio est un “meta package” permettant de lire et d’?crire des donn?es dans un large ?ventail de formats. La philosophie du package est de simplifier la lecture et l’?criture de fichiers dans R ? travers deux fonctions : import() et export(). Le format du fichier est automatiquement d?termin? ? partir de son extension.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(rio)
+<span class="co"># Lecture d&#39;un fichier s?par? par des tabulations</span>
+donnees &lt;-<span class="st"> </span><span class="kw">import</span>(<span class="st">&quot;repertoire/fichier_importe.tsv&quot;</span>)
+<span class="co"># ?criture d&#39;un fichier CSV (s?parateur : &quot;,&quot;)</span>
+<span class="kw">export</span>(donnees, <span class="st">&quot;fichier_sortie.csv&quot;</span>)</code></pre></div>
+<p>Malgr? sa facilit? d’utilisation, il a ?t? ?cart? pour plusieurs raisons :</p>
+<ul>
+<li>il s’appuie sur la fonction fread du package data.table pour la lecture de fichiers avec s?parateurs (ou les fonctions de R de base lorsqu’on utilise l’option fread= FALSE pour la fonction import)</li>
+<li>lors de la lecture d’un fichier, lorsqu’on souhaite utiliser des arguments suppl?mentaires (pour par exemple sp?cifier le type des colonnes), il faut utiliser ceux de la fonction sous-jacente utilis?e par la fonction import. Il faut donc d’une part consulter l’aide de la fonction import pour conna?tre le package et la fonction utilis?e pour la lecture d’un type de fichier donn?, et consulter l’aide de cette fonction pour ajouter les arguments n?cessaires.</li>
+</ul>
+<!-- ## Package ff ? -->
+</div>
+</div>
+<div id="solutions-ne-pas-utiliser" class="section level4 unnumbered">
+<h4>Solutions ? ne pas utiliser</h4>
+<p>Aucune.</p>
 
+</div>
 </div>
 <div id="fichiers-texte-formattes" class="section level2">
 <h2><span class="header-section-number">3.2</span> Fichiers texte formattés</h2>
@@ -124,8 +341,8 @@
           </div>
         </div>
       </div>
-<a href="elements-de-confort.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-
+<a href="elements-de-confort.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="stockage.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
