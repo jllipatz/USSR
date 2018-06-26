@@ -1,0 +1,123 @@
+---
+title: "Les opérateurs logiques"
+author: "CA"
+date: "26 juin 2018"
+output:
+  html_document:
+    theme: united
+    toc: yes
+    toc_depth: 2
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Problématique
+
+Pouvoir exprimer une condition logique à partir d'opérateurs, afin par exemple de ne retenir que certaines variables ou certaines observations dans la base de données initiale.
+
+### Solution retenue
+
+Les tests logiques sont intégrés au logiciel R, ils ne nécessitent pas l'installation d'un package particulier.
+
+Les test logiques sont :
+
+Egalite ==
+Different de !=
+Superieur >
+Superieur ou égal >=
+Inferieur <
+Inferieur ou égal <=
+Et &
+Ou |
+Dans une liste %in% c(…)
+N'est pas dans la liste !(x %in% c(…))
+
+### Niveau d'intégration à l'USSR
+
+#### Développements préconisés
+
+
+#### Points de vigilance
+
+
+### Intégration au dispositif de formation
+
+Les outils préconisés ne demandent pas de formation spécifique pour être maîtrisés.
+
+### Particularités de syntaxe
+
+On peut combiner plusieurs opérateurs logiques en les séparant par :
+"&" (et) ou "|"" (ou).
+
+### Exemples
+
+On utilise pour les exemples la fonction "filter" qui sera définie au paragraphe 3.2 (sélection d'observations).
+
+#### Test d'égalité 
+
+```{r égalité}
+
+S1 <- filter(selection,DEP=="62")
+
+```
+
+#### Test différent de
+
+```{r different}
+
+S2 <- filter(selection,DEP!="62")
+
+```
+
+#### Test supérieur à
+
+```{r supérieur}
+
+S3 <- filter(selection,densite>100)
+
+```
+
+#### Test est dans la liste
+
+```{r dans liste}
+
+S4 <- filter(selection,DEP %in% c("59","62"))
+
+```
+
+#### Test n'est pas dans la liste
+
+```{r pas dans liste}
+
+S5 <- filter(selection,!(DEP %in% c("59","62")))
+
+```
+
+#### Test avec la condition & (ET)
+
+```{r et}
+
+S6 <- filter(selection,DEP=="62" & densite>100)
+
+```
+
+#### Test avec la condition | (OU)
+
+```{r ou}
+
+S7 <- filter(selection, DEP=="62" | densite > 100)
+
+```
+
+
+### Solutions viables non retenues
+
+Aucune.
+
+
+### Solutions à ne pas utiliser
+
+Aucune.
