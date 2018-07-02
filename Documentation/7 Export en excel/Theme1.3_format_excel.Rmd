@@ -1,0 +1,65 @@
+---
+title: "01-03_Fichiers_Excel"
+author: "Nicolas Kempf & Simon Gaillard"
+date: "25 juin 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Problématique
+
+TO DO (SG)
+
+## Solution retenue
+
+Le package **openxlsx** offre un ensemble de fonctions simples et efficaces permettant de lire et écrire des données en Excel au format **xlsx**. De plus, il n'a pas de dépendance avec une installation java. Enfin, il gère correctement les formats de données notamments les dates, les nombres très proches de zéro et les formats monétaires.
+
+## Niveau d'intégration à l'USSR
+
+### Développements préconisés
+
+Aucun.
+
+### Points de vigilance
+
+Ce package ne permet pas de lire et d'écrire des fichiers au format **xls**.
+
+## Intégration au dispositif de formation
+
+TO DO (SG  + NK)
+
+## Particularité de syntaxe
+
+Pour l'instant, aucune. 
+
+## Exemples
+
+L'auteur du package a réalisé deux très bonnes vignettes disponibles sur le CRAN :
+
+* Exemples basics : <https://cran.r-project.org/web/packages/openxlsx/vignettes/Introduction.pdf>
+* Exemples complexes : <https://cran.r-project.org/web/packages/openxlsx/vignettes/formatting.pdf>
+
+
+### Écriture
+
+```{r}
+library(openxlsx)
+
+write.xlsx(iris, file = "writeXLSX1.xlsx")
+```
+
+### Lecture
+
+TO DO (NK)
+
+## Solutions viables non retenues
+
+Les packages **xlsx** et **XLConnect** sont des bonnes alternatives au package **openxlsx**. Néanmoins, ils sont dépendants à une installation java ce qui peut les rendre inutilisables sous certains systèmes.  
+
+## Solutions à ne pas utiliser
+
+Les packages **readXl** et **writexl** sont efficaces pour la lecture et l'écriture de fichiers. Cependant, ils disposent de peu de fonctionnalités et ne gèrent pas correctement certains formats de données. Autres packages tels que **excel.link**, **RODBC**, **RJDBC**, **dataframes2xls**, **WriteXLS**, **RExcel**, **xlsReadWrite** et **gdata** existent mais sont utilisés de manière marginale par la communauté de programmeur R. 
+

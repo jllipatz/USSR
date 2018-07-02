@@ -1,5 +1,10 @@
 # Eléments de confort 
 
+Mettre un # avant le titre de chapitre.
+
 ## Affichages intermédiaires
 
-blablabla
+Mettre deux # avant le titre de section
+
+
+Mettre au moins quatre # avant les autres titres et un {-} après le titre (tout sur la même ligne)
