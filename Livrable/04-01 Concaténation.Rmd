@@ -1,0 +1,97 @@
+---
+title: "Concaténation"
+author: "PE"
+date: "29 juin 2018"
+output:
+  html_document:
+    theme: united
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Problématique
+
+Concaténer deux tables ou plus, c'est à dire fusionner des tables sans contrôle.
+Pour se faire, il faut que les tables aient le même nombre de lignes.
+
+## Solution retenue
+
+La fonction bind_cols du package dplyr.
+
+
+# Particularités de syntaxe
+
+Aucune.
+
+
+# Exemples
+
+Le jeu d'essai est généré par le programme suivant.
+La fonction tibble permet de créer une table de données.
+Les fonctions letters et LETTERS permettent de créer des vecteurs de lettres respectivement en minuscule et majuscule. La fonction ":" permet de créer une séquence de chiffre avec un pas de 1.
+```{r dplyr,message=FALSE}
+library(dplyr)
+table_un <- tibble(x=letters[1:4],y=1:4)
+table_deux <- tibble(a=LETTERS[1:4],b=c("un","deux","trois","quatre"))
+colonne <- c("bleu","blanc","rouge","vert")
+```
+
+```{r}
+resultat <- table_un %>% 
+     bind_cols(table_deux, couleurs = colonne)
+
+resultat <- bind_cols(table_un, table_deux, couleurs = colonne)
+```
+
+
+## Solutions viables non retenues
+
+### R de base
+
+La solution basée sur du R de base est écartée car elle est jugée trop permissive pour la concaténation de tables avec un nombre de lignes différent et trop compliquée pour la concaténation de listes. 
+
+```{r}
+resultat <- cbind(table_un, table_deux, couleurs = colonne)
+```
+
+Avec la fonction cbind il n'y a pas de message d'erreur (ni d'avertissement) si on veut concaténer 2 tables dont le nombre de ligne de la table la plus petite est un multiple de l'autre.
+
+```{r}
+#♦ Les tables ont 4 lignes et la troisième 2, les valeurs 1, 2 seront répétées 2 fois dans la table finale sans message d'erreur contrairement à la fonction bind_cols().
+resultat_base <- cbind(table_un, table_deux, test = 1:2)
+resultat_dplyr <- bind_cols(table_un, table_deux, test = 1:2)
+```
+
+```{r}
+liste_un <- list(x=letters[1:4],y=1:4)
+liste_deux <- list(a=LETTERS[1:4],b=c("un","deux","trois","quatre"))
+#On obtient une table
+resultat_dplyr <- bind_cols(liste_un, liste_deux)
+# On obtient une liste
+resultat_base <- cbind(liste_un, liste_deux)
+```
+
+
+## Solutions à ne pas utiliser
+
+Rien à signaler.
+
+## Niveau d'intégration à l'USSR
+
+### Développements préconisés
+
+Aucun.
+
+### Points de vigilance
+
+Aucun.
+
+
+# Intégration au dispositif de formation
+
+La question est abordée dans la formation "prise en main rapide de données sous R".

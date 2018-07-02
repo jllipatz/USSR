@@ -1,0 +1,93 @@
+---
+title: "Concaténation"
+author: "PE"
+date: "29 juin 2018"
+output:
+  html_document:
+    theme: united
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Problématique
+
+Réunir deux tables avec une variable de contrôle.
+
+## Solution retenue
+
+Les fonctions XXX_join du package dplyr.
+
+
+# Particularités de syntaxe
+
+Aucune.
+
+
+# Exemples
+
+
+```{r dplyr,message=FALSE}
+library(dplyr)
+table_un <- tibble(x=letters[1:3],y=1:3)
+table_deux <- tibble(a=LETTERS[1:4],b=c("un","deux","trois","quatre"),c=1:4)
+```
+
+```{r}
+resultat <- table_un %>% 
+     full_join(table_deux, by = c("y"="c"))
+```
+
+
+## Solutions viables non retenues
+
+### Le package sqldf
+
+Le package **sqldf** permet d'utiliser des requêtes en langage SQL. 
+
+```{r sqldf,message=FALSE}
+library(sqldf)
+resultat <- sqldf("select * from table_un left outer join table_deux on y=c")
+```
+
+### Le package data.table
+
+Le package **data.table** offre des perfomances supérieures aux autres solutions.
+
+```{r data.table,message=FALSE}
+library(data.table)
+table_un[table_deux, ,on=.(y = c)]
+```
+
+
+### R de base
+
+La solution basée sur du R de base est écartée 
+
+```{r}
+resultat <- merge(table_un, table_deux, by.x="y", by.y="c", all=T)
+```
+
+
+## Solutions à ne pas utiliser
+
+Rien à signaler.
+
+## Niveau d'intégration à l'USSR
+
+### Développements préconisés
+
+Aucun.
+
+### Points de vigilance
+
+Aucun.
+
+
+# Intégration au dispositif de formation
+
+La question est abordée dans la formation "prise en main rapide de données sous R".
