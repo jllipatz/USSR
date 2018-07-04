@@ -1,0 +1,99 @@
+# Manipulation du format date
+## La problématique : convertir, calculer et importer les objets dates.
+
+Pour la conversion, la manipulation et le calcul d'intervalles par exemple, nous utiliserons le package lubridate. 
+Pour l'import nous présenterons des arguments des fonctions read_csv ou read_delim pour gérer la reconnaissance des formats date.
+
+## La conversion
+Les fonctions dmy, mdy, ymd, ydm, myd, dym et yq permettent de reconnaitre la pluspart des chaines de caractères formant une date.
+
+Dans l'exemple ci dessous, les dates sont écrites toutes dans l'ordre année, mois et jour mais avec des séparateur différent. Il suffit alors pour convertir ce vecteur de type caractère au format date d'utiliser la fonction ymd(). Le nom de la fonction correspond à l'ordre des attributs date (y pour l'année, m pour le mois et d pour le jour)
+
+```{r}
+dates <- c("111213","20090101", "2009-01 02", "2009 01 03", "2009-1-4","2009-1, 5", "Naissance le 2009 1 6", "200901 !!! 07")
+dates_ok <- ymd(dates)
+```
+
+Les mois en français ou anglais sont aussi reconnu, comme les jours.
+```{r}
+dates<-dmy(c("19 juin 11", "12 avr. 1975", "29 june 2009"))
+dates_ok <- ymd(dates)
+```
+
+## Manipulation des dates
+Les fonctions year, month, day, wday, quarter et semester permmettent d'extraire l'année, le mois, le jour, le jour de la semaine (du mois et de l'année avec mday et yday), le numéro du trimestre ou du semestre.
+Exemples:
+```{r}
+#On définit une date
+noel <- dmy(25122019)
+#On récupére le jour de la semaine en spécifiant lundi premier jour de la semaine (c'est dimanche par défaut).
+wday(noel, week_start = 1)
+#On récupére le jour de la semaineen lettre
+wday(noel,label=T,abbr = F)
+#On récupére le jour dans l'année, noel est le 359eme jour en 2019 
+yday(noel)
+#On récupére le trimestre (Q4)
+quarter(noel)
+#On récupére le trimestre avec l'année
+quarter(noel,with_year = T)
+```
+
+Quelques calculs sur les dates.
+
+L'opérateur "-" renvoie le nombre de jours entre 2 dates. 
+```{r}
+ymd("2010-02-02") - ymd("2009-01-01")
+```
+
+L'opérateur "+" permet d'ajouter des jours à une date.
+```{r}
+ymd("2009-11-07") + 10
+```
+
+Les fonctions floor_date() et ceilling() permettent d'arrondir une date (début de mois, année, semaine... respectivement début de mois en cours et début de mois suivant)
+```{r}
+#Pour mettre le jour en début de mois
+floor_date(ymd("2010-02-02"),unit='month')
+#Astuce, pour mettre le jour en fin de mois, on se place en début de mois suivant et on enlève un jour.
+ceiling_date(ymd("2010-02-02"), unit = "month")-1 
+```
+
+Pour déterminer l'âge révolu d'une personne à une date donnée, on peut utiliser la différence de millésime:
+```{r}
+year(ymd("2010-02-02")) - year(ymd("2009-01-01"))
+```
+  Ou de façon plus généralisée, déterminer un intervalle et calculer la longueur de cet intervalle. Cette méthode permet d'avoir le nombre exact de l'unité choisie (jours, mois, semaines, années) entre deux dates.
+```{r}
+#On crée un intervalle
+intervalle <- interval(ymd("2009-01-01"), ymd("2010-02-02"))
+#On détermine la longueur de l'intervalle en unité mois
+time_length(intervalle,unit = "month")
+#On garde la partie entière, c'est à dire le nombre de mois complets écoulés entre les 2 dates.
+trunc(time_length(intervalle,unit = "month"))
+```
+Pour savoir si une date se trouve dans une période, il existe la fonction %within%
+```{r}
+ymd("2009-11-07") %within% intervalle
+```
+
+## Import au format date
+Le paramètre col_types des fonctions read_delim ou read_csv(2) permet de spécifier le type des variables de la table à importer. Pour les dates, il faudra utiliser la fonction col_date et son paramètre format en décrivant le format des dates de la table à importer.
+%d correspond au jour en chiffre
+%A correspond au jour de la semaine
+%m correspond au mois en chiffre
+%B correspond au mois en lettre
+%Y correspond à l'année (%y l'année sur 2 caractères)
+Pour plus de détails, allez voir l'aide de la fonction strptime.
+Exemple: pour coder la date samedi, 12 avril 75
+Il faut décrire exactement le format yc les espaces soit:
+  %A, %d %m %Y
+Pour vérifier, on peut utiliser la fonction 
+```{r}
+  as.Date("samedi, 12 avril 75"," %A, %d %B %y")  
+```
+
+Exemple d'import
+```{r}
+read_delim("id|date\n1|12-04-1975\n2|28-08-1975", delim = "|", col_types = list(col_integer(), col_date(format = "%d-%m-%Y")))
+```
+
