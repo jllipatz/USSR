@@ -1,0 +1,100 @@
+---
+title: "La transposition de données"
+author: "CA"
+date: "10 juillet 2018"
+output:
+  html_document:
+    theme: united
+    toc: yes
+    toc_depth: 2
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '2'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Problématique
+
+Pour bien manipuler des données, leur structuration est fondamentale.
+
+    Qu'est ce qu'une ligne de notre table ?
+
+    Qu'est ce qu'une colonne de notre table ?
+
+Sur une table non agrégée (un répertoire, une table d'enquête.), la structuration naturelle est une ligne par observation (un individu, une entreprise.), une colonne par variables (âge, taille.) sur cette observation.
+
+Mais dès qu'on agrège une telle table pour construire des tables structurées par dimensions d'analyse et indicateurs, se pose toujours la question de savoir ce qu'on va considérer comme des dimensions et comme des indicateurs.
+
+La bonne réponse, c'est que ça dépend de ce que l'on veut en faire. L'important est de pouvoir facilement passer de l'un à l'autre suivant ce que l'on doit faire. C'est l'intérêt du module **tidyr**.
+
+### Solution retenue
+
+**gather()** permet d'empiler plusieurs colonnes (correspondant à des variables quantitatives). Elles sont repérées par création d'une variable qualitative, à partir de leurs noms.
+
+#Pour mettre une image d'illustration
+#file:///d:/Users/colin.albizzati/Desktop/gather.png
+
+**spread()** fait l'inverse. Cette fonction crée autant de colonnes qu'il y a de modalités d'une variable qualitative, en remplissant chacune par le contenu d'une variable numérique.
+
+#Pour mettre image illustration
+#file:///d:/Users/colin.albizzati/Desktop/spread.png
+
+### Niveau d'intégration à l'USSR
+
+#### Développements préconisés
+
+
+#### Points de vigilance
+
+
+### Intégration au dispositif de formation
+
+Les outils préconisés ne demandent pas de formation spécifique pour être maîtrisés.
+
+### Particularités de syntaxe
+
+
+
+### Exemples
+
+Un exemple : obtenir un fichier avec une ligne par région, et une colonne par année qui donne l'évolution en % de la construction neuve par rapport à l'année précédente
+
+```{r exemple gather spread}
+
+library (stringr)
+library (dplyr)
+library (tidyr)
+library (readxl)
+
+rm (list = ls ())
+
+sitadel_long <- read_excel ("data/ROES_201702.xls", "AUT_REG") %>%
+  mutate (ANNEE = str_sub (date, 1, 4)) %>%
+  group_by (REG, ANNEE) %>%
+    summarise_if (is.numeric, funs (sum (., na.rm = T))) %>%
+    mutate_if (is.numeric, funs (EVO = 100 * . / lag (.) - 100)) %>%
+    select (REG, ANNEE, log_AUT_EVO) %>% 
+  ungroup ()
+
+sitadel_large <- sitadel_long %>%
+  spread (key = ANNEE, value = log_AUT_EVO, sep = "_")
+
+sitadel_long2 <- sitadel_large %>% 
+  gather (key = annee, value = log_aut_evo, -REG)
+
+```
+
+
+### Solutions viables non retenues
+
+Aucune.
+
+
+### Solutions à ne pas utiliser
+
+Aucune.
+

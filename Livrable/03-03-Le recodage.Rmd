@@ -1,0 +1,106 @@
+---
+title: "Le recodage"
+author: "CA"
+date: "26 juin 2018"
+output:
+  html_document:
+    theme: united
+    toc: yes
+    toc_depth: 2
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Problématique
+
+Comment recoder une variable ?
+C'est-à-dire par exemple créer des classes pour une variable continue.
+Il peut aussi s'agir de modifier le type d'une variable.
+
+### Solution retenue
+
+Dans un **mutate**, on peut utiliser le **case_when** qui permet d’étendre la logique de **ifelse** à des cas plus complexes. 
+Attention, les conditions mises dans un **case_when** ne sont pas exclusives. 
+De ce fait, il faut pouvoir déterminer l’ordre d’évaluation des conditions qui y sont posées. Cet ordre s’effectue de "bas en haut", c’est à dire que la dernière condition évaluée (celle qui primera sur toutes les autres) sera à écrire en premier en "haut".
+Pour modifier le type on utilise les fonctions **as.character()** **as.factor()** ou **as.numeric()**
+Pour connaitre le type d'une variable : **typeof()**
+On pourra renommer une variable avec la fonction **rename()**
+
+### Niveau d'intégration à l'USSR
+
+#### Développements préconisés
+
+
+
+#### Points de vigilance
+
+Attention, les conditions mises dans un **case_when** ne sont pas exclusives. 
+De ce fait, il faut pouvoir déterminer l’ordre d’évaluation des conditions qui y sont posées. Cet ordre s’effectue de "bas en haut", c’est à dire que la dernière condition évaluée (celle qui primera sur toutes les autres) sera à écrire en premier en "haut".
+
+### Intégration au dispositif de formation
+
+Les outils préconisés ne demandent pas de formation spécifique pour être maîtrisés.
+
+### Particularités de syntaxe
+
+
+### Exemples
+
+```{r init,echo=FALSE,message=FALSE}
+library("dplyr")
+```
+
+
+#### Modifier le type d'une variable
+
+```{r modif type}
+
+bdd <- mutate  (bdd, var = as.character (var))
+
+```
+
+#### Renommer une variable
+
+```{r rename}
+
+bdd <- rename (bdd, nom_nouvelle_var = var)
+
+```
+
+
+#### Exemple recoder une variable continue en classes
+
+Le premier argument indique la base de données.
+
+```{r case when}
+
+tab_fin <- mutate (tab_debut, var_fin = case_when (
+                        var_init == 0  ~ "1",
+                        var_init <= 0.001  ~ "2",
+                        var_init <= 0.01  ~ "3",
+                        var_init <= 0.1  ~ "4",
+                        var_init > 0.1  ~ "5",
+                        TRUE ~ ""
+                    ))
+
+```
+
+
+### Solutions viables non retenues
+
+Les fonctions du module **forcats** permettent notamment de regrouper des modalités d'une variable qualitative. 
+On peut également utiliser le **ifelse** qui permet d’affecter valeursi ou valeursinon à une variable en fonction du fait que x réponde ou non à une condition.
+
+```{r ifelse}
+
+bdd2 <- mutate (bdd, var2 = ifelse (var1 == "a", val1 = TRUE, val2 = FALSE))
+
+```
+
+
+### Solutions à ne pas utiliser
+
+Aucune.
