@@ -61,7 +61,7 @@ Voir la partie précédente sur la lecture de fichiers excel.
 
 ### Solutions viables non retenues
 
-Les packages `xlsx` et `XLConnect` sont des alternives efficaces. Ils présentent le même inconvénient que le package `openxlsx` à savoir la nécessite de convertir le fichier en entrée au format **xlsx**.  
+Les packages `xlsx` et `XLConnect` sont des alternatives efficaces. Ils présentent le même inconvénient que le package `openxlsx` à savoir la nécessite de convertir le fichier en entrée au format **xlsx**.  
 
 ### Solutions à ne pas utiliser
 
@@ -79,7 +79,7 @@ Les fonctionnalités envisagées et la syntaxe devraient équivalentes à celles
 
 #### Points de vigilance
 
-Le package `openxlsx` ne lit que les fichiers au format **xlsx**. Il faut donc convertir au préalable les fichiers **ods** à ce format. De plus, la robustesse de cette méthode est dépendante des mises à jours du format **xlsx** qui évolue régulièrement et qui risque donc de créer des problèmes de compatibilité. 
+Le package `openxlsx` ne lit que les fichiers au format **xlsx**. Il faut donc convertir au préalable les fichiers **ods** à ce format. De plus, la robustesse de cette méthode est dépendante des mises à jours du format **xlsx** qui évolue régulièrement. Cela risque donc de créer des problèmes de compatibilité. 
 
 ### Intégration au dispositif de formation
 

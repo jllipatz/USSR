@@ -61,17 +61,31 @@ La création d'un classeur comportant plusieurs feuilles, plusieurs tableaux, de
 
 La syntaxe est présentée dans l'exemple suivant : 
 
-Création du classeur
+**Étape 1** : Création du classeur
 
 ```{r}
 wb <- createWorkbook()
 ```
 
-Ajout d'une feuille au classeur
+**(Étape facultative)** : création d'un style de mis en forme pour les titres
+```{r}
+titre.style <- createStyle(fontSize=14, textDecoration=c("bold", "italic"))
+```
+
+
+**Étape 2** : Ajout d'une feuille au classeur qui contient deux tableaux de données dont l'un mis en forme. 
 
 ```{r}
 addWorksheet(wb, "Tableau")
 ```
+
+
+Ajout d'un titre mis en forme
+```{r}
+writeData(wb,sheet = "Tableau", x = "Exemple de tableaux de données contenant différents types de variables", startRow = 1)
+addStyle(wb, "Tableau", style = titre.style, rows= 1,cols = 1)
+```
+
 
 Ajout de deux tableaux de données dans la feuille **Tableau**. Les délimitations de colonnes sont tracées pour le second tableau.
 
@@ -80,7 +94,7 @@ writeData(wb, 1, df, startRow = 2, startCol = 2)
 writeData(wb, 1, mtcars, startRow = 9, startCol = 2, borders ="all")
 ```
 
-Ajout d'une feuille supplémentaire
+**Étape 3** : Ajout d'une feuille supplémentaire contenant un tableau mis en forme
 
 ```{r}
 addWorksheet(wb, "Tableau mis en forme")
@@ -100,7 +114,7 @@ writeData(wb, sheet = "Tableau mis en forme", iris, startRow = 16, startCol = 10
           borders = "rows", borderStyle = "medium")
 ```
 
-Ajout de la feuille graphique
+**Étape 4** : Ajout de la feuille graphique
 
 ```{r}
 addWorksheet(wb,"Graphique")

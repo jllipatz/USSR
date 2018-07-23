@@ -1,0 +1,66 @@
+---
+title: "Export vers la PAO"
+author: "NK"
+date: "23/07/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Problématique
+
+TO DO (NK)
+
+### Solution retenue
+
+TO DO (NK)
+
+## Particularité de syntaxe
+
+TO DO (NK)
+
+### Exemples
+
+TO DO (NK)
+
+#### Table d'entrainement
+
+TO DO (NK)
+
+#### Écriture
+
+TO DO (NK)
+
+#### Lecture
+
+TO DO (NK)
+
+#### Plus de détails
+
+TO DO (NK)
+
+### Solutions viables non retenues
+
+TO DO (NK)
+
+### Solutions à ne pas utiliser
+
+TO DO (NK)
+
+### Niveau d'intégration à l'USSR
+
+TO DO (NK)
+
+#### Développements préconisés
+
+TO DO (NK)
+
+#### Points de vigilance
+
+TO DO (NK)
+
+### Intégration au dispositif de formation
+
+TO DO (NK)
