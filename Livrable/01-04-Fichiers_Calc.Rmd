@@ -1,4 +1,89 @@
+---
+title: "Theme1.4_format_ods"
+author: "NK & SG"
+date: "25 juin 2018"
+output: html_document
+---
 
-## Fichiers Calc
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
 
-blablabla
+### Problématique
+
+TO DO (SG)
+
+### Solution retenue
+
+Le package `openxlsx` est la meilleure solution actuellement. Elle présente une contrainte importante : ce package ne lit pas directement les fichiers au format **ods**. Il faut les convertir au préalable (via calc par exemple) au format **xlsx**. De plus, ce package ne permet d'écrire directement au format **ods**.
+
+## Particularité de syntaxe
+
+Pour l'instant, aucune. 
+
+### Exemples
+
+#### Table d'entrainement
+
+Cette table contient divers formats de données tels que les dates, les opérateurs logiques, les données monétaires, des nombres négatifs, des liens internet, des pourcentages et des chiffres très petits. 
+
+```{r}
+library(openxlsx)
+
+df <- data.frame("Date" = Sys.Date()-0:4,
+                 "Logical" = c(TRUE, FALSE, TRUE, TRUE, FALSE),
+                 "Currency" = paste("$",-2:2),
+                 "Accounting" = -2:2,
+                 "hLink" = "https://CRAN.R-project.org/",
+                 "Percentage" = seq(-1, 1, length.out=5),
+                 "TinyNumber" = runif(5) / 1E9, stringsAsFactors = FALSE)
+```
+
+#### Écriture
+
+```{r}
+library(openxlsx)
+
+write.xlsx(iris, file = "writeXLSX1.xlsx")
+```
+
+#### Lecture
+
+```{r}
+df.excel <- read.xlsx(xlsxFile = "writeXLSX1.xlsx",detectDates = TRUE)
+head(df.excel,n = 2)
+```
+
+#### Plus de détails
+
+Voir la partie précédente sur la lecture de fichiers excel. 
+
+
+### Solutions viables non retenues
+
+Les packages `xlsx` et `XLConnect` sont des alternives efficaces. Ils présentent le même inconvénient que le package `openxlsx` à savoir la nécessite de convertir le fichier en entrée au format **xlsx**.  
+
+### Solutions à ne pas utiliser
+
+Le package `readODS` n'est pas recommandé. La fonction `read_ods` de ce package permet de lire un fichier au format **ods**. La fonction `write_ods` ne fonctionne pas. De plus, le développement et la maintenance du package semblent interrompus : la derniere mis à jour remonte à fin 2016. 
+
+### Niveau d'intégration à l'USSR
+
+#### Développements préconisés
+
+La position de l'Insee est de favoriser l'utilisation du tableur libre **calc**. À l'heure actuelle, aucune solution n'est complètement satisfaisante pour faire intérargir **calc** et **R**. Le développement d'un package spécifique à la lecture et l'écriture de fichier au format **ods** devrait être envisagé. Le package `readODS` pourrait être le point de départ de ce nouveau package. 
+
+Le code du package `readODS` est disponible sur github : <https://github.com/chainsawriot/readODS>.
+
+Les fonctionnalités envisagées et la syntaxe devraient équivalentes à celles disponibles dans le package `openxlsx`. 
+
+#### Points de vigilance
+
+Le package `openxlsx` ne lit que les fichiers au format **xlsx**. Il faut donc convertir au préalable les fichiers **ods** à ce format. De plus, la robustesse de cette méthode est dépendante des mises à jours du format **xlsx** qui évolue régulièrement et qui risque donc de créer des problèmes de compatibilité. 
+
+### Intégration au dispositif de formation
+
+TO DO (SG)
+
+
+

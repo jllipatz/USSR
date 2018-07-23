@@ -188,6 +188,9 @@ des utilisateurs. Voici le lien vers la vignette : <https://cran.r-project.org/w
 
 # V. Export vers la PAO
 
+
+## V.1. Graphiques
+
 Le travail de PAO nécessite de disposer de graphiques au format vectoriel. Il existe plusieurs formats notamment en  **postscript**, **pdf** et **svg**. 
 
 A la Dirag, l'unité en charge de la PAO utilise principalement les logiciels de PAO adobe Illustrator et Corel Draw. L'import des fichiers issus de R dans ces trois formats a été testé sur ces deux logiciels. Le format svg semble être le moins performant autant en terme d'espace disque que la facilité d'exploitation du graphique dans le logiciel de PAO. Le format **postscript** semble le plus performant. Les deux logiciels l'ont correctement interprété et il semble facile à exploiter. Le format **pdf** est aussi une bonne alternative. De plus, il permet de visualiser le graphique avec un logiciel de lecture des pdf. 
@@ -236,7 +239,9 @@ dev.print(device = svg, file = "Documentation/7 Export en excel/ggplot2Complex.s
 
 ```
 
+## V.2. Tableaux
 
+La solution actuelle est de construire des tableaux complexes directement en 
 
 
 

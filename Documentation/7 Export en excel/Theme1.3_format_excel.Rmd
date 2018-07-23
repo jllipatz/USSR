@@ -1,6 +1,6 @@
 ---
-title: "01-03_Fichiers_Excel"
-author: "Nicolas Kempf & Simon Gaillard"
+title: "Fichiers Excel"
+author: "NK & SG"
 date: "25 juin 2018"
 output: html_document
 ---
@@ -9,57 +9,174 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Problématique
+### Problématique
 
 TO DO (SG)
 
-## Solution retenue
+### Solution retenue
 
-Le package **openxlsx** offre un ensemble de fonctions simples et efficaces permettant de lire et écrire des données en Excel au format **xlsx**. De plus, il n'a pas de dépendance avec une installation java. Enfin, il gère correctement les formats de données notamments les dates, les nombres très proches de zéro et les formats monétaires.
+Le package `openxlsx` offre un ensemble de fonctions simples et efficaces permettant de lire et écrire des données en Excel au format **xlsx**. Il gère correctement les formats de données notamments les dates, les nombres très proches de zéro et les formats monétaires.
 
-## Niveau d'intégration à l'USSR
+Il n'est pas dépendant d'une installation java sur poste.
 
-### Développements préconisés
-
-Aucun.
-
-### Points de vigilance
-
-Ce package ne permet pas de lire et d'écrire des fichiers au format **xls**.
-
-## Intégration au dispositif de formation
-
-TO DO (SG  + NK)
-
-## Particularité de syntaxe
+### Particularité de syntaxe
 
 Pour l'instant, aucune. 
 
-## Exemples
+### Exemples
 
-L'auteur du package a réalisé deux très bonnes vignettes disponibles sur le CRAN :
+#### Table d'entrainement
+
+Cette table contient divers formats de données tels que les dates, les opérateurs logiques, les données monétaires, des nombres négatifs, des liens internet, des pourcentages et des chiffres très petits. 
+
+```{r}
+library(openxlsx)
+
+df <- data.frame("Date" = Sys.Date()-0:4,
+                 "Logical" = c(TRUE, FALSE, TRUE, TRUE, FALSE),
+                 "Currency" = paste("$",-2:2),
+                 "Accounting" = -2:2,
+                 "hLink" = "https://CRAN.R-project.org/",
+                 "Percentage" = seq(-1, 1, length.out=5),
+                 "TinyNumber" = runif(5) / 1E9, stringsAsFactors = FALSE)
+```
+
+#### Écriture 
+
+```{r}
+write.xlsx(df, file = "writeXLSX1.xlsx")
+```
+
+#### Lecture
+
+```{r}
+df.excel <- read.xlsx(xlsxFile = "writeXLSX1.xlsx",detectDates = TRUE)
+head(df.excel,n = 2)
+```
+
+
+#### Ecriture d'un rapport complexe
+
+La création d'un classeur comportant plusieurs feuilles, plusieurs tableaux, des titres et des graphiques est possible. Pour cela, il faut créer manuellement une série d'objets intéragissant les uns avec les autres. 
+
+La syntaxe est présentée dans l'exemple suivant : 
+
+Création du classeur
+
+```{r}
+wb <- createWorkbook()
+```
+
+Ajout d'une feuille au classeur
+
+```{r}
+addWorksheet(wb, "Tableau")
+```
+
+Ajout de deux tableaux de données dans la feuille **Tableau**. Les délimitations de colonnes sont tracées pour le second tableau.
+
+```{r}
+writeData(wb, 1, df, startRow = 2, startCol = 2)
+writeData(wb, 1, mtcars, startRow = 9, startCol = 2, borders ="all")
+```
+
+Ajout d'une feuille supplémentaire
+
+```{r}
+addWorksheet(wb, "Tableau mis en forme")
+```
+
+Création d'un style de mise en forme pour le tableau
+
+```{r}
+hs1 <- createStyle(fgFill = "#4F81BD", halign = "CENTER", textDecoration = "Bold",
+                   border = "Bottom", fontColour = "white")
+```
+
+Ajout du tableau mis en forme dans la feuille
+
+```{r}
+writeData(wb, sheet = "Tableau mis en forme", iris, startRow = 16, startCol = 10, headerStyle = hs1,
+          borders = "rows", borderStyle = "medium")
+```
+
+Ajout de la feuille graphique
+
+```{r}
+addWorksheet(wb,"Graphique")
+```
+
+Création d'un graphique avec la library ggplot2
+
+```{r}
+library(ggplot2)
+
+data("midwest", package = "ggplot2")
+
+# Scatterplot
+gg <- ggplot(midwest, aes(x=area, y=poptotal)) + 
+  geom_point(aes(col=state, size=popdensity)) + 
+  geom_smooth(method="loess", se=F) + 
+  xlim(c(0, 0.1)) + 
+  ylim(c(0, 500000)) + 
+  labs(subtitle="Area Vs Population", 
+       y="Population", 
+       x="Area", 
+       title="Scatterplot", 
+       caption = "Source: midwest")
+```
+
+
+```{r,echo=FALSE,warning=FALSE}
+gg
+```
+
+Insertion du graphique dans la feuille **Graphique**.
+
+```{r}
+insertPlot(wb, sheet = "Graphique", xy = c("J", 3))
+```
+
+Ouverture d'un version temporaire du classeur. 
+
+```{r,eval=FALSE}
+openXL(wb)
+```
+
+Enregistrement du classeur
+
+```{r}
+saveWorkbook(wb, "basics.xlsx", overwrite = TRUE)
+```
+
+#### Plus de détails
+
+Deux très bonnes vignettes sont disponibles sur le CRAN :
 
 * Exemples basics : <https://cran.r-project.org/web/packages/openxlsx/vignettes/Introduction.pdf>
 * Exemples complexes : <https://cran.r-project.org/web/packages/openxlsx/vignettes/formatting.pdf>
 
 
-### Écriture
+### Solutions viables non retenues
 
-```{r}
-library(openxlsx)
+Les packages `xlsx` et `XLConnect` sont des bonnes alternatives au package `openxlsx`. Néanmoins, ils sont dépendants à une installation java sur poste ce qui peut les rendre inutilisables sous certains systèmes.  
 
-write.xlsx(iris, file = "writeXLSX1.xlsx")
-```
+### Solutions à ne pas utiliser
 
-### Lecture
+Les packages `readXl` et `writexl` sont efficaces pour la lecture et l'écriture de fichiers. Cependant, ils disposent de peu de fonctionnalités et ne gèrent pas correctement certains formats de données. D'autres packages tels que `excel.link`, `RODBC`, `RJDBC`, `dataframes2xls`, `WriteXLS`, `RExcel`, `xlsReadWrite` et `gdata` existent mais sont utilisés de manière marginale par la communauté R. 
 
-TO DO (NK)
+### Niveau d'intégration à l'USSR
 
-## Solutions viables non retenues
+#### Développements préconisés
 
-Les packages **xlsx** et **XLConnect** sont des bonnes alternatives au package **openxlsx**. Néanmoins, ils sont dépendants à une installation java ce qui peut les rendre inutilisables sous certains systèmes.  
+Aucun.
 
-## Solutions à ne pas utiliser
+#### Points de vigilance
 
-Les packages **readXl** et **writexl** sont efficaces pour la lecture et l'écriture de fichiers. Cependant, ils disposent de peu de fonctionnalités et ne gèrent pas correctement certains formats de données. Autres packages tels que **excel.link**, **RODBC**, **RJDBC**, **dataframes2xls**, **WriteXLS**, **RExcel**, **xlsReadWrite** et **gdata** existent mais sont utilisés de manière marginale par la communauté de programmeur R. 
+Ce package ne permet pas de lire et d'écrire des fichiers au format **xls**.
+
+### Intégration au dispositif de formation
+
+TO DO (SG)
+
 
