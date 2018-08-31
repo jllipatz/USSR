@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Exporter des données sous forme de tableaux et de graphiques dans un format utilisable par la PAO. 
 
-À l'heure actuelle, les données sont envoyées à la PAO dans un tableur **calc**. Les tableaux doivent respecter un certain style de mise en forme et les graphiques doivent être générés par calc. L'inconvenient de cette méthode est qu'il est difficilement possible d'automatiser la création de ce fichier et des graphiques correspondant. Au moindre changement en amont, il faut refaire ou mettre à jour le fichier manuellement ce qui occasionne une perte de temps et l'apparition de coquilles (erreur de copier-coller par exemple). Ce document présente une méthode spécifique permettant d'automatiser la chaine de production des fichiers à destination de la PAO. Les graphiques sont réalisés directement sous R ce qui permet de profiter des fonctionnalités de packages tel que `ggplot2`. 
+À l'heure actuelle, les données sont envoyées à la PAO dans un tableur **calc**. Ils doivent respecter un certain style de mise en forme et les graphiques doivent être générés par calc. L'inconvenient de cette méthode est qu'il est difficil d'automatiser la création de ce fichier et des graphiques correspondant. Au moindre changement en amont, il faut mettre à jour le fichier manuellement ce qui occasionne une perte de temps et l'apparition de coquilles (erreur de copier-coller par exemple). Ce document présente une méthode spécifique permettant d'automatiser la chaine de production des fichiers à destination de la PAO. Les graphiques sont réalisés directement sous R ce qui permet de profiter des fonctionnalités de packages tel que `ggplot2`. 
 
 Les tableaux et les graphiques (au format image) sont exportés directement dans un tableur contenant autant de feuilles que nécessaire. Le format **image** étant limité en terme de retouches, les graphiques sont exportés une seconde fois dans un format **vectoriel** pouvant ensuite être retravaillé par la PAO. 
 
@@ -95,7 +95,7 @@ sheet <- "Fig1"
 addWorksheet(wb, sheet)
 ```
 
-Ajout du titre mise en forme.
+Ajout du titre mis en forme.
 ```{r}
 writeData(wb,sheet = sheet, x = "Densité de population dans le midwest", startRow = 1)
 addStyle(wb, sheet, style = titre.style, rows= 1,cols = 1)
@@ -192,7 +192,7 @@ saveWorkbook(wb, "exportPao_exemple.xlsx", overwrite = TRUE)
 
 ### Solutions viables non retenues
 
-Les packages `xlsx` et `XLConnect` sont des bonnes alternatives au package `openxlsx`. Néanmoins, ils sont dépendants à une installation java sur poste ce qui peut les rendre inutilisables sous certains systèmes.
+Les packages `xlsx` et `XLConnect` sont des bonnes alternatives au package `openxlsx`. Néanmoins, ils sont dépendants d'une installation java sur poste ce qui peut les rendre inutilisables sous certains systèmes.
 
 ### Solutions à ne pas utiliser
 
