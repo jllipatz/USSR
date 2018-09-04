@@ -1,0 +1,248 @@
+---
+title: "Tableaux de statistiques"
+author: 'USSR: Pascal Eusebio'
+date: "5 juillet 2018"
+output:
+  html_document:
+    highlight: tango
+    theme: united
+    toc: yes
+    toc_depth: 2
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '2'
+---
+
+```{r, echo=FALSE, warning=FALSE}
+library(dplyr)
+```
+
+# Tableau de comptage (Proc Freq)
+
+Avec les packages base et stats, on peut déterminer les fréquences par modalités d'une variable
+L'écriture est simple par contre pour ajouter des totaux ou des pourcentage, l'écriture est assez lourde. Il faut encapsuler l'objet table ou xtabs avec les fonctions margin.table ou prop.table.
+
+
+## Tableau de contingence à 1 (ou plusieurs) dimension(s)
+```{r}
+xtabs(~Species,data=iris)
+xtabs(~Species+(Sepal.Length>5)+(Sepal.Width>3),data=iris)
+```
+## Tableau croisé à 1 (ou plusieurs) dimension(s)
+```{r}
+xtabs(Sepal.Length~Species,data=iris)
+xtabs(Sepal.Length~Species+(Sepal.Length>5),data=iris)
+```
+
+Pour les sorties, 
+L'objet renvoyé par la fonction xtabs() est un objet xtabs (une liste). Si c'est un croisement de 2 variable, on peut exporter la table avec la fonction kable(). Si c'est un croisement de plus de 2 variables, il faut utiliser d'autres packages comme kableExtra.
+
+
+```{r, results='asis'}
+library(knitr)
+tab<-xtabs(~Species+(Sepal.Length>5),data=iris)
+kable(tab)
+```
+
+## Tableau de stat automatique (proc summary/freq)
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(skimr, warn.conflicts = FALSE, quietly=TRUE)
+```
+```{r}
+dplyr::group_by(iris, Species) %>% 
+  skim()
+```
+
+## Tableau de stat manuel (proc summary/freq)
+```{r}
+library(dplyr)
+
+b<-iris %>% 
+  mutate(poids=sample(1:3,150,T)) %>% 
+  group_by(Species) %>% 
+  summarise_at(vars(Sepal.Length),funs(sum,mean,median,min,max,weighted.mean(.,poids)))
+
+iris %>% 
+  mutate(poids=sample(1:3,150,T)) %>% 
+  group_by(Species) %>% 
+  summarise("Longueur max tige" = max(Sepal.Length),
+            "Largeur moyenne tige" = mean(Sepal.Width),
+            "Largeur moyenne pondérée tige" = weighted.mean(Sepal.Width,poids),
+            "Longueur du pétale moyen" = median(Petal.Length), 
+            "Nb de na largeur pétale"= sum(is.na(Petal.Width)))
+
+iris %>% 
+    mutate(n = n())  %>%
+    group_by(Species) %>% 
+    mutate(nombre=n(), pourcentage=n()/first(n)) %>% 
+    group_by(nombre, pourcentage, add=T) %>% 
+    summarise_at(vars(-n),funs(sum,mean,median,min,max)) 
+
+iris %>% 
+  mutate(n = n())  %>%
+  group_by(Species) %>% 
+  mutate(nombre=n(), pourcentage=n()/first(n)) %>% 
+  group_by(nombre, pourcentage, add=T) %>% 
+  summarise_at(vars(-n),funs(sum,mean,median,min,max,na=sum(is.na(.)))) %>% 
+  ungroup %>% 
+  select(matches(paste0(names(iris),collapse = "|"))) %>% 
+  gather(stat,value,-Species) %>% 
+  separate(stat,c("var","stat"),sep="_") %>% 
+  spread(stat,value)
+```
+
+
+### Package Weighted.Desc.Stat
+
+**Paramétre pondération**: Oui 
+
+**Fonctions stat**: Les fonctions stat sont w.sd; w.var;w.ad;w.cv;w.skewness;w.kurtosis...   
+
+**Utilisation**: fonctionne avec dplyr pour simplifier la creation de tableau stat    
+
+**Sortie**: sortie .  
+
+**Conclusion**: Pas de médiane ou quantile. Fonctionne uniquement sur des vecteurs atomiques
+
+```{r, echo=FALSE, warning=FALSE}
+library(Weighted.Desc.Stat)
+```
+```{r, message=FALSE}
+x <- c(1:10)
+mu <- c(0.9, 0.7, 0.8, 0.7, 0.6, 0.4, 0.2, 0.3, 0.0, 0.1)
+w.mean(iris$Sepal.Length, iris$weight)
+```
+
+
+##Solutions non retenues
+
+### Package gmodels ou descr
+
+**Paramétre pondération**: Non 
+
+**Fonctions stat**: Les fonctions stat sont mean, med, n   
+
+**Utilisation**: fonctionne avec dplyr pour simplifier la creation de tableau stat    
+
+**Sortie**: l'objet en sortie est une sortie liste $t donnee $prop.row $prop.col $prop.tbl.  
+
+**Conclusion**: transformer des xtable en flextable avant export. 
+
+```{r, echo=FALSE, warning=FALSE}
+library(gmodels)
+```
+```{r, message=FALSE, warning=FALSE}
+CrossTable(cut(iris$Sepal.Length,4,labels = paste("Longueur",1:4)),iris$Species, expected = TRUE, format="SAS", dnn=c("Longueur de pétale","Espéce"))
+```
+
+
+### Package arsenal
+
+**Paramétre pondération**: Oui  
+
+**Fonctions stat**: Les fonctions stat sont prédéfinies en fonctions des objets qu'on utilise. Par exemple, pour des variables numériques, on ajoute le paramétre numeric.stats qui contient les fonctions: N, Nmiss, Nmiss2, mean, meansd, median, q1q3, medianq1q3, iqr, range, medianrange.
+
+**Utilisation**: le code repose sur un objet formule, simple à utiliser mais formula à l'envers !!!
+
+**Sortie**: l'objet en sortie est une liste mais il existe une fonction equivalente de ods pour extraire  vers pdf, html et doc.
+
+**Conclusion**: Relativement simple à utiliser. Ne s'intègre pas directement avec dplyr (paramètre data après la formaule), il faut utiliser le "." . La présentation n'est pas tout à fait celle qu'on peut attendre. Limité sur les statistiques mais l'essentiel y est.
+
+```{r, echo=FALSE, warning=FALSE}
+library(arsenal)
+```
+```{r}
+tab <- tableby(Species ~ Sepal.Length, data=iris,numeric.stats = c("Nmiss", "meansd", "range","iqr"))
+```
+```{r, results='asis'}
+summary(tab, labelTranslations = list(Sepal.Length="Longueur de Pétale"), text=TRUE)
+```
+
+```{r}
+#avec le poids
+iris$weight<- sample(1:10,nrow(iris),replace = T)
+```
+```{r, results='asis'}
+iris %>%  
+  tableby(Species ~ Sepal.Length, data=.,numeric.stats = c("Nmiss", "meansd", "range","iqr")) %>% 
+  summary(labelTranslations = list(Sepal.Length="Longueur de Pétale"), text=TRUE)
+```
+```{r, results='hide', message=FALSE, eval=FALSE}
+## Sortie en HTML document
+write2html(tab, "~/arsenal.html")
+## Sortie en document Word mais ne fonctionne pas avec writer
+write2word(tab, "~/arsenal.doc", title="Mon tableau dans word")
+```
+
+
+### Package sjmisc et sjPlot
+
+**Paramétre pondération**: Oui 
+
+**Fonctions stat**: Les fonctions stat sont n NA.prc mean   sd   se md trimmed   range  skew.   
+
+**Utilisation**: fonctionne avec dplyr pour simplifier la creation de tableau stat    
+
+**Sortie**: sortie: utilisation de kable pour sortir en html ou pdf.  
+
+**Conclusion**: ecriture simple avec dplyr
+  frq() pour la proc freq, desc() pour la proc means  
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(sjmisc, warn.conflicts = FALSE, quietly=TRUE)
+library(sjPlot, warn.conflicts = FALSE, quietly=TRUE)
+```
+```{r}
+iris %>% 
+  group_by(Species) %>% 
+  frq(Sepal.Length,Sepal.Width,weight.by = weight,out="viewer")
+iris %>% 
+  group_by(Species) %>% 
+  descr(contains("Sepal"))
+
+iris %>%
+  group_by(Species) %>%
+  select(Sepal.Length) %>%
+  flat_table()
+```
+
+```{r, results='asis', message=FALSE, warning=FALSE}
+# tableau croisé
+data(efc)
+sjt.xtab(
+  efc$e16sex,
+  efc$e42dep,
+  var.labels = c("Elder's gender", "Elder's dependency"),
+  show.exp = TRUE,
+  show.cell.prc = T,
+  show.col.prc = T,
+  show.row.prc = T,
+  show.legend = T,
+  show.na = T,
+  use.viewer = T,
+  file="test_sj.html"
+)
+
+```
+
+
+### Package tables
+
+**Paramétre pondération**: Oui 
+
+**Fonctions stat**: Les fonctions stat sont toutes les fonctions qui s'appliquent à un vecteur...   
+
+**Utilisation**: fonctionne avec dplyr pour simplifier la creation de tableau stat    
+
+**Sortie**: sortie html ou pdf.  
+
+**Conclusion**: equivalent de proc tabulate ponderee
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(tables)
+library(Weighted.Desc.Stat)
+```
+```{r, results='asis', message=FALSE}
+tabular((Species + 1) ~ (n=1) + Format(digits=2)*
+           (Sepal.Length + Sepal.Width)*(w.mean+w.var)*Arguments(weight), data=iris )

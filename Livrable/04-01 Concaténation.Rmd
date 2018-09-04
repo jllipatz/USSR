@@ -44,7 +44,7 @@ colonne <- c("bleu","blanc","rouge","vert")
 ```{r}
 resultat <- table_un %>% 
      bind_cols(table_deux, couleurs = colonne)
-
+#ou
 resultat <- bind_cols(table_un, table_deux, couleurs = colonne)
 ```
 
@@ -53,26 +53,27 @@ resultat <- bind_cols(table_un, table_deux, couleurs = colonne)
 
 ### R de base
 
-La solution basée sur du R de base est écartée car elle est jugée trop permissive pour la concaténation de tables avec un nombre de lignes différent et trop compliquée pour la concaténation de listes. 
+La solution basée sur langage R de base est écartée car elle est jugée trop permissive pour la concaténation de tables avec un nombre de lignes différent et trop compliquée pour la concaténation de listes. 
 
 ```{r}
 resultat <- cbind(table_un, table_deux, couleurs = colonne)
 ```
 
-Avec la fonction cbind il n'y a pas de message d'erreur (ni d'avertissement) si on veut concaténer 2 tables dont le nombre de ligne de la table la plus petite est un multiple de l'autre.
+Avec la fonction cbind il n'y a pas de message d'erreur (ni d'avertissement) si on veut concaténer 2 tables dont le nombre de ligne de la table la plus petite est un multiple du nombre de lignes de l'autre table.
 
 ```{r}
 #♦ Les tables ont 4 lignes et la troisième 2, les valeurs 1, 2 seront répétées 2 fois dans la table finale sans message d'erreur contrairement à la fonction bind_cols().
 resultat_base <- cbind(table_un, table_deux, test = 1:2)
 resultat_dplyr <- bind_cols(table_un, table_deux, test = 1:2)
 ```
+Pour les listes, le résultat des 2 fonctions cbind et col_binds est très différent.
 
 ```{r}
 liste_un <- list(x=letters[1:4],y=1:4)
 liste_deux <- list(a=LETTERS[1:4],b=c("un","deux","trois","quatre"))
-#On obtient une table
+#Avec bind_cols, on obtient une table
 resultat_dplyr <- bind_cols(liste_un, liste_deux)
-# On obtient une liste
+# Avec cbind, on obtient une liste
 resultat_base <- cbind(liste_un, liste_deux)
 ```
 

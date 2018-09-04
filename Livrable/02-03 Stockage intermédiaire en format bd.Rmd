@@ -1,0 +1,141 @@
+---
+title: "Stockage intermédiaire en format bd"
+author: "PE"
+date: "9 juillet 2018"
+output:
+  html_document:
+    theme: united
+    toc: yes
+    toc_depth: 2
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Problématique
+
+La manipulation de données sous R utilise la mémoire vive (RAM). Il faut donc contrairement à SAS se limiter à utiliser uniquement les données nécessaires. Dans le cas de grosses bases (quelques gigas), la manipulation peut devenir difficile voire impossible. Il s'agit alors d'utiliser un stockage intermédiaire de type base de données. Il est alors possible d'interroger le SGBD avec des requêtes SQL pour extraire uniquement les données nécessaires pour le traitement.
+
+# Solution retenue
+
+Le package **dplyr** offre les fonctionnalités souhaitées. 
+Selon le SGBD utilisé, il faut utiliser le package correspondant. Par exemple RSQLite pour sqlite, RPostgreSQL pour postgresql... Enfin, le package DBI pezrmet la connexion aux différents SGBD.
+
+# Niveau d'intégration à l'USSR
+
+## Développements préconisés
+
+Aucun
+
+## Points de vigilance
+
+Aucun
+
+# Intégration au dispositif de formation
+
+Les outils préconisés ne demandent pas de formation spécifique pour être maîtrisés. Il s'agit du même code utilisé pour une base locale avec dplyr. La seule différence est le connecteur à une base distante.
+
+# Particularités de syntaxe
+
+Aucune.
+
+# Exemples
+
+## Ecriture sur disque de l'intégralité d'une table R.
+
+```{r init,echo=FALSE,message=FALSE}
+library("dplyr")
+```
+
+```{r new,warning=FALSE}
+# Créer un  connecteur vers la base de données
+# selon la base de données il faut utiliser le package approprié
+#Exemples: RMySQL::MySQL(), 
+base_donnees <- DBI::dbConnect(RSQLite::SQLite(),"maBase.sqlite")
+#Lister les tables présentes dans la bd
+DBI::dbListTables(conn = base_donnees)
+# Ecrire une table dans la bd.
+copy_to(dest = base_donnees,df = iris,name = "iris", temporary = F)
+#Lister les tables présentes dans la bd
+DBI::dbListTables(conn = base_donnees)
+# Se déconnecter d'un BD
+DBI::dbDisconnect(conn = base_donnees)
+```
+
+```{r init,echo=FALSE,message=FALSE}
+library("DBI")
+```
+## Ecriture en mémoire de l'intégralité d'une table
+
+```{r}
+base_donnees <- dbConnect(RSQLite::SQLite(),":memory:")
+#Lister les tables présentes dans la bd
+dbListTables(base_donnees)
+# Ecrire une table dans la bd.
+copy_to(base_donnees,iris)
+# Se déconnecter d'un BD
+dbDisconnect(base_donnees)
+```
+
+## Exploration du contenu d'une table (sans la charger)
+
+Les fonctions des packages dplyr, dbplyr et DBI sont dites "lazy", c'est à dire qu'elles exécute le code sur la base de données sans récupérer le résultat. 
+
+## Accès au contenu d'un fichier du répertoire sans le charger entièrement
+
+La fonction ***tbl*** établit une connexion entre un fichier du répertoire et R. Le nom du fichier est à spécifier sans le suffixe 'fst', tel que listé dans l'exemple précédent.
+
+```{r}
+base_donnees <- dbConnect(RSQLite::SQLite(),"maBase.sqlite")
+base_donnees %>% #à partir de la bd
+  tbl("iris")
+``` 
+De la même façon il est possible d'exécuter la requête PRAGMA table_info sur la table iris
+```{r}
+dbGetQuery(base_donnees, "PRAGMA table_info (iris)")
+```
+
+Récupèrer une partie des données d'une table
+```{r}
+#On peut requeter directement sur la table
+DBI::dbGetQuery(base_donnees,"select * from iris where Species = 'setosa'")
+#ou garder la même écriture que pour une table locale
+base_donnees %>% #à partir de la bd
+  tbl("iris") %>% #on selectionne la table
+  filter(Species=="setosa")#on filtre
+
+# Recupèrer les seules variables 'Species' et 'Sepal.Length'.
+base_donnees %>% #à partir de la bd
+  tbl("iris") %>% #on selectionne la table
+  select(Species,Sepal.Length)#on selectionne 2 colonnes
+
+# Avec les 2 codes ci dessus, nous n'avons pas récupérer de données. Il s'agit simplement de la requête qui sera envoyer à la base de données (fonction 'lazy'). Pour récupérer les données, il faut utiliser la fonction collect().
+
+base_donnees %>% #à partir de la bd
+  tbl("iris") %>% #on selectionne la table
+  select(Species,Sepal.Length) %>% #on selectionne 2 colonnes
+  collect
+
+#En utilisant la fonction explain, on récupère la requête SQL générée
+base_donnees %>% #à partir de la bd
+  tbl("iris") %>% #on selectionne la table
+  select(Species,Sepal.Length) %>% #on selectionne 2 colonnes
+  explain
+
+#Pour supprimer une table de la bd
+DBI::dbRemoveTable(base_donnees,"iris")
+#Pour vérifier si une table est dans la bd
+DBI::dbExistsTable(base_donnees, "iris")  
+#Pour se déconnecter de la bd
+DBI::dbDisconnect(base_donnees)
+```
+
+# Solutions viables non retenues
+
+Aucune.
+
+# Solutions à ne pas utiliser
+
+Aucune.
