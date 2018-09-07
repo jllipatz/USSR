@@ -26,7 +26,7 @@ VARIABLE <- "cyl"
 mtcars %>% select(VARIABLE) %>% head(1)
 ```
 
-Mais le code qui suit ne marche pas, la fonction `group_by` n'accepte que des symboles qui soient des noms de colonnes de 'mtcars' :
+Mais le code qui suit ne marche pas, la fonction `group_by` n'accepte que des symboles qui soient des noms de colonnes de 'mtcars' : 
 ```{r include = TRUE, echo= TRUE, warning = FALSE,message = FALSE, eval = FALSE }
 VARIABLE <- "cyl"
 mtcars %>% group_by(VARIABLE) %>% summarise(n=n())
@@ -35,7 +35,10 @@ mtcars %>% group_by(VARIABLE) %>% summarise(n=n())
 tryCatch(mtcars %>% group_by(VARIABLE) %>% summarise(n=n()),
          error = function(e) print(e$message))
 ```
-Pour avoir un comportement uniforme, il faut donc présenter les choses de manière à ce que le calcul se fasse en deux temps : un premier de substitution des valeurs des paramètres, un second d'évaluation selon le processus standard. 
+Ce type de comportement est appelé "evaluation non standard" (Non Standard Evaluation ou NSE en anglais) : certaines fonctions interceptent ce qu'on leur passe en arguments et tentent de les interpreter sans auparavant les évaluer. C'est par exemple le cas de `library` qui autorise d'oubli des quotes, c'est systématiquement le cas avec les fonctions de **dplyr** dont certaines vont jusqu'à ne pas évaluer du tout ce qu'on leur fournit.<br>
+Ceci posé, le passage d'informations dans des variables ne serait de toutes manières pas suffisant pour complètement paramétrer un programme. on peut en effet aussi souhaiter mettre en paramètre un traitement statistique, c'est à dire la fonction à exécuter (n() ou mean(VARIABLE) par exemple). Or dans ce cas, c'est l'interpréteur de R qui ne nous laisse pas le choix : les choix sont figées à l'écriture du programme. Du moins en apparence...
+
+Pour avoir un comportement uniforme, il faut présenter les choses de manière à ce que le calcul se fasse en deux temps : un premier de substitution des valeurs des paramètres, un second d'évaluation selon le processus standard. 
 
 # Solution retenue
 
@@ -101,7 +104,7 @@ m(mpg==max(mpg))
 
 ## Paramétrer une chaine de caractères
 
-La fonction `glue`du package de même nom est une généralisation de la saisie de chaînes de caractères de R. En R de base l'utilisation  de \\ signifie l'inclusion d'un caractère spécial dont l'abbréviation suit le \\. La foncton glue rajoute la notation `{...}` qui va dire qu'il faut évaluer ce qu'il y a entre accolades et inclure la chaîne de caractères correspondantes. On peut y mettre un nom de variable ou une expression complète.
+La fonction `glue`du package de même nom est une généralisation de la saisie de chaînes de caractères de R. En R de base l'utilisation  de \\ signifie l'inclusion d'un caractère spécial dont l'abbréviation suit le \\. La fonction `glue` rajoute la notation `{...}` qui va dire qu'il faut évaluer ce qu'il y a entre accolades et inclure la chaîne de caractères correspondante. On peut y mettre un nom de variable ou une expression complète.
 ```{r echo=TRUE,message=FALSE}
 library(glue)
 library(sqldf)
