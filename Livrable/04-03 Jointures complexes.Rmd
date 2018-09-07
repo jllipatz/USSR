@@ -1,7 +1,7 @@
 ---
 title: "Jointures sur conditions quelconques"
 author: "JLL"
-date: "12 juin 2018"
+date: "25 juin 2018"
 output:
   html_document:
     theme: united
@@ -21,20 +21,9 @@ Fusionner deux tables données sur un critère d'appariemment qui soit plus comp
 
 # Solution retenue
 
-Faire un produit cartésien entre les deux tables (en clair, si les deux tables ont des tailles respectives N et M, on crée une table de taile NxM), puis sélectionner les croisements à conserver en appliquant la condition. Le produit cartésien fait appel à une fonction spécifique **crossing** du package **tidyr**. Pour réduire l'ampleur du produit cartésien, lorsque la condition est un mixte d'égalités et d'autres sous-conditions, il faut procéder en deux étapes : faire la jointure sur les égalités comme au 4.2, puis traités les autres sous-conditions.
+Faire un produit cartésien entre les deux tables (en clair, si les deux tables ont des tailles respectives N et M, on crée une table de taile NxM), puis sélectionner les croisements à conserver en appliquant la condition. Le produit cartésien fait appel à une fonction spécifique **crossing** du package **tidyr**. Pour réduire l'ampleur du produit cartésien, lorsque la condition est un mixte d'égalités et d'autres sous-conditions, il faut procéder en deux étapes : faire la jointure sur les égalités comme au 4.2, puis traiter les autres sous-conditions.
 
 <br>Le résultat est une jointure simple ('inner join'). En cas de besoin une jointure partielle ('left join') peut être obtenue par jointure partielle sur clé du résultat avec la table voulue.
-
-
-# Niveau d'intégration à l'USSR
-
-## Développements préconisés
-
-Aucun.
-
-## Points de vigilance
-
-Aucun.
 
 
 # Intégration au dispositif de formation
@@ -48,16 +37,17 @@ Aucune.
 
 
 # Exemples
-
+## Une valeur d'une table comprise entre deux valeurs issues d'une autre table
 Le jeu d'essai testé est généré par le programme suivant. Il consiste en une table contenant des points 'X', et une table contenant des intervalles 'Y' de bornes 'debut' et 'fin'. Le problème constiste à associer à chaque point les intervalles qui le contiennent : debut<=X et X<=fin. On veut conserver les points sans écho parmi les intervalles (jointure partielle).
 
 ```{r dplyr,message=FALSE}
 library(dplyr)
 N = 100
 M = 10
-points <- data.frame(X=round(runif(min=1,max=365,n=N)))
-intervalles <- data.frame(Y=1:M,debut=round(runif(min=1,max=365,n=M)),longueur=round(runif(min=1,max=7,n=M)))
-intervalles$fin <- pmin(intervalles$debut+intervalles$longueur,365)
+points <- data.frame(X=sample(1:365,size=N,replace=TRUE))
+intervalles <- data.frame(Y=1:M,debut=sample(1:365,size=M,replace=TRUE),
+                          longueur=sample(1:7,size=M,replace=TRUE)) %>%
+  mutate(fin=pmin(debut+longueur,365))
 ```
 
 ```{r}
@@ -67,12 +57,21 @@ resultat <- points %>%
   dplyr::right_join(points,"X")
 ```
 
+## Les chaines d'une table qui contiennent un mot d'une seconde table
+```{r}
+library(stringr)
+resultat <- data.frame(sentences,stringsAsFactors=FALSE) %>%
+  tidyr::crossing(fruit) %>%
+  dplyr::filter(stringr::str_detect(sentences,paste0("\\b",fruit,"\\b")))
+```
 
 # Solutions viables non retenues
 
 ## Le package sqldf
 
-Le package **sqldf** permet d'utiliser des requêtes en langage SQL. Malgré la simplicité de la solution, celle ci a été écartée en raison de performances moindres (32 secondes au lieu de 7 secondes sur l'exemple) provenant de la constitution préalable en mémoire d'une base de données SQLite. Cette étape initiale peut d'ailleurs être un obstacle en cas de saturation de la mémoire, mais dans ce cas d'autres solutions que celle préconisée sont de toutes manières nécessaires.
+Le package **sqldf** permet d'utiliser des requêtes en langage SQL. Malgré la simplicité de la solution, celle ci a été écartée en raison de :
+<br>- performances moindres (32 secondes au lieu de 7 secondes sur l'exemple) provenant de la constitution préalable en mémoire d'une base de données SQLite. Cette étape initiale peut d'ailleurs être un obstacle en cas de saturation de la mémoire, mais dans ce cas d'autres solutions que celle préconisée sont de toutes manières nécessaires.
+<br>- limitation au langage SQL dans l'expression de la condition : cela exclut par exemple le recours aux expressions régulières à la PERL (voir l'opérateur 'like' de SQL pour un erzatz)
 
 ```{r sqldf,message=FALSE}
 library(sqldf)
@@ -97,7 +96,7 @@ resultat <- a[b, (name1) := mget(name1), on = .(X >= debut, X <= fin)]
 
 ## Le package fuzzyjoin
 
-L'utilisation du package **fuzzyjoin**, conçu pour ce type de cas est écartée en raison de sa complexité de mise en oeuvre et de performances nettement inférieures (43 secondes sur l'exemple). En outre la documentation du package pour des cas non triviaux (comme le cas pris en exemple) est très nettement insuffisante et l'analyse du code a rèvélé que l'exécution reposait sur un produit cartésien (mais limité aux variables utilisées dans la condition).
+L'utilisation du package **fuzzyjoin**, en principe conçu pour ce type de cas est écartée en raison de la complexité de sa mise en oeuvre et de performances nettement inférieures (43 secondes sur l'exemple). En outre la documentation du package pour des cas non triviaux (comme le cas pris en exemple) est très nettement insuffisante et l'analyse du code a révélé que l'exécution reposait sur un produit cartésien (mais limité aux variables utilisées dans la condition).
 
 ```{r fuzzyjoin,message=FALSE}
 library(fuzzyjoin)
@@ -112,9 +111,9 @@ resultat <- fuzzy_join(points,intervalles
 
 La solution basée sur du R de base est écartée à la fois en raison de sa complexité et de performances nettement inférieures (45 secondes sur l'exemple). Néanmoins elle pourrait avoir un sens dans un contexte de grandes tables où le passage par un produit cartésien serait réhibitoire.
 
-En R de base, le principe constiste à boucler sur l'ensemble des valeurs des points, et pour chacune de celles ci à produire une table des intervalles répondant à la question, puis à fusionner toutes les tables résultat. Cette approche présente plusieurs difficultés qui peuvent être contournées mais au détriment de la lisibilité du programme et de ses performances.
+En R de base, le principe consiste à boucler sur l'ensemble des valeurs des points, et pour chacune de celles ci à produire une table des intervalles répondant à la question, puis à fusionner toutes les tables résultat. Cette approche présente plusieurs difficultés qui peuvent être contournées mais au détriment de la lisibilité du programme et de ses performances.
 <br>Dans la condition, on ne peut utiliser qu'une seule variable de la table 'points' : if faudrait utiliser **mapply** au lieu de **lapply** en citant toutes les variables nécessaires de la table 'points', ce qui rend une généralisation difficile.
-<br>Le résultat est une jointure simple ('inner join') d'où vont être écartés les points sans écho dans la table de intervalles : il faudrait utiliser replyr::replyr_bind_rows au lieu de l'appel à 'rbind' via 'do.call'. Les performances sont alors sensiblement dégradées (110 secondes sur l'exemple).
+<br>Le résultat est une jointure simple ('inner join') d'où vont être écartés les points sans écho dans la table de intervalles : pour obtenir un 'left join', il faudrait utiliser replyr::replyr_bind_rows au lieu de l'appel à 'rbind' via 'do.call'. Les performances sont alors sensiblement dégradées (110 secondes sur l'exemple).
 <br>Il n'est pas possible de se passer de la syntaxe de base à l'intérieur de la condition (par exemple avec 'within') sans très sensiblement dégrader les performances (157 secondes sur l'exemple).
 
 ```{r}
@@ -132,4 +131,16 @@ resultat <- do.call("rbind",
 # Solutions à ne pas utiliser
 
 Rien à signaler.
+
+
+# Niveau d'intégration à l'USSR
+
+## Développements préconisés
+
+Aucun.
+
+## Points de vigilance
+
+Aucun.
+
 
