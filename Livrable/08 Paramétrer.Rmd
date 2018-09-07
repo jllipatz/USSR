@@ -1,0 +1,220 @@
+---
+title: "Stockage intermédiaire en format spécifique SAS"
+author: "JLL"
+date: "12 juin 2018"
+output:
+  html_document:
+    theme: united
+    toc: yes
+    toc_depth: 2
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+```
+
+# Problématique
+
+En SAS, les macro-fonctions permettent de définir des sections de programme qui contiennent des références à des éléments susceptibles d'être changés au moment du lancement du programme : les macro-variables. Cette fonctionnalité permet de paramétrer facilement un programme SAS.<br>
+En SAS, les macros reposent sur des substitutions de morceaux de texte dans une commande, puis sur l'exécution de cette commande. L'équivalent R se trouve naturellement dans ses fonctions et ses variables, mais, malheureusement toutes les fonctions n'évaluent pas leurs arguments.<br>
+
+Le code suivant fonctionne, `select` rencontre le symbole 'VARIABLE' et, comme cela ne correspond pas à une colonne connue de 'mtcars', en prend la valeur:
+```{r include = TRUE, echo= TRUE, warning = FALSE, message = FALSE, eval = TRUE}
+VARIABLE <- "cyl"
+mtcars %>% select(VARIABLE) %>% head(1)
+```
+
+Mais le code qui suit ne marche pas, la fonction `group_by` n'accepte que des symboles qui soient des noms de colonnes de 'mtcars' :
+```{r include = TRUE, echo= TRUE, warning = FALSE,message = FALSE, eval = FALSE }
+VARIABLE <- "cyl"
+mtcars %>% group_by(VARIABLE) %>% summarise(n=n())
+```
+```{r include = TRUE, echo= FALSE, warning = FALSE,message = FALSE, eval = TRUE }
+tryCatch(mtcars %>% group_by(VARIABLE) %>% summarise(n=n()),
+         error = function(e) print(e$message))
+```
+Pour avoir un comportement uniforme, il faut donc présenter les choses de manière à ce que le calcul se fasse en deux temps : un premier de substitution des valeurs des paramètres, un second d'évaluation selon le processus standard. 
+
+# Solution retenue
+
+La solution proposée est la fonction `defmacro` du package **gtools**. Elle a été retenue parce qu'évoquant de près les macros disponibles dans d'autres langages et parce qu'elle s'appuie sur un enrobage simple de mécanismes inclus dans le R de base.<br>
+La fonction `defmacro`construit un programme en assemblant des morceaux de programme syntaxiquement corrects. Dans certains cas ce qu'on cherche c'est à assembler des morceaux de chaîne de caractères pour constituer le texte d'une requête (par exemple une requête SQL). Pour ce genre d'utilisation la solution est complétée par la fonction `glue`du package **glue** qui premet de présenter les choses de la façon la plus lisible possible.
+
+
+# Intégration au dispositif de formation
+
+Evoqué dans la formation Insee « Prise en main rapide de données sous R».
+
+
+# Particularités de syntaxe
+
+Aucune.
+
+# Exemples
+
+Noter que dans les exemples qui suivent, le nom du paramètre est systématiquement en majuscules. En l'absence de signe distinctif comme le & de SAS, paramètres et autres éléments du langage pourraient ne pas être différenciables facilement. La mise en majuscules permet d'obtenir cette distinction visuelle.
+
+
+## Paramétrer une colonne
+
+```{r echo=TRUE,message=FALSE}
+library(gtools)
+m <- defmacro(VARIABLE,
+  expr = { 
+    mtcars %>% group_by(VARIABLE) %>% summarise(n=n())
+         }
+     )
+
+m(cyl)
+```
+Notes:<br>
+- Les accolades ne sont pas indispensables ici car le programme à exécuter est constitué d'une seule instruction.<br>
+- Les doubles-quotes doivent être omises pour générer in fine `group_by(cyl)` et non `group_by("cyl")`.
+
+## Paramétrer une fonction
+
+```{r echo=TRUE,message=FALSE}
+m <- defmacro(VARIABLE, VARIABLE2, FONCTION, PARTIE,
+  expr = { 
+    mtcars %>% group_by(VARIABLE) %>% summarise(n=FONCTION(VARIABLE2)) %>% PARTIE(1)
+         }
+     )
+
+m(cyl,mpg,mean,head)
+```
+
+
+## Paramétrer une expression
+
+```{r echo=TRUE,message=FALSE}
+m <- defmacro(EXPRESSION,
+  expr = {
+    mtcars %>% filter(EXPRESSION)
+        }
+  )
+
+m(mpg==max(mpg))
+```
+
+
+## Paramétrer une chaine de caractères
+
+La fonction `glue`du package de même nom est une généralisation de la saisie de chaînes de caractères de R. En R de base l'utilisation  de \\ signifie l'inclusion d'un caractère spécial dont l'abbréviation suit le \\. La foncton glue rajoute la notation `{...}` qui va dire qu'il faut évaluer ce qu'il y a entre accolades et inclure la chaîne de caractères correspondantes. On peut y mettre un nom de variable ou une expression complète.
+```{r echo=TRUE,message=FALSE}
+library(glue)
+library(sqldf)
+
+m <- function(VARIABLE)
+  sqldf(glue("select {VARIABLE},count(*) from mtcars group by {VARIABLE}"))
+
+m("cyl")
+```
+Note : ici les double-quotes sont indispensables car ce qu'on manipule c'est uniquement des chaînes de caractères.
+
+# Solutions viables non retenues
+
+## Les fonctions `parse` et `eval` du R de base
+
+Le macro-processing consiste à construire un programme pour, dans un second temps, demander son exécution. Ceci est un mécanisme courant en R puisque c'est exactement ce qui se passe lorsqu'on soumet des instructions : celles ci sont lues depuis un fichier ou depuis le clavier (donc initialement sous forme de chaînes de caractères) puis transformées en programme par l'interpréteur R qui est ensuite exécuté. Les fonctions qui se cachent derrière ces deux dernières étapes sont respectivement `parse` et `eval`, qu'on peut utiliser pour son propre compte, une fois construit le programme cible.
+
+```{r echo=TRUE,message=FALSE}
+m <- function(VARIABLE)
+  eval(
+    parse(
+      text=paste0("mtcars %>% group_by(",VARIABLE,") %>% summarise(n=n())")
+  ))
+
+m("cyl")
+```
+
+Ou, mieux, avec le package **glue** :
+```{r echo=TRUE,message=FALSE}
+m <- function(VARIABLE)
+  eval(
+    parse(
+      text=glue("mtcars %>% group_by({VARIABLE}) %>% summarise(n=n())")
+  ))
+
+m("cyl")
+```
+
+
+## Les fonctions `substitute` et `eval` du R de base
+
+```{r echo=TRUE,message=FALSE}
+m <- function(VARIABLE)
+  eval(
+    substitute(mtcars %>% group_by(VAR) %>% summarise(n=n()),
+               list(VAR=VARIABLE)
+  ))
+
+m(quote(cyl))
+```
+Note : on doit écrite `quote(cyl)` parce que l'appel `VAR=VARIABLE` va évaluer le contenu de 'VARIABLE' et qu'on veut que le résultat soit le nom 'cyl' et non la valeur d'une éventuelle variable 'cyl'.
+
+Cette soluton n'a pas été retenue parce que, de fait, elle est complètement intégrée dans la fonction `defmacro` de **gtools**, avec une syntaxe d'appel plus simple.
+
+
+## Le dispositif interne à **dplyr**
+
+```{r echo=TRUE,message=FALSE}
+m <- function(VARIABLE) {
+  VAR <- enquo(VARIABLE)
+  mtcars %>% group_by(UQ(VAR)) %>% summarise(n=n())
+}
+
+m(cyl)
+```
+
+Note : les doubles-quotes doivent être omises pour générer in fine `group_by(cyl)` et non `group_by("cyl")`.<br>
+
+Cette solution n'a pas été retenue en raison de son adhérence totale au 'tidyverse' : seuls les packages de cet ensemble sont susceptibles de reconnaître la notation `UQ` (ce n'est pas une fonction) qui permet à la fonction `group_by` d'interpréter ce qu'on lui passe comme une référence devant être évaluée.
+
+
+## La fonction `let` du package **wrapr**
+
+```{r echo=TRUE,message=FALSE}
+library(wrapr)
+
+m <- function(VARIABLE)
+  let(c(VAR=VARIABLE),
+    mtcars %>% group_by(VAR) %>% summarise(n=n())
+  )
+
+m("cyl")
+```
+Cette solution n'a pas été retenue car elle a une moins grande généralité et ne permet pas de passer en paramètre une expression :
+```{r echo=TRUE,message=FALSE,eval=FALSE}
+m <- function(EXPRESSION)
+  let(c(EXPR=EXPRESSION),
+    mtcars %>% filter(EXPR)
+  )
+
+m(quote(mpg==max(mpg)))
+```
+```{r echo=FALSE,message=FALSE,eval=TRUE}
+m <- function(EXPRESSION)
+  let(c(EXPR=EXPRESSION),
+    mtcars %>% filter(EXPR)
+  )
+tryCatch(m(quote(mpg==max(mpg))),error=function(e) print(e$message))
+```
+
+
+# Solutions à ne pas utiliser
+
+Aucune.
+
+
+# Niveau d'intégration à l'USSR
+
+## Développements préconisés
+
+Aucun.
+
+
+## Points de vigilance
+
+Aucun.
