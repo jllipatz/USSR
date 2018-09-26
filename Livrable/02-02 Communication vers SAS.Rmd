@@ -1,0 +1,177 @@
+---
+title: "Communication vers SAS"
+author: "JLL"
+date: "19 septembre 2018"
+output:
+  html_document:
+    theme: united
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Problématique
+
+Il s'agit :<br>
+1) D'être capables de lire l'important patrimoine de fichiers mis à disposition en format SAS, notamment les fichiers "en GEN".<br>
+2) De disposer de moyens simples d'échanger des données entre des briques logicielles construites autour des deux logiciels R et SAS, en particulier dans le cadre de chaînes applicatives qui, pour une raison ou une autre, auraient des traitements mobilisant tantôt l'un tantôt l'autre des deux logiciels. Dans ces échanges, il est important que le surcoût lié au changement d'environnement soit limité au maximum et n'implique pas la réalisation de programmes de lecture spécifiques. Le transport automatique des méta-données est donc fondamental.
+
+
+
+# Solution retenue
+
+Dans le sens SAS vers R, le package **haven** fournit une fonction de lecture des tables SAS qui répond à la question . La fonction `read_sas` permet de lire une table SAS en la convertissant en data.frame R sans perdre les types des données ni les éventuels labels.<br>
+Dans le sens R vers SAS (ou WPS), la solution préconisée consiste à invoquer une nouvelle session R depuis SAS (ou WPS) à y charger les données à transférer vers SAS, puis à demander à SAS (ou WPS) de faire l'import et la conversion des données. L'opération demande donc le transfert des données entre deux sessions R, celle où se faisait le travail et celle invoquée depuis SAS (ou WPS) : il est nécessaire de créer un fichier intermédiaire, par exemple en format RDS pour ne rien perdre des méta-données.
+
+
+# Particularités de syntaxe
+
+Aucune.
+
+
+# Exemples
+## De SAS vers R
+
+```{r eval=FALSE}
+library(haven)
+a <- read_sas("W:/AAA21/GEN_AAA21000_DDIFFSAS/NAIS00.sas7bdat")
+```
+Remarques:<br>
+
+- La fonction `read_sas`ne sait malheureusement pas lire un sous ensemble d'observations : en cas de travail sur seulement une partie des observations il faudra tout charger puis ensuite sélectionner les observations partinentes. Par contre la fonction sait ne charger que certaines colonnes (paramètre `cols_only`) : 
+
+```{r eval=FALSE}
+a <- read_sas("W:/AAA21/GEN_AAA21000_DDIFFSAS/NAIS00.sas7bdat", cols_only=c("agem","agep"))
+```
+- La lecture depuis l'environnement UNIX de certaines tables créées sous Windows et contenant des chaînes de caractères peut nécessiter de spécifier explicitement le mode d'encodage des caractères (paramètre `encoding`), comme dans le cas du fichier des naissances :
+```{r eval=FALSE}
+a <- read_sas("/shares/gen/AAA21/GEN_AAA21000_DDIFFSAS/NAIS00.sas7bdat", encoding="latin1")
+```
+- La fonction `read_sas`a quelques limitations:<br>
+Elle ne sait pas lire les fichiers cryptés.<br>
+Elle ne détecte pas la suppression manuelle d'enregistrements réalisée sour l'éditeur de SAS (fsb).
+
+## De R vers SAS
+
+On suppose qu'on a sauvegardé au préalable les données à transférer dans le fichier "a.RDS".<br>
+L'invocation de R depuis SAS se fait par le biais d'IML qui offre en outre une fonction de transfert des données depuis l'espace mémoire de R vers un membre de bibliothèque. Dans l'exemple ci dessous, on lit le fichier RDS pour en récupérer la table dans 'a' et on transfère les données de cette table vers le membre 'a' de la bibliothèque 'work'.
+
+```{r engine="SAS"}
+proc iml;
+  submit / R;       
+    a <- readRDS("a.RDS")
+  endsubmit;                               
+  call ImportDataSetFromR("work.a","a");  
+quit;
+```
+NOTE : ne pas mettre d'espace entre `endsubmit` et le `;`, cela conduirait à ce qu'endsumbit ne soit pas reconnu comme une commande SAS, donnant alors l'impression que l'appel est "gelé" sans que quoi ce soit qu'on envoie ensuite soit pris en compte.
+
+
+
+## De R vers SAS en conservant les labels
+
+Dans l'exemple précédent la fonction `ImportDataSetFromR` ne sait pas récupérer les labels, ce concept étant rarement utilisé en R. Néanmoins des labels peuvent exister (en tant qu'attribut "label" des colonnes du data.frame), soit qu'ils aient été positionnés explicitement en R (certains packages le font), soit qu'ils proviennent d'une lecture d'une table SAS. La solution consiste à extraire explicitement ces labels, à l'aide de la courte fonction `labels` définie ci-dessous et à les exporter en plus des données. Une macro SAS trouvée sur le web assemble ensuite les deux parties.
+
+```{r engine="SAS"}
+%macro label_data(data_set, library, ds_labels, column_name, column_label);
+* Source:
+*   https://chemicalstatistician.wordpress.com/2018/03/04/a-sas-macro-to-label-variables-in-one-data-set-using-a-character-variable-from-another-data-set/;
+* Modifié pour éliminer des warnings de conversion numérique -> caractère;
+* NOTE: On peut faire plus court (cf. Stackoverflow) mais il faut faire attention à la limite de longueur des macro-variables;
+
+* create distinct macro variables for each variable name and label; 
+proc sql noprint; select count(*) into :nobs from &ds_labels;
+data _null_; 
+     set &ds_labels; 
+	 n = put(_N_,5.);
+     call symput('var' || trim(left(n)), &column_name); 
+     call symput('label' || trim(left(n)), trim(left(&column_label)));  
+run;
+
+* use PROC DATASETS to change the labels;
+proc datasets 
+     library = &library 
+          memtype = data
+          nolist; 
+     modify &data_set; 
+     label 
+          %do i = 1 %to &nobs; 
+               &&var&i = &&label&i 
+          %end; 
+     ; 
+     quit; 
+run; 
+
+%mend;
+          
+proc iml;
+  submit / R;       
+	  library(dplyr)
+	  labels <- function(table) {
+		  f <- Vectorize(function(nom) {z <- attr(table[[nom]],"label"); ifelse(is.null(z),NA,z)})
+		  data.frame(name=colnames(table),stringsAsFactors=FALSE) %>% mutate(label=f(name))
+	  }
+    a <- readRDS("a.RDS")
+	  b <- labels(b)
+  endsubmit;                               
+  call ImportDataSetFromR("work.a","a");  
+  call ImportDataSetFromR("work.b","b");  
+quit;
+  
+%label_data(b,work,c,name,label)
+```
+
+
+## De R vers WPS
+
+Sous WPS, l'ensemble des deux processus décrits précédement fonctionne de la même manière mais avec une syntaxe légèrement différente.
+```{r engine="SAS"}
+options engine=sas7bdat;                          * Pour créer des tables en format SAS (au lieu du format spécifique WPS);
+proc r;
+  submit;
+    a <- readRDS("a.RDS")
+  endsubmit;
+  import R=a data=work.a; 
+quit;
+```
+
+
+# Solutions viables non retenues
+
+
+## Le package **SASxport**
+
+Le format XPORT de SAS est un ancien format datant de la SAS v6 et implique donc certaines limitations, dont celle de la longueur des noms des variables (8 caractères maximum). 
+
+# Solutions à ne pas utiliser
+
+## La fonction `write_sas` du package **haven**
+
+Le package **haven** offre une fonction `write_sas`qui crée des fichiers de type sas7bdat. Néanmoins, les fichiers créés ne sont reconnus ni par SAS v9, ni par WPS.
+
+
+## Le package **sas7bdat**
+
+Le package **sas7bdat** est, historiquement, la première tentative de fournir des outils de lecture de tables SAS sans passer par un support intermédiaire. Sa dernière mise à jour est ancienne et le package est néanmoins toujours documenté comme "expérimental". En outre,  les temps de chargement peuvent se réveler prohibitoires sur des fichiers un peu conséquents (6800 secondes sur un fichier de 200 Mo contre 85 secondes avec read_sas).
+
+
+# Intégration au dispositif de formation
+
+La question est abordée dans la formation "prise en main rapide de données sous R".
+
+
+# Niveau d'intégration à l'USSR
+
+## Développements préconisés
+
+Aucun.
+
+## Points de vigilance
+
+Aucun.
+
+
