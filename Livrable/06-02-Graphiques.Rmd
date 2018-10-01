@@ -1,0 +1,244 @@
+---
+title: "Graphiques"
+author: "AMSP"
+date: "1er octobre 2018"
+output: html_document
+---
+
+
+### Problématique
+
+Créer des graphiques à partir des données en choisissant le type de graphique correspondant à la représentation souhaitée. Personnaliser les graphiques (modifications du titre, de la légende). Exporter les graphiques.  
+
+### Solution retenue
+
+Le package retenu pour les graphiques est **ggformula**. Ce dernier propose une syntaxe consistante pour les différentes fonctions du package. Il s'appuie sur le package **ggplot2**, qui offre la possibilité de créer des graphiques relativement complexes en combinant différentes couches de graphiques. En outre, le package se prête plutôt bien à l'utilisation de l'opérateur pipe `%>%`.
+
+```{r chgmt_ggformula, warning=FALSE, message=FALSE}
+library(ggformula)
+```
+
+### Particularités de syntaxe
+
+Les fonctions du package **ggformula** commencent par le préfixe "gf". Elles s'écrivent sous la forme :
+
+```{r syntaxeggformula, eval=FALSE}
+gf_typedegraphique(formule, data=mes_donnees)
+```
+Où :
+
+* `typedegraphique` décrit le type de graphique souhaité (par exemple un histogramme, une ligne...)
+* `mes_donnees` est une table qui contient les variables utilisées pour le graphique
+* `formule` décrit comment utiliser ces variables
+
+Par exemple, lorsqu'on souhaite tracer deux variables, `formule` va prendre la forme `y ~ x` où `y` est le nom de la variable en ordonnées et `x` le nom de la variable en abscisses. 
+
+Notons que l'argument `data=mes_donnees` est en deuxième position car il est optionnel : il est possible de tracer un graphique uniquement à l'aide de vecteurs et de ne pas utiliser une table. 
+
+Le package **ggformula** permet d'utiliser facilement l'opérateur pipe `%>%` :
+
+```{r syntaxeggformula2, eval=FALSE}
+mes_donnees %>% gf_typedegraphique(formule)
+```
+
+### Exemples
+
+Dans les exemples ci-dessous, nous travaillerons sur les données de la table `mtcars`, dont les premières lignes sont représentées ci-dessous. 
+
+```{r mtcars_ggformula}
+head(mtcars)
+```
+
+#### Distribution d'une variable discrète ou qualitative : diagramme en barres
+
+Le diagramme en barre permet de représenter une variable discrète ou qualitative. Il est défini par la fonction `gf_bar`, en utilisant la formule `~x` vu qu’il n’y a qu’une variable. Ici, nous représenterons le nombre de cylindres (variable `cyl`) dans les moteurs des voitures de notre table. 
+
+```{r mtcars_bars}
+mtcars %>% gf_bar(~cyl)
+```
+
+Remarquons que par défaut, l'axe des abscisses représente une variable continue dans le graphique ci-dessus. Comme les diagrammes en barre servent à représenter des variables catégorielles, il faudra convertir notre variable numérique en facteur afin de représenter correctement les données.
+
+```{r mtcars_bars2}
+mtcars %>% gf_bar(~as.factor(cyl))
+```
+
+#### Distribution d'une variable continue : histogramme
+
+Nous nous intéressons à la variable `mpg`, qui correspond à la consommation du véhicule en carburant en milles par gallon. Il est possible de modifier le nombre de classes avec l'argument `bins`.
+
+```{r mtcars_histogram}
+mtcars %>% gf_histogram(~mpg)
+mtcars %>% gf_histogram(~mpg, bins=5)
+```
+
+#### Distribution d'une variable continue : densité
+
+La fonction `gf_dens` permet de représenter la distribution (ou densité) lissée de la variable. Il s'agit d'une estimation par noyau de la densité de probabilité. L'argument `kernel` permet de préciser la forme du noyau à utiliser (par défaut, il s'agit d'un noyau gaussien). 
+
+```{r mtcars_densite}
+mtcars %>% gf_dens(~mpg) %>% gf_labs(title="Noyau gaussien")
+mtcars %>% gf_dens(~mpg, kernel="rectangular") %>% gf_labs(title="Noyau rectangulaire")
+mtcars %>% gf_dens(~mpg, kernel="triangular") %>% gf_labs(title="Noyau triangulaire")
+```
+
+#### Nuage de point 
+
+La fonction `gf_point(y ~ x)` permet de tracer le nuage de points de deux variables, où `y` représente la variable sur l'axe des ordonnées et `x` la variable sur l'axe des abscisses. 
+
+Dans cet exemple, nous souhaitons observer la consommation de carburant (variable `mpg`) en fonction du poids de la voiture (variable `wt`).
+
+```{r mtcars_scatterplot}
+mtcars %>% gf_point(mpg ~ wt)
+```
+
+#### Distribution d'un ensemble de variables continues : boîte à moustache
+
+On s'intéresse ici à la consommation en carburant en milles par gallons (variable `mpg`) en fonction du nombre de cylindres de la voiture (variable `cyl`). 
+
+```{r mtcars_boxplot}
+mtcars %>% gf_boxplot(mpg ~ as.factor(cyl))
+```
+
+#### Distribution d'un ensemble de variables continues : diagramme en violon
+
+On peut également utiliser une représentation en violon, qui illustre une estimation lissée de la distribution des variables. Les mêmes précautions que pour représenter la densité s'appliquent. 
+
+```{r mtcars_violon}
+mtcars %>% gf_violin(mpg ~ as.factor(cyl))
+```
+
+#### Série temporelle
+
+On s'intéresse désormais à la table `longley` et nous souhaitons représenter l'évolution du PNB au cours du temps. 
+
+```{r graph_serie_temps}
+longley %>% gf_line(GNP~Year)
+```
+
+
+#### Modifier le titre du graphique
+
+La fonction `gf_labs` permet de modifier le titre du graphique, avec l'argument `title`. Il est aussi possible d'ajouter un sous-titre avec l'argument `subtitle` et une légende pour le graphique avec l'argument `caption`. 
+
+```{r titre_graphique}
+mtcars %>% gf_point(mpg ~ wt) %>% gf_labs(title="Consommation du carburant en fonction du poids de la voiture")
+mtcars %>% gf_point(mpg ~ wt) %>% gf_labs(title="Consommation du carburant en fonction du poids de la voiture", subtitle="Modèles de voitures datant de 1973-1974", caption="Source : Motor Trend US Magazine")
+```
+
+#### Modifier la légende des axes
+
+La fonction `gf_labs` permet de modifier la légende des axes, avec l'argument `y` pour l'axe des ordonnées et `x` pour l'axe des abscisses. Par défaut, le nom de la variable représentée est affichée. Si on souhaite cacher le label, pour la variable de l'axe des abscisses par exemple, alors on peut préciser `x=""`.
+
+```{r legende_graphique}
+mtcars %>% gf_point(mpg ~ wt) %>% gf_labs(y="Consommation de carburant (en milles/gallon)", x="Poids (en milliers de livres)")
+```
+
+#### Modifier les limites des axes
+
+La fonction `gf_lims` permet de modifier les limites des axes (pour les abscisses et/ou les ordonnées), en spécifiant la borne inférieure, la borne inférieure, ou les deux.
+
+Dans cet exemple, nous précisons que nous souhaitons voir, sur l'axe des abscisses (x), les valeurs de 0 à 6. Sur l'axe des ordonnées (y), nous souhaitons représenter les données à partir de 0. La valeur `NA` permet de ne pas spécifier de borne supérieure pour le graphique, dans ce cas la valeur est déterminée automatiquement à partir des données. 
+
+Remarque : R peut afficher un message d'avertissement si certaines observations sont en dehors de la fenêtre choisie pour représenter le graphique. R ne les affichera pas mais indique qu'il manque des observations sur le graphique. 
+```{r limites_axes}
+mtcars %>% gf_point(mpg ~ wt) %>% gf_lims(x=c(0,6), y=c(0,NA))
+```
+
+#### Modifier les graduations des axes
+
+La fonction `gf_refine` permet de modifier les graduations des axes, avec `scale_x_continuous` (pour l'axe des abscisses) ou `scale_y_continuous` (pour l'axe des ordonnées). 
+
+Ici, nous modifions les graduations sur l'axe des ordonnées. 
+
+```{r graduation_axes}
+mtcars %>% gf_point(mpg ~ wt) %>% gf_refine(scale_y_continuous(breaks=c(10,20,30)))
+```
+
+#### Modifier l'ordre des modalités
+
+```{r ordre_modalite}
+mtcars %>% gf_bar(~as.factor(cyl)) %>% gf_refine(scale_x_discrete(limits=c("8", "6", "4")))
+```
+
+#### Modifier le nom des modalités des axes
+
+```{r noms_modalite}
+mtcars %>% gf_bar(~as.factor(cyl)) %>% gf_refine(scale_x_discrete(labels=c("4 cylindres", "6 cylindres", "8 cylindres")))
+```
+
+
+#### Modifier les couleurs du graphique
+
+Il est possible de modifier les couleurs du graphique sans ajouter d'information. L'option `colour` permet de définir la couleur du contour, l'argument `fill` la couleur à l'intérieur et enfin l'argument `alpha` correspond à la transparence de la couleur intérieure. Cet argument est compris entre 0 et 1.
+
+```{r couleurs_graphique}
+mtcars %>% gf_histogram(~mpg, colour="grey", fill="blue", alpha=0.1)
+```
+
+Il est également possible d'ajouter de l'information en attribuant une couleur différente selon les valeurs d'une troisième variable. Dans ce cas, il faut faire précéder le nom de la variable par un `~` dans l'argument `colour`. 
+
+Par exemple, sur le nuage de points de la consommation de carburant en fonction du poids de la voiture, nous attribuons des couleurs différentes selon le nombre de cylindres des moteurs des voitures. 
+
+```{r couleurs_graphique2}
+mtcars %>% gf_point(mpg ~ wt, colour= ~as.factor(cyl)) %>% gf_labs(color="Nombre de cylindres")
+```
+
+
+#### Modifier le thème du graphique
+
+La fonction `gf_theme` permet de modifier rapidement l'apparence d'un graphique, en précisant le thème à utiliser en argument. Il est possible d'utiliser tous les thèmes du packages `ggplot2`. Le nom de ces thèmes et un exemple de leur rendu est disponible à l'adresse suivante : 
+
+https://ggplot2.tidyverse.org/reference/ggtheme.html
+
+Nous avons ici pris l'exemple d'un thème en noir et blanc. 
+
+```{r theme_graphique}
+mtcars %>% 
+  gf_bar(~as.factor(cyl)) %>% 
+  gf_theme(theme_bw())
+```
+
+#### Enregistrer le graphique
+
+On peut sauvegarder le dernier graphique créé avec la fonction `ggsave`, qui fait partie du package `ggplot2` mais est compatible avec `ggformula`. 
+
+```{r enregistrer_graphique, eval=FALSE}
+ggsave("mongraphique.png", width = 12, height = 8, unit = "cm", dpi = 300)
+```
+
+Attention, l’aspect du graphique peut ne pas être celui de R Studio, par exemple car le ratio largeur/hauteur est différent. Il faut toujours vérifier l’aspect du graphique enregistré. 
+
+### Solutions viables non retenues
+
+Il existe de nombreux packages permettant de réaliser des graphiques sous R. Un des plus connus est `ggplot2`, qui sert de base au package `ggformula`, ce dernier visant à ajouter une syntaxe unifiée. R de base permet également de réaliser des graphiques. 
+
+### Solutions à ne pas utiliser
+
+Aucune
+
+### Niveau d'intégration à l'USSR
+
+#### Développements préconisés
+
+Aucun.
+
+#### Points de vigilance
+
+Aucun. 
+
+### Intégration au dispositif de formation
+
+Les graphiques sont abordés lors de la séquence 18 ("Faire des graphiques").
+
+### Pour aller plus loin
+
+<!-- A noter que les tutoriels sur learnr ne fonctionnent pas a priori ? -->
+
+La vignette du package **ggformula** :
+
+https://cran.r-project.org/web/packages/ggformula/vignettes/ggformula.html
+
+Un tutoriel sur l'utilisation du package **gplot2** :
+
+http://r-statistics.co/ggplot2-Tutorial-With-R.html
