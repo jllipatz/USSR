@@ -1,10 +1,13 @@
 ---
 title: "Graphiques"
 author: "AMSP"
-date: "1er octobre 2018"
+date: "3 octobre 2018"
 output: html_document
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
 
 ### Problématique
 
