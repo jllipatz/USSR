@@ -2,7 +2,7 @@
 title: "Graphiques"
 author: "AMSP"
 date: "3 octobre 2018"
-output: html_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
