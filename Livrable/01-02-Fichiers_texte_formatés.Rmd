@@ -1,0 +1,141 @@
+---
+title: "Fichiers texte formatés"
+author: "AMSP"
+date: "octobre 2018"
+output: 
+  html_document:
+    theme: united
+    toc: true
+    toc_depth: 4
+    toc_float: yes
+---
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Problématique
+
+Lire et écrire des fichiers texte formatés, où chaque enregistrement apparaît sur une ligne et où la longueur des champs est la même pour chaque variable donnée pour chaque enregistrement. 
+
+<!-- Note : pour les fichiers formatés (de longueur fixe ?), ça correspond peut etre au formatted input p 74 du livre learning sas by example --> 
+
+## Solution retenue
+
+Pour la lecture, le package **readr** permet de lire les fichiers texte de type largueur fixe, avec la fonction **read_fwf**. Pour l'écriture, seul le package **gdata** permet d'exporter des fichiers à largeurs de colonnes fixes.
+
+<!-- Est ce qu'on conserve le fait de parler de l'écriture ? Car l'utilisation me semble assez marginale ... En plus, je n'ai pas eu le temps de tester gdata -->
+
+Ce package ne faisant pas partie de R de base, il est nécessaire de l'installer au préalable à l'aide de l'instruction `install.packages` (l'installation n'est à faire qu'une fois) et de le charger à chaque nouvelle ouverture de session R à l'aide de l'instruction `library`. 
+
+```{r chargement_readr, eval=FALSE}
+# Installer le package (une fois pour toutes)
+install.packages("readr")
+# Charger le package et les fonctions qu'il contient en mémoire (à faire à chaque fois, lors de l'ouverture d'une nouvelle session R)
+library(readr)
+```
+
+```{r eval=TRUE, include=FALSE}
+library(readr)
+```
+
+## Particularité de syntaxe
+
+Contrairement à SAS où le backslash \\ indique le séparateur de répertoire, en R le séparateur de répertoire est indiqué par un slash / (pour tous les systèmes d'exploitations) ou par un double backslash \\\\ (sous Windows uniquement). Il faudra donc penser à modifier le chemin du répertoire si l'on copie colle ce dernier depuis l'explorateur. 
+
+## Exemples
+
+### Code SAS
+
+En SAS : 
+
+<!-- A changer pour avoir les memes choses que dans le code d'example--> 
+```{r fwf_sas, engine="sas", eval=FALSE}
+libname lib 'chemin_librairie';
+filename fichier 'repertoire\fichier.txt';
+data lib.donnees;
+  infile fichier truncover;
+  input Id 1-2 Nom $ 3-16 Prenom $ 17-31 Numero_tel 32-42 ;
+run;
+```
+
+### Jeu de données d'exemple
+
+<!-- Reste à tester pour le nom des colonnes déjà dans le fichier à lire et les espaces -->
+
+Nous allons travailler sur le fichier d'exemple du package **readr**.
+
+```{r table_ex_fwf}
+fwf_exemple<-readr_example("fwf-sample.txt")
+cat(read_lines(fwf_exemple))
+```
+
+### Spécifier les positions des colonnes :
+
+En laissant la fonction deviner automatiquement à partir de la position des colonnes vides, suivi d'un vecteur contenant le nom des colonnes :
+
+```{r fwf1}
+read_fwf(fwf_exemple, fwf_empty(fwf_exemple, col_names = c("prenom", "nom", "etat", "ssn")))
+```
+
+En spécifiant la largeur de chaque colonne par un vecteur, suivi d'un vecteur contenant le nom des colonnes : 
+```{r fwf2}
+read_fwf(fwf_exemple, fwf_widths(c(20, 10, 12), c("nom", "etat", "ssn")))
+```
+
+En spécifiant la position de début et de fin de chaque colonnes (ici les colonnes débutent aux premier caractère pour la colonne nom et au 30ème caractère inclus pour la colonne ssn, et se terminent au 10ème caractère pour la colonne nom et au 42ème caractère inclus pour la colonne ssn) :
+```{r fwf3}
+read_fwf(fwf_exemple, fwf_positions(c(1, 30), c(10, 42), c("nom", "ssn")))
+```
+
+En donnant le nom d'une colonne, suivi des positions de début et de fin pour cette colonne :
+```{r fwf4}
+read_fwf(fwf_exemple, fwf_cols(nom = c(1, 10), ssn = c(30, 42)))
+```
+
+En donnant le nom d'une colonne, suivi de la longueur de la colonne
+```{r fwf5}
+read_fwf(fwf_exemple, fwf_cols(nom = 20, state = 10, ssn = 12))
+```
+
+### Exportation 
+
+Seul le package `gdata` permet d'exporter des fichiers à largeurs de colonnes fixes. 
+
+```{r fwf_export, message=FALSE}
+donnees<-data.frame(id=c("01","02","03"),
+                    noms=c("Jean", "Marie", "Edouard"),
+                    ssn=c("418-Y11-4111", "319-Z19-4341", "219-532-c301"))
+library(gdata)
+write.fwf(donnees, file="~/fichier_sortie.txt", width=c(2,10,12), colnames = TRUE)
+```
+
+## Niveau d'intégration à l'USSR
+
+### Développements préconisés
+
+Aucun.
+
+#### Points de vigilance
+
+Aucun. 
+
+### Solutions viables non retenues
+
+#### R de base
+
+En terme de performances, la fonction `read.fwf` est beaucoup moins rapide que la fonction `read_fwf` du package **readr**. En effet, l'implémentation de cette fonction est inefficace, puisqu'elle consiste à lire le fichier, à insérer des tabulations entre les colonnes, à enregistrer le fichier sur le disque et à le lire avec `read.table`.
+
+```{r fwf_rbase, eval=FALSE}
+donnees<-read.fwf("repertoire/fichier.txt", widths=c(2,13,14,10), colClasses=c("numeric", "character", "character", "numeric"), col.names=c("Id", "Nom", "Prenom", "Numero_tel"))
+```
+
+<!-- Package LaF supprimé car d'une part, il semblerait que readr utilise en partie LaF, et d'autre part, readr semblait plus efficace en termes de performances dans certains benchmark-->
+
+### Solutions à ne pas utiliser
+Aucune. 
+<!-- package sqldf ?-->
+
+### Intégration au dispositif de formation
+
+La question est abordée dans la formation "Prise en main rapide de données sous R", lors de la séquence 9 ("formats de fichiers d'échange").

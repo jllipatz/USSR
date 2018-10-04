@@ -1,8 +1,13 @@
 ---
 title: "Fichiers texte avec séparateurs"
 author: "AMSP"
-date: "June 24, 2018"
-output: html_document
+date: "octobre 2018"
+output:
+  html_document:
+    theme: united
+    toc: true
+    toc_depth: 4
+    toc_float: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -10,13 +15,13 @@ knitr::opts_chunk$set(echo = TRUE)
 library(readr)
 ```
 
-### Problématique
+## Problématique
 
 <!-- Est-ce qu'on sait s'il vaut mieux utiliser séparateur ou délimiteur dans le vocabulaire ?-->
 Lire et écrire des fichiers texte où chaque enregistrement apparaît sur sa propre ligne et dont les champs sont séparés par un caractère unique appelé "séparateur" (ou "délimiteur"). Ce dernier peut correspondre à n'importe quel caractère absent des valeurs des champs, tel qu'une virgule ou un point-virgule (fichiers CSV), des espaces, ou un autre délimiteur.
 <!-- http://www.thibault.laurent.free.fr/cours/R_avance/chapitre_1_avance.html#repertoires-et-fichiers -->
 
-### Solution retenue
+## Solution retenue
 
 Le package **readr** offre un ensemble de fonctions permettant de lire les données d'un fichier délimité. La fonction la plus générale de ce package est la fonction `read_delim`, qui permet de spécifier le séparateur à utiliser lors de la lecture du fichier. Parallèlement, la fonction `write_delim` permet l'écriture d'un fichier texte avec séparateur. 
 
@@ -31,14 +36,14 @@ library(readr)
 
 Remarque : Nous présenterons ici uniquement les fonctions `read_delim` et `write_delim`. Ces fonctions sont plus générales et permettent de lire tout type de fichier avec séparateur. D'autres fonctions du package **readr** permettent de lire des types de fichiers spécifiques, comme par exemple les fonctions `read_csv` et `read_csv2` pour les fichiers CSV (ayant comme séparateur respectivement la virgule et le point-virgule).
 
-### Particularité de syntaxe
+## Particularité de syntaxe
 
 <!-- Pas vraiment une spécificité du package, plutôt une spécificité de R, mais ça me semble important à préciser pour des débutants, surtout que SAS ne fonctionne pas pareil -->
 Pour spécifier le chemin d'un fichier : contrairement à SAS où le backslash \\ indique le séparateur de répertoire, en R le séparateur de répertoire est indiqué par un slash / (pour tous les systèmes d'exploitations) ou par un double backslash \\\\ (sous Windows uniquement). Il faudra donc penser à modifier le chemin du répertoire si l'on copie colle ce dernier depuis l'explorateur. 
 
-### Exemples
+## Exemples
 
-#### Pour comparaison : code SAS pour l'importation de fichiers avec séparateurs
+### Pour comparaison : code SAS pour l'importation de fichiers avec séparateurs
 
 <!-- Est ce qu'on garde cette partie code SAS ? Car elle n'a pas l'air d'être évoquée par ailleurs dans les autres chapitres ? -->
 
@@ -60,7 +65,7 @@ proc import datafile="repertoire\fichier"
 run;
 ```
 
-#### Importer un fichier avec l'interface graphique de RStudio
+### Importer un fichier avec l'interface graphique de RStudio
 
 RStudio permet d'importer des fichiers avec séparateurs depuis le panneau "Environment" en haut à droite, en cliquant sur *Import Dataset > From CSV...*
 Une autre option est d'utiliser le menu : *File> Import Dataset > From CSV...*
@@ -94,7 +99,7 @@ Modifier l'encodage | Panneau "Import options">Locale>Configure...>Encoding | Si
 Préciser le caractère correspondant aux valeurs manquantes | Panneau "Import options">NA | Un menu déroulant permet de spécifier si nécessaire la chaîne de caractère qui correspond à une valeur manquante. 
 
 
-#### La fonction *read_delim* du package *readr*
+### La fonction *read_delim* du package *readr*
 
 La fonction `read_delim` a pour arguments obligatoires l'emplacement du fichier à lire et le type de délimiteur du fichier. 
 
@@ -103,7 +108,7 @@ ma_table<-read.delim(file="chemin_du_fichier", delim="separateur_du_fichier")
 ```
 D'autres arguments optionnels permettront de spécifier comment lire le fichier. 
 
-##### Quel délimiteur retenir ? 
+#### Quel délimiteur retenir ? 
 
 L'argument `delim` permet de spécifier le séparateur de champs dans le fichier. Les plus fréquents sont : 
 
@@ -117,7 +122,7 @@ Fichier texte utilisant des espaces comme délimiteur | espace | " \" |
 <!-- Mettre éventuellement un exemple avec CSV2 en spécifiant de le télécharger sur github 
 Sinon chercher des liens vers mtcars.csv ? Pb : pas de décimales ! Est ce que dans datasets il y a qch avec les décimales ? -->
 
-##### Spécifier le type des colonnes : l'argument col_types
+#### Spécifier le type des colonnes : l'argument col_types
 
 La fonction `read_delim` détermine automatiquement le type à attribuer (exemple : entier) aux colonnes du fichier, en analysant les 1000 premières lignes. Les types de colonnes attribués sont précisés après l'exécution de la fonction. On peut également y accéder avec la fonction `spec`.
 
@@ -193,7 +198,7 @@ Pour les dates, il est possible de préciser le format, par exemple `col_date(fo
 
 <!-- Vérifier si numeric ça passe avec les décimales, à défaut faire un avertissement -->
 
-##### Spécifier les colonnes à ne pas lire
+#### Spécifier les colonnes à ne pas lire
 
 Pour ne pas lire une colonne, son type doit être `col_skip`. En reprenant l'exemple précédent et en choisissant de ne pas lire la variable "Ligne5" :
 
@@ -207,7 +212,7 @@ codes_postaux <- read_delim("~/laposte_hexasmal.csv", delim=";", guess_max=500,
 head(codes_postaux)
 ```
 
-##### Ne pas lire les lignes au début du fichier
+#### Ne pas lire les lignes au début du fichier
 
 Si la table de données ne commence pas dès la première ligne du fichier, il peut-être utile de ne démarrer la lecture qu'à partir d'une certaine ligne. L'option `skip` indique le nombre de lignes à sauter avant de lire les données. 
 
@@ -219,7 +224,7 @@ table <- read_delim("~/valeurs_trimestrielles.csv", delim=";", skip=3, col_names
 head(table)
 ```
 
-##### Changer le nom des colonnes
+#### Changer le nom des colonnes
 
 Par défaut, la première ligne lue dans le fichier est utilisée pour le nom des colonnes. Si on ne souhaite pas utiliser la première ligne pour définir le nom des colonnes, il faut préciser `col_names=FALSE`. Dans ce cas, le nom des colonnes est généré automatiquement : X1, X2, X3, etc. 
 
@@ -233,7 +238,7 @@ head(table)
 
 
 
-##### Gestion des caractères accentués : modifier l'encodage avec l'argument locale
+#### Gestion des caractères accentués : modifier l'encodage avec l'argument locale
 
 Il arrive parfois qu'après la lecture d'un fichier, les accents ne s'affichent pas correctement.Dans le fichier ci-dessous de la nomenclature produit utilisée par les douanes, les libellés des lignes 4 et 6 ne s'affichent pas correctement.
 
@@ -254,7 +259,7 @@ head(codes_nc8)
 ```
 Cette fois-ci, les caractères accentués s'affichent correctement. 
 
-##### Exporter une table
+#### Exporter une table
 
 La fonction `write_delim` permet l'exportation d'une table dans un fichier délimité. Il faut préciser la table à exporter, l'emplacement du fichier en sortie, le délimiteur retenu. 
 
@@ -266,15 +271,15 @@ write_delim(df, "~/table_exportee.csv", delim=",")
 ```
 
 
-### Solutions viables non retenues
+## Solutions viables non retenues
 
 <!-- Parler des autres fonctions du package readr ? --> 
 
-#### Le package data.table
+### Le package data.table
 
 La fonction **fread** du package **data.table** est efficace en termes de performances. Cette fonction permet une lecture des fichiers beaucoup plus rapide que les fonctions de R de base, notamment lorsque la taille du fichier augmente.
 
-Toutefois, cette solution a été écartée en raison d'incompatibilités avec le reste des outils préconisés. 
+Toutefois, cette solution a été écartée en raison d'une moindre compatibilité avec le reste des outils préconisés. 
 
 ```{r delim data.table, eval=FALSE}
 library(data.table)
@@ -287,7 +292,7 @@ fwrite(donnees, "repertoire/fichier_sortie.csv")
 ```
 
 
-#### R de base
+### R de base
 
 R dispose par défaut de plusieurs fonctions pour lire des fichiers délimités, la plus générale étant read.table. Les fonctions read.csv et read.csv2 sont un raccourci de read.table et permettent de lire des fichiers CSV. 
 
@@ -304,25 +309,25 @@ Contrairement aux fonctions des packages **readr** et **data.table**, les foncti
 
 <!-- ## Package iotools ? -->
 
-### Solutions à ne pas utiliser
+## Solutions à ne pas utiliser
 
 Aucune. 
 
-### Niveau d'intégration à l'USSR
+## Niveau d'intégration à l'USSR
 
-#### Développements préconisés
-
-Aucun.
-
-#### Points de vigilance
+### Développements préconisés
 
 Aucun.
 
-### Intégration au dispositif de formation
+### Points de vigilance
+
+Aucun.
+
+## Intégration au dispositif de formation
 
 La question est abordée dans la formation "Prise en main rapide de données sous R", lors de la séquence 9 ("formats de fichiers d'échange").
 
-### Pour aller plus loin
+## Pour aller plus loin
 
 Vignettes du package readr :
 

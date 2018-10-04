@@ -1,11 +1,11 @@
 ---
 title: "Graphiques"
 author: "AMSP"
-date: "3 octobre 2018"
+date: "octobre 2018"
 output:
   html_document:
     theme: united
-    toc: yes
+    toc: true
     toc_depth: 4
     toc_float: yes
 ---
@@ -13,8 +13,6 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
-# Graphiques
 
 ## Problématique
 
@@ -209,7 +207,7 @@ mtcars %>%
   gf_theme(theme_bw())
 ```
 
-### Enregistrer le graphique
+#### Enregistrer le graphique
 
 On peut sauvegarder le dernier graphique créé avec la fonction `ggsave`, qui fait partie du package `ggplot2` mais est compatible avec `ggformula`. 
 
