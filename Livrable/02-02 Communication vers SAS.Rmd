@@ -6,7 +6,7 @@ output:
   html_document:
     theme: united
     toc: yes
-    toc_depth: 3
+    toc_depth: 4
     toc_float: yes
 ---
 
@@ -14,7 +14,9 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Problématique
+# Communication vers SAS
+
+## Problématique
 
 Il s'agit :<br>
 1) D'être capables de lire l'important patrimoine de fichiers mis à disposition en format SAS, notamment les fichiers "en GEN".<br>
@@ -22,19 +24,19 @@ Il s'agit :<br>
 
 
 
-# Solution retenue
+## Solution retenue
 
 Dans le sens SAS vers R, le package **haven** fournit une fonction de lecture des tables SAS qui répond à la question . La fonction `read_sas` permet de lire une table SAS en la convertissant en data.frame R sans perdre les types des données ni les éventuels labels.<br>
 Dans le sens R vers SAS (ou WPS), la solution préconisée consiste à invoquer une nouvelle session R depuis SAS (ou WPS) à y charger les données à transférer vers SAS, puis à demander à SAS (ou WPS) de faire l'import et la conversion des données. L'opération demande donc le transfert des données entre deux sessions R, celle où se faisait le travail et celle invoquée depuis SAS (ou WPS) : il est nécessaire de créer un fichier intermédiaire, par exemple en format RDS pour ne rien perdre des méta-données.
 
 
-# Particularités de syntaxe
+## Particularités de syntaxe
 
 Aucune.
 
 
-# Exemples
-## De SAS vers R
+## Exemples
+### De SAS vers R
 
 ```{r eval=FALSE}
 library(haven)
@@ -56,7 +58,7 @@ Elle ne sait pas lire les fichiers cryptés.<br>
 Elle ne détecte pas la suppression manuelle d'enregistrements réalisée sour l'éditeur de SAS (fsb).<br>
 Elle consomme au moins deux fois la place mémoire nécessaire pour accueillir la table finale.
 
-## De R vers SAS
+### De R vers SAS
 
 On suppose qu'on a sauvegardé au préalable les données à transférer dans le fichier "a.RDS".<br>
 L'invocation de R depuis SAS se fait par le biais d'IML qui offre en outre une fonction de transfert des données depuis l'espace mémoire de R vers un membre de bibliothèque. Dans l'exemple ci dessous, on lit le fichier RDS pour en récupérer la table dans 'a' et on transfère les données de cette table vers le membre 'a' de la bibliothèque 'work'.
@@ -73,7 +75,7 @@ NOTE : ne pas mettre d'espace entre `endsubmit` et le `;`, cela conduirait à ce
 
 
 
-## De R vers SAS en conservant les labels
+### De R vers SAS en conservant les labels
 
 Dans l'exemple précédent la fonction `ImportDataSetFromR` ne sait pas récupérer les labels, ce concept étant rarement utilisé en R. Néanmoins des labels peuvent exister (en tant qu'attribut "label" des colonnes du data.frame), soit qu'ils aient été positionnés explicitement en R (certains packages le font), soit qu'ils proviennent d'une lecture d'une table SAS. La solution consiste à extraire explicitement ces labels, à l'aide de la courte fonction `labels` définie ci-dessous et à les exporter en plus des données. Une macro SAS trouvée sur le web assemble ensuite les deux parties.
 
@@ -127,7 +129,7 @@ quit;
 ```
 
 
-## De R vers WPS
+### De R vers WPS
 
 Sous WPS, l'ensemble des deux processus décrits précédement fonctionne de la même manière mais avec une syntaxe légèrement différente.
 ```{r engine="SAS"}
@@ -141,7 +143,7 @@ quit;
 ```
 
 
-# Solutions viables non retenues
+## Solutions viables non retenues
 
 En lecture, le jeu d'essai utilisé est une base SAS de 1,2GO issue de la concaténation de l'ensemble des fichiers départementaux de la base de sondage adresse de 2003. Elle comporte essentiellement des variables de type caractère, facteur a priori pénalisant dans toute lecture de données en R.
 
@@ -154,35 +156,46 @@ foreign       | read.ssd   |                281s | necessite SAS, pas de labels
 -             | WPS/proc R |                  NA | nécessite WPS, pas de labels, stockage intermédiaire
 SASxport      | read.xport |           71s+ 797s | nécessite SAS, noms de variables courts, stockage intermédiaire
 
-## Le package **Hmisc**
+### Le package **Hmisc**
 
-Le package **Hmisc** offre une fonction `sas.get` qui permet de lire des tables SAS en dialoguant avec une session SAS lancée depuis R. Pour utiliser la fonction, il faut donc savoir où se trouve installé le programme SAS. La solution est écartée n raison de sa dépendance à la présence du logiciel SAS.
+Le package **Hmisc** offre une fonction `sas.get` qui permet de lire des tables SAS en dialoguant avec une session SAS lancée depuis R. Pour utiliser la fonction, il faut donc savoir où se trouve installé le programme SAS. La solution est donc écartée en raison de sa dépendance à la présence du logiciel SAS. 
 
 ```{r eval=FALSE}
 library(Hmisc)
-tbl <- sas.get("U:/R", "bsa2003"
-               ,sasprog="C:/Program Files/SAS94/SASFoundation/9.4/sas.exe")
+b <- sas.get("U:/R", "bsa2003",
+             sasprog="C:/Program Files/SAS94/SASFoundation/9.4/sas.exe")
+```
+Néanmoins, cette solution présente plusieurs options interessantes :<br>
+- possibilité de selectionner uniquement certaines variables (paramètre `variables`)<br>
+- possibilité de passer des instructions SAS de filtrage des observations (paramètre `ifs`)
+```{r eval=FALSE}
+b <- sas.get("U:/R", "bsa2003",
+             variables=c("ID_CICN2","NBLOGEMENT"),
+             ifs='if (DEP="86")and(COM="194");'),
+             sasprog="C:/Program Files/SAS94/SASFoundation/9.4/sas.exe")
 ```
 Remarques :<br>
 - Les données de type caractère sous SAS sont transformées en facteurs sous R.<br>
-- Les éventuels labels de variable sont conservés.
+- Les éventuels labels de variable sont conservés.<br>
+- Il n'y a pas de fonction d'écriture de table SAS.
 
-## Le package **foreign**
+### Le package **foreign**
 
-Le package  **foreign** offre une fonction  `read.ssd` qui permet de lire des tables SAS en dialoguant avec une session SAS lancée depuis R. Pour utiliser la fonction, il faut donc savoir où se trouve installé le programme SAS. La solution est écartée en raison de sa dépendance à la présence du logiciel SAS.
+Le package  **foreign** offre une fonction  `read.ssd` qui permet de lire des tables SAS en dialoguant avec une session SAS lancée depuis R. Pour utiliser la fonction, il faut donc savoir où se trouve installé le programme SAS. La solution est donc écartée en raison de sa dépendance à la présence du logiciel SAS.
 
 ```{r eval=FALSE}
 library(foreign)
-tbl <- read.ssd("U:/R", "bsa2003"
-                ,sascmd="C:/Program Files/SAS94/SASFoundation/9.4/sas.exe")
+tbl <- read.ssd("U:/R", "bsa2003",
+                sascmd="C:/Program Files/SAS94/SASFoundation/9.4/sas.exe")
 ```
 Remarques :<br>
 - Les données de type caractère sous SAS sont transformées en facteurs sous R.<br>
-- Les éventuels labels de variable ne sont pas conservés.
+- Les éventuels labels de variable ne sont pas conservés.<br>
+- Il n'y a pas de fonction d'écriture de table SAS.
 
-## De SAS vers R depuis SAS et WPS
+### De SAS vers R depuis SAS et WPS
 
-### Avec WPS
+#### Avec WPS
 
 La `proc R` permet de communiquer dans les deux sens : `ìmport` pour tranférer vers WPS des données accédées depuis une nouvelle session R, `export` dans le sens inverse. Les performances de cette dernière sont supérieures à celles de la fonction `read_sas` de **haven**.<br>
 Cette solution n'a néanmoins pas été mise en avant, car une fois transférées vers R les données doivent être réécrites dans un format intermédiaire (RDS ou fst) pour être accéssible depuis une session R ou RStudio indépendante de celle lancée par WPS.
@@ -200,7 +213,7 @@ Remarques : <br>
 - Comme avec **haven**, WPS garde le type "character" pour les données chaines de caractères.<br>
 - Comme dans le transfert dans l'autre sens, les éventuels labels présents sur les variables de la table ne sont pas transférés sous R et nécessiteraient une programmation complémentaire.
 
-### Avec SAS
+#### Avec SAS
 
 La `proc IML` permet de communiquer dans les deux sens. La fonction `ExportDataSetToR` permet de transférer des données dans une session R ouverte par SAS. Les performances de cette dernière sont sensiblement les mêmes que le `read_sas`du package **haven**.<br>
 Cette solution n'a néanmoins pas été mise en avant, car une fois transférées vers R les données doivent être réécrites dans un format intermédiaire (RDS ou fst) pour être accéssible depuis une session R ou RStudio indépendante de celle lancée par SAS.
@@ -218,9 +231,9 @@ Remarques :<br>
 - Comme dans le transfert dans l'autre sens, les éventuels labels présents sur les variables de la table ne sont pas transférés sous R et nécessiteraient une programmation complémentaire.
 
  
-# Solutions à ne pas utiliser
+## Solutions à ne pas utiliser
 
-## Le package **SASxport**
+### Le package **SASxport**
 
 Le format XPORT de SAS est un ancien format datant de la SAS v6 et implique donc certaines limitations, dont celle de la longueur des noms des variables (8 caractères maximum). Pour transférer des données de SAS à R on devra faire :<br>
 Sous SAS, créer un fichier de transport avec des noms de variable de moins de 8 caractères (les originaux vont être perdus!) :
@@ -247,31 +260,31 @@ Puis sous R :
 tbl<-read.xport("U:/transport-file")
 ```
 
-## La fonction `write_sas` du package **haven**
+### La fonction `write_sas` du package **haven**
 
 Le package **haven** offre une fonction `write_sas`qui crée des fichiers de type sas7bdat. Néanmoins, les fichiers créés ne sont reconnus ni par SAS v9, ni par WPS.
 
 
-## Le package **sas7bdat**
+### Le package **sas7bdat**
 
 Le package **sas7bdat** est, historiquement, la première tentative de fournir des outils de lecture de tables SAS sans passer par un support intermédiaire. Sa dernière mise à jour est ancienne et le package est néanmoins toujours documenté comme "expérimental". En outre,  les temps de chargement peuvent se réveler prohibitoires sur des fichiers un peu conséquents (6800 secondes sur un fichier de 200 Mo contre 85 secondes avec read_sas).
 
+## Niveau d'intégration à l'USSR
 
-# Intégration au dispositif de formation
-
-La question est abordée dans la formation "prise en main rapide de données sous R".
-
-
-# Niveau d'intégration à l'USSR
-
-## Développements préconisés
+### Développements préconisés
 
 Aucun.
 
-## Points de vigilance
+### Points de vigilance
 
 La solution **haven** passe par une ré-ingenierie du format SAS : celui-ci n'étant pas documenté publiquement, le concepteur du package a dû deviner comment fonctionnaient les choses à partir des exemples dont il disposait. Cette façon de pratiquer ne conduit pas à une assurance totale sur le fonctionnement des fonctions : certaines particularités de stockage peuvent avoir été ignorées (c'est le cas des fichiers cryptées) ou mal appréhendées (c'est ce qui fait que `write_sas` ne marche pas). Donc: <br>
 - Aucune garantie ne peut être donnée que toutes nos tables SAS sont effectivement lisible par **haven**.<br>
 - Aucune garantie ne peut être donnée sur la lisibilité des tables SAS qui seront produites par des versions ultérieures de SAS.<br>
+
+## Intégration au dispositif de formation
+
+La question est abordée dans la formation "prise en main rapide de données sous R".
+
+
 
 
