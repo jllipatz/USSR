@@ -80,15 +80,15 @@ iris_3 <- select (iris, starts_with ("Sepal"))
 
 #### Exemple des principaux helpers
 
-starts_with(): starts with a prefix
+starts_with(): commence par le préfixe
 
-ends_with(): ends with a prefix
+ends_with(): se termine par le suffixe
 
-contains(): contains a literal string
+contains(): contient une chaine de texte
 
-one_of(): variables in character vector
+one_of(): liste de variables
 
-everything(): all variables
+everything(): toutes les variables
 
 ### Solutions viables non retenues
 
