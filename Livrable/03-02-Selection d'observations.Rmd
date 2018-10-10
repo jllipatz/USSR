@@ -14,40 +14,41 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 data(iris)
 ```
+# Sélection d'observations
 
-### Problématique
+## Problématique
 
 Comment sélectionner certaines observations dans une base de données ?
 
 C'est-à-dire, quel est le verbe clé pour sélectionner certaines observations d'une base de données.
 
-### Solution retenue
+## Solution retenue
 
 Le package **dplyr** offre la fonctionnalité souhaitée.
 C'est dans ce package le verbe **filter()** qui permet de sélectionner des variables.
 
-### Niveau d'intégration à l'USSR
+## Niveau d'intégration à l'USSR
 
-#### Développements préconisés
+### Développements préconisés
 
 
 
-#### Points de vigilance
+### Points de vigilance
 
 Attention, R différencie minuscules et majuscules
 
-### Intégration au dispositif de formation
+## Intégration au dispositif de formation
 
 Les outils préconisés ne demandent pas de formation spécifique pour être maîtrisés.
 
-### Particularités de syntaxe
+## Particularités de syntaxe
 
 
-### Exemples
+## Exemples
 
 Certains exemples ont été décrits dans le thème 3.0
 
-#### Sélectionner un ensemble d'observations selon deux conditions d'égalité cumulatives
+### Sélectionner un ensemble d'observations selon deux conditions d'égalité cumulatives
 
 Lorsque les deux conditions doivent être vérifiées, on les sépare au choix soit par un "&" soit par une virgule. Les deux sont équivalents.
 
@@ -65,7 +66,7 @@ iris_1 <- filter(iris, Species == "setosa" , Sepal.Length > 5 )
 
 ```
 
-#### Sélectionner des observations selon deux conditions non cumulatives
+### Sélectionner des observations selon deux conditions non cumulatives
 
 On sépare les conditions par le signe | qui représente le OU logique.
 
@@ -75,7 +76,7 @@ iris_2 <- filter(iris, Species == "setosa" | Sepal.Length > 5 )
 
 ```
 
-#### Sélectionner des observations selon deux conditions non cumulatives portant sur la même variable
+### Sélectionner des observations selon deux conditions non cumulatives portant sur la même variable
 
 On privilégie dans ce cas un test logique de sélection dans une liste avec l'opérateur 
 
@@ -86,7 +87,7 @@ iris_3 <- filter (iris, Species %in% c ("setosa", "versicolor"))
 ```
 
 
-#### Sélectionner les observations qui ne répondent pas à la condition
+### Sélectionner les observations qui ne répondent pas à la condition
 
 On utilise le !
 Deux possibilités équivalentes
@@ -101,7 +102,7 @@ iris_4 <- filter(iris, !(Species == "setosa"))
 
 
 
-### Solutions viables non retenues
+## Solutions viables non retenues
 
 Il est possible de sélectionner des observations en utilisant les crochets
 
@@ -119,6 +120,6 @@ iris[c(i,j),]
 ```
 
 
-### Solutions à ne pas utiliser
+## Solutions à ne pas utiliser
 
 Aucune.
