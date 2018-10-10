@@ -1,5 +1,5 @@
 ---
-title: "La sélection de variables"
+title: "La sÃ©lection de variables"
 author: "CA"
 date: "26 juin 2018"
 output:
@@ -15,20 +15,20 @@ knitr::opts_chunk$set(echo = TRUE)
 data(iris)
 ```
 
-### Problématique
+### ProblÃ©matique
 
-Comment sélectionner un champ de variables dans une base de données ?
+Comment sÃ©lectionner un champ de variables dans une base de donnÃ©es ?
 
-C'est-à-dire, quel est le verbe clé pour sélectionner certaines variables d'une base de données.
+C'est-Ã -dire, quel est le verbe clÃ© pour sÃ©lectionner certaines variables d'une base de donnÃ©es.
 
 ### Solution retenue
 
-Le package **dplyr** offre la fonctionnalité souhaitée.
-C'est dans ce package le verbe **select()** qui permet de sélectionner des variables. 
+Le package **dplyr** offre la fonctionnalitÃ© souhaitÃ©e.
+C'est dans ce package le verbe **select()** qui permet de sÃ©lectionner des variables. 
 
-### Niveau d'intégration à l'USSR
+### Niveau d'intÃ©gration Ã  l'USSR
 
-#### Développements préconisés
+#### DÃ©veloppements prÃ©conisÃ©s
 
 
 
@@ -36,19 +36,19 @@ C'est dans ce package le verbe **select()** qui permet de sélectionner des varia
 
 
 
-### Intégration au dispositif de formation
+### IntÃ©gration au dispositif de formation
 
-Les outils préconisés ne demandent pas de formation spécifique pour être maîtrisés.
+Les outils prÃ©conisÃ©s ne demandent pas de formation spÃ©cifique pour Ãªtre maÃ®trisÃ©s.
 
-### Particularités de syntaxe
+### ParticularitÃ©s de syntaxe
 
 Le package **dplyr** contient des helpers pour faciliter l'appel des variables dans la fonction select.
 
 ### Exemples
 
-#### Sélectionner un ensemble de variables en les nommant
+#### SÃ©lectionner un ensemble de variables en les nommant
 
-Le premier argument représente la base de données, les suivants représentent les variables à conserver.
+Le premier argument reprÃ©sente la base de donnÃ©es, les suivants reprÃ©sentent les variables Ã  conserver.
 
 ```{r init,echo=FALSE,message=FALSE}
 library("dplyr")
@@ -60,17 +60,17 @@ iris_1 <- select (iris, Species, Sepal.Length, Sepal.Width)
 
 ```
 
-#### Sélectionner des variables en indiquant les variables que l'on ne souhaite pas conserver
+#### SÃ©lectionner des variables en indiquant les variables que l'on ne souhaite pas conserver
 
-On indique le signe - devant la variable à supprimer
+On indique le signe - devant la variable Ã  supprimer
 
-```{r complémentaire}
+```{r complÃ©mentaire}
 
 iris_2 <- select (iris, -Sepal.Length)
 
 ```
 
-#### Sélectionner toutes les variables qui commencent par une chaine de caractères (helper starts_with) 
+#### SÃ©lectionner toutes les variables qui commencent par une chaine de caractÃ¨res (helper starts_with) 
 
 ```{r}
 
@@ -81,32 +81,36 @@ iris_3 <- select (iris, starts_with ("Sepal"))
 #### Exemple des principaux helpers
 
 starts_with(): starts with a prefix
+
 ends_with(): ends with a prefix
+
 contains(): contains a literal string
+
 one_of(): variables in character vector
+
 everything(): all variables
 
 ### Solutions viables non retenues
 
-Il est possible de sélectionner des variables en utilisant les crochets
+Il est possible de sÃ©lectionner des variables en utilisant les crochets
 
 ```{r crochets}
 
-#Sélection de la Jème variable de la bdd
+#SÃ©lection de la JÃ¨me variable de la bdd
 var_j <- iris[,j]
 
-#Sélection de la variable Species
+#SÃ©lection de la variable Species
 var_Species <- iris[,'Species']
 
-#Sélection de la Jème à la Kème variables
+#SÃ©lection de la JÃ¨me Ã  la KÃ¨me variables
 var_j_k <- iris[,j:k]
 
-#Sélection de la Jème et de la Kème variables
+#SÃ©lection de la JÃ¨me et de la KÃ¨me variables
 varjk <- iris[,c(j,k)]
 
 ```
 
-On peut également utiliser la fonction **pull**
+On peut Ã©galement utiliser la fonction **pull**
 
 ```{r pull}
 
@@ -117,6 +121,6 @@ extract_var1 <- pull (iris, Species)
 ```
 
 
-### Solutions à ne pas utiliser
+### Solutions Ã  ne pas utiliser
 
 Aucune.
