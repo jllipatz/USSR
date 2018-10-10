@@ -14,12 +14,13 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 data(iris)
 ```
+# Opérateurs logiques
 
-### Problématique
+## Problématique
 
 Pouvoir exprimer une condition logique à partir d'opérateurs, afin par exemple de ne retenir que certaines variables ou certaines observations dans la base de données initiale.
 
-### Solution retenue
+## Solution retenue
 
 Les tests logiques sont intégrés au logiciel R, ils ne nécessitent pas l'installation d'un package particulier.
 
@@ -47,28 +48,28 @@ Les test logiques sont :
 
 **N'est pas dans la liste :**  !(x %in% c(…))
 
-### Niveau d'intégration à l'USSR
+## Niveau d'intégration à l'USSR
 
-#### Développements préconisés
-
-
-#### Points de vigilance
+### Développements préconisés
 
 
-### Intégration au dispositif de formation
+### Points de vigilance
+
+
+## Intégration au dispositif de formation
 
 Les outils préconisés ne demandent pas de formation spécifique pour être maîtrisés.
 
-### Particularités de syntaxe
+## Particularités de syntaxe
 
 On peut combiner plusieurs opérateurs logiques en les séparant par :
 "&" (et) ou "|"" (ou).
 
-### Exemples
+## Exemples
 
 On utilise pour les exemples la fonction "filter" qui sera définie au paragraphe 3.2 (sélection d'observations).
 
-#### Test d'égalité 
+### Test d'égalité 
 
 ```{r égalité}
 
@@ -76,7 +77,7 @@ iris_1 <- filter(iris,Species == "setosa")
 
 ```
 
-#### Test différent de
+### Test différent de
 
 ```{r different}
 
@@ -84,7 +85,7 @@ iris_2 <- filter(iris,Species != "setosa")
 
 ```
 
-#### Test supérieur à
+### Test supérieur à
 
 ```{r supérieur}
 
@@ -92,7 +93,7 @@ iris_3 <- filter(iris,Sepal.Length > 5)
 
 ```
 
-#### Test est dans la liste
+### Test est dans la liste
 
 ```{r dans liste}
 
@@ -100,7 +101,7 @@ iris_4 <- filter(iris,Species %in% c("setosa","versicolor"))
 
 ```
 
-#### Test n'est pas dans la liste
+### Test n'est pas dans la liste
 
 ```{r pas dans liste}
 
@@ -108,7 +109,7 @@ iris_5 <- filter(iris,!(Species %in% c("setosa","versicolor")))
 
 ```
 
-#### Test avec la condition & (ET)
+### Test avec la condition & (ET)
 
 ```{r et}
 
@@ -116,7 +117,7 @@ iris_6 <- filter(iris,Species == "setosa" &  Sepal.Length > 5)
 
 ```
 
-#### Test avec la condition | (OU)
+### Test avec la condition | (OU)
 
 ```{r ou}
 
@@ -125,11 +126,11 @@ iris_7 <- filter(iris, Species == "setosa" | Sepal.Length > 5)
 ```
 
 
-### Solutions viables non retenues
+## Solutions viables non retenues
 
 Aucune.
 
 
-### Solutions à ne pas utiliser
+## Solutions à ne pas utiliser
 
 Aucune.
