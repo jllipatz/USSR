@@ -14,15 +14,16 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 data(iris)
 ```
+# Recoder une variable
 
-### Problématique
+## Problématique
 
 Comment recoder une variable ?
 C'est-à-dire par exemple créer des classes pour une variable continue.
 Il peut aussi s'agir de modifier le type d'une variable.
 Cela peut s'avérer util lors de l'import des données.
 
-### Solution retenue
+## Solution retenue
 
 Dans un **mutate**, on peut utiliser le **case_when** qui permet d’étendre la logique de **ifelse** à des cas plus complexes. 
 Attention, les conditions mises dans un **case_when** ne sont pas exclusives. 
@@ -31,32 +32,32 @@ Pour modifier le type on utilise les fonctions **as.character()** **as.factor()*
 Pour connaitre le type d'une variable : **typeof()**
 On pourra renommer une variable avec la fonction **rename()**
 
-### Niveau d'intégration à l'USSR
+## Niveau d'intégration à l'USSR
 
-#### Développements préconisés
+### Développements préconisés
 
 
 
-#### Points de vigilance
+### Points de vigilance
 
 Attention, les conditions mises dans un **case_when** ne sont pas exclusives. 
 De ce fait, il faut pouvoir déterminer l’ordre d’évaluation des conditions qui y sont posées. Cet ordre s’effectue de "bas en haut", c’est à dire que la dernière condition évaluée (celle qui primera sur toutes les autres) sera à écrire en premier en "haut".
 
-### Intégration au dispositif de formation
+## Intégration au dispositif de formation
 
 Les outils préconisés ne demandent pas de formation spécifique pour être maîtrisés.
 
-### Particularités de syntaxe
+## Particularités de syntaxe
 
 
-### Exemples
+## Exemples
 
 ```{r init,echo=FALSE,message=FALSE}
 library("dplyr")
 ```
 
 
-#### Modifier le type d'une variable
+### Modifier le type d'une variable
 
 ```{r modif type}
 
@@ -65,7 +66,7 @@ iris <- mutate  (iris, var1 = as.numeric (var1))
 iris <- mutate  (iris, var1 = as.factor (var1))
 ```
 
-#### Renommer une variable
+### Renommer une variable
 
 ```{r rename}
 
@@ -74,7 +75,7 @@ iris <- rename (iris, Especes = Species)
 ```
 
 
-#### Exemple recoder une variable continue en classes avec case_when
+### Exemple recoder une variable continue en classes avec case_when
 
 Le premier argument indique la base de données.
 Attention, les conditions mises dans un **case_when** ne sont pas exclusives. 
@@ -95,7 +96,7 @@ iris_1 <- mutate (iris, cat_Sepal.length = case_when (
 ```
 
 
-### Solutions viables non retenues
+## Solutions viables non retenues
 
 Les fonctions du module **forcats**, non développées ici, permettent notamment de regrouper des modalités d'une variable qualitative.
 
@@ -108,6 +109,6 @@ iris_2 <- mutate (iris, Espece_setosa = ifelse (Species == "setosa", val1 = TRUE
 ```
 
 
-### Solutions à ne pas utiliser
+## Solutions à ne pas utiliser
 
 Aucune.
