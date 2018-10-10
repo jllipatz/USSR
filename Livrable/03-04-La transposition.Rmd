@@ -1,5 +1,5 @@
 ---
-title: "La transposition de données"
+title: "La transposition de donnÃ©es"
 author: "CA"
 date: "10 juillet 2018"
 output:
@@ -16,52 +16,53 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+# Transposer
 
-### Problématique
+## ProblÃ©matique
 
-Pour bien manipuler des données, leur structuration est fondamentale.
+Pour bien manipuler des donnÃ©es, leur structuration est fondamentale.
 
     Qu'est ce qu'une ligne de notre table ?
 
     Qu'est ce qu'une colonne de notre table ?
 
-Sur une table non agrégée (un répertoire, une table d'enquête.), la structuration naturelle est une ligne par observation (un individu, une entreprise.), une colonne par variables (âge, taille.) sur cette observation.
+Sur une table non agrÃ©gÃ©e (un rÃ©pertoire, une table d'enquÃªte.), la structuration naturelle est une ligne par observation (un individu, une entreprise.), une colonne par variables (Ã¢ge, taille.) sur cette observation.
 
-Mais dès qu'on agrège une telle table pour construire des tables structurées par dimensions d'analyse et indicateurs, se pose toujours la question de savoir ce qu'on va considérer comme des dimensions et comme des indicateurs.
+Mais dÃ¨s qu'on agrÃ¨ge une telle table pour construire des tables structurÃ©es par dimensions d'analyse et indicateurs, se pose toujours la question de savoir ce qu'on va considÃ©rer comme des dimensions et comme des indicateurs.
 
-La bonne réponse, c'est que ça dépend de ce que l'on veut en faire. L'important est de pouvoir facilement passer de l'un à l'autre suivant ce que l'on doit faire. C'est l'intérêt du module **tidyr**.
+La bonne rÃ©ponse, c'est que Ã§a dÃ©pend de ce que l'on veut en faire. L'important est de pouvoir facilement passer de l'un Ã  l'autre suivant ce que l'on doit faire. C'est l'intÃ©rÃªt du module **tidyr**.
 
-### Solution retenue
+## Solution retenue
 
-**gather()** permet d'empiler plusieurs colonnes (correspondant à des variables quantitatives). Elles sont repérées par création d'une variable qualitative, à partir de leurs noms.
+**gather()** permet d'empiler plusieurs colonnes (correspondant Ã  des variables quantitatives). Elles sont repÃ©rÃ©es par crÃ©ation d'une variable qualitative, Ã  partir de leurs noms.
 
 #Pour mettre une image d'illustration
 #file:///d:/Users/colin.albizzati/Desktop/gather.png
 
-**spread()** fait l'inverse. Cette fonction crée autant de colonnes qu'il y a de modalités d'une variable qualitative, en remplissant chacune par le contenu d'une variable numérique.
+**spread()** fait l'inverse. Cette fonction crÃ©e autant de colonnes qu'il y a de modalitÃ©s d'une variable qualitative, en remplissant chacune par le contenu d'une variable numÃ©rique.
 
 #Pour mettre image illustration
 #file:///d:/Users/colin.albizzati/Desktop/spread.png
 
-### Niveau d'intégration à l'USSR
+## Niveau d'intÃ©gration Ã  l'USSR
 
-#### Développements préconisés
-
-
-#### Points de vigilance
+### DÃ©veloppements prÃ©conisÃ©s
 
 
-### Intégration au dispositif de formation
-
-Les outils préconisés ne demandent pas de formation spécifique pour être maîtrisés.
-
-### Particularités de syntaxe
+### Points de vigilance
 
 
+## IntÃ©gration au dispositif de formation
 
-### Exemples
+Les outils prÃ©conisÃ©s ne demandent pas de formation spÃ©cifique pour Ãªtre maÃ®trisÃ©s.
 
-Un exemple : obtenir un fichier avec une ligne par région, et une colonne par année qui donne l'évolution en % de la construction neuve par rapport à l'année précédente
+## ParticularitÃ©s de syntaxe
+
+
+
+## Exemples
+
+Un exemple : obtenir un fichier avec une ligne par rÃ©gion, et une colonne par annÃ©e qui donne l'Ã©volution en % de la construction neuve par rapport Ã  l'annÃ©e prÃ©cÃ©dente
 
 ```{r exemple gather spread}
 
@@ -89,12 +90,12 @@ sitadel_long2 <- sitadel_large %>%
 ```
 
 
-### Solutions viables non retenues
+## Solutions viables non retenues
 
 Aucune.
 
 
-### Solutions à ne pas utiliser
+## Solutions Ã  ne pas utiliser
 
 Aucune.
 
