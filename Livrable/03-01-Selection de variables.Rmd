@@ -18,7 +18,7 @@ data(iris)
 
 ## Problématique
 
-On s'intéresse ici à comment sélectionner un champ de variables (une ou plusieurs) dans une base de données.
+On s'intéresse ici à comment sélectionner un champ de variables (une ou plusieurs colonnes) dans une base de données.
 
 C'est-à-dire, quel est le verbe clé dans le logiciel R pour sélectionner certaines variables d'une base de données.
 On suppose dans les exemples que les variables sont les colonnes de la base de données et les observations les lignes.
