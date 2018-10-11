@@ -63,7 +63,7 @@ Les outils préconisés ne demandent pas de formation spécifique pour être ma�
 ## Particularités de syntaxe
 
 On peut combiner plusieurs opérateurs logiques en les séparant par :
-"&" (et) ou "|"" (ou).
+"&" (et) ou "|" (ou).
 
 ## Exemples
 
