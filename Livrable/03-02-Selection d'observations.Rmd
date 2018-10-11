@@ -38,7 +38,10 @@ On s'intéressera également au verbe **slice()** qui permet de sélectionner de
 
 ### Points de vigilance
 
-Attention, R différencie les minuscules et les majuscules
+Attention, R différencie les minuscules et les majuscules.
+
+Dans le logiciel R, les priorités de calcul ne sont pas forcément les mêmes que dans SAS ou C.
+Il est important de mettre des parenthèses dans les calculs pour ne pas faire confiance aux priorités du langage.
 
 ## Intégration au dispositif de formation
 
@@ -49,11 +52,10 @@ Les outils préconisés ne demandent pas de formation spécifique pour être ma�
 
 ## Exemples
 
-Certains exemples ont été décrits dans le thème 3.0
 
 ### Sélectionner un ensemble d'observations selon deux conditions d'égalité cumulatives
 
-Lorsque les deux conditions doivent être vérifiées, on les sépare au choix soit par un "&" soit par une virgule. Les deux sont équivalents.
+Lorsque les deux conditions doivent être vérifiées, on les sépare au choix soit par un "&" soit par une virgule.
 
 Le premier argument indique la base de données.
 
