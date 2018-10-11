@@ -67,9 +67,11 @@ On peut combiner plusieurs opérateurs logiques en les séparant par :
 
 ## Exemples
 
-On utilise pour les exemples la fonction "filter" qui sera définie au paragraphe 3.2 (sélection d'observations).
+On utilise pour les exemples la fonction "filter" qui sera définie au paragraphe 3.2 (sélection d'observations) et qui permet de sélectionner des lignes d'une table en fonction de conditions.
 
-### Test d'égalité 
+### Test d'égalité
+
+On sélectionne les lignes pour lesquelles la variable Species prend une valeur égale à la valeur setosa.
 
 ```{r égalité}
 
@@ -79,6 +81,8 @@ iris_1 <- filter(iris,Species == "setosa")
 
 ### Test différent de
 
+On sélectionne les lignes pour lesquelles la variable Species prend des valeurs différentes de la valeur setosa.
+
 ```{r different}
 
 iris_2 <- filter(iris,Species != "setosa")
@@ -86,6 +90,8 @@ iris_2 <- filter(iris,Species != "setosa")
 ```
 
 ### Test supérieur à
+
+On sélectionne les lignes pour lesquelles les valeurs de la variable Sepal.Length sont supérieures à 5.
 
 ```{r supérieur}
 
@@ -95,6 +101,8 @@ iris_3 <- filter(iris,Sepal.Length > 5)
 
 ### Test est dans la liste
 
+On sélectionne les lignes pour lesquelles les valeurs de la variable Species sont dans la liste : setosa, versicolor.
+
 ```{r dans liste}
 
 iris_4 <- filter(iris,Species %in% c("setosa","versicolor"))
@@ -102,6 +110,8 @@ iris_4 <- filter(iris,Species %in% c("setosa","versicolor"))
 ```
 
 ### Test n'est pas dans la liste
+
+On sélectionne les lignes pour lesquelles les valeurs de la variable Species ne sont pas dans la liste : setosa, versicolor.
 
 ```{r pas dans liste}
 
@@ -111,6 +121,10 @@ iris_5 <- filter(iris,!(Species %in% c("setosa","versicolor")))
 
 ### Test avec la condition & (ET)
 
+On sélectionne les lignes pour lesquelles la valeur de la variable Species est égale à setosa
+ET
+la valeur de la variable Sepal.Length supérieure à 5.
+
 ```{r et}
 
 iris_6 <- filter(iris,Species == "setosa" &  Sepal.Length > 5)
@@ -118,6 +132,10 @@ iris_6 <- filter(iris,Species == "setosa" &  Sepal.Length > 5)
 ```
 
 ### Test avec la condition | (OU)
+
+On sélectionne les lignes pour lesquelles la valeur de la variable Species est égale à setosa
+OU
+la valeur de la variable Sepal.Length supérieure à 5.
 
 ```{r ou}
 
