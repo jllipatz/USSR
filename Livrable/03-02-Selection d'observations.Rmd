@@ -110,6 +110,13 @@ iris_4 <- filter(iris, !(Species == "setosa"))
 
 ```
 
+### La fonction slice()
+
+```{r slice}
+
+iris_5 <- slice(iris, )
+
+```
 
 
 ## Solutions viables non retenues
