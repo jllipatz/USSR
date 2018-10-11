@@ -69,7 +69,7 @@ iris_1 <- select (iris, Species, Sepal.Length, Sepal.Width)
 
 ### Sélectionner des variables en indiquant les variables que l'on ne souhaite pas conserver
 
-On indique le signe - devant la variable à ne pas conserver.
+On indique le signe "**-**" devant la variable à ne pas conserver.
 On sélectionne les variables de la base de données iris, excepté la variable Sepal.Length.
 
 ```{r complémentaire}
@@ -90,13 +90,13 @@ iris_3 <- select (iris, starts_with ("Sepal"))
 
 ### Exemple des principaux helpers
 
-starts_with(): commence par le préfixe
+starts_with(): commence par le préfixe spécifié entre les paraenthèses
 
-ends_with(): se termine par le suffixe
+ends_with(): se termine par le suffixe spécifié entre les parenthèses
 
-contains(): contient une chaine de texte
+contains(): contient une chaine de texte spécifiée entre les parenthèses
 
-one_of(): liste de variables
+one_of(): liste de variables spécifiée entre les parenthèses
 
 everything(): toutes les variables
 
@@ -110,8 +110,8 @@ iris_4 <- select (iris,Species,everything())
 
 ## Solutions viables non retenues
 
-Il est possible de sélectionner des variables en utilisant les crochets.
-Le premier argument entre crochets correspond à la ligne et le second à la colonne.
+Il est possible de sélectionner des variables en utilisant l'écriture avec les crochets.
+Le premier argument entre les crochets correspond à la ligne et le second à la colonne.
 Si le premier argument est laissé à blanc, cela correspond à la totalité des lignes de la base de données.
 
 ```{r crochets}
