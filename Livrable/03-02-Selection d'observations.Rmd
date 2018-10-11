@@ -112,9 +112,19 @@ iris_4 <- filter(iris, !(Species == "setosa"))
 
 ### La fonction slice()
 
+On sélectionne la dixième ligne 
+
 ```{r slice}
 
-iris_5 <- slice(iris, )
+iris_5 <- slice(iris,10)
+
+```
+
+On sélectionne les lignes de la seconde à la neuvième
+
+```{r slice}
+
+iris_6 <- slice(iris,2:9)
 
 ```
 
