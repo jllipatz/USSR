@@ -18,24 +18,27 @@ data(iris)
 
 ## Problématique
 
-Comment sélectionner certaines observations dans une base de données ?
+On s'intéresse ici à comment sélectionner certaines observations (une ou plusieurs lignes) dans une base de données.
 
-C'est-à-dire, quel est le verbe clé pour sélectionner certaines observations d'une base de données.
+Quel est le verbe clé pour sélectionner certaines observations d'une base de données.
+
+On suppose dans les exemples que les observations correspondnet aux lignes et les variables aux colonnes.
 
 ## Solution retenue
 
 Le package **dplyr** offre la fonctionnalité souhaitée.
 C'est dans ce package le verbe **filter()** qui permet de sélectionner des variables.
 
+On s'intéressera également au verbe **slice()** qui permet de sélectionner des lignes selon leur position.
+
 ## Niveau d'intégration à l'USSR
 
 ### Développements préconisés
 
 
-
 ### Points de vigilance
 
-Attention, R différencie minuscules et majuscules
+Attention, R différencie les minuscules et les majuscules
 
 ## Intégration au dispositif de formation
 
