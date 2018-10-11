@@ -20,9 +20,9 @@ data(iris)
 
 On s'intéresse ici à comment sélectionner certaines observations (une ou plusieurs lignes) dans une base de données.
 
-Quel est le verbe clé pour sélectionner certaines observations d'une base de données.
+Quel est le verbe clé pour sélectionner certaines observations d'une base de données ?
 
-On suppose dans les exemples que les observations correspondnet aux lignes et les variables aux colonnes.
+On suppose dans les exemples que les observations correspondent aux lignes et les variables aux colonnes.
 
 ## Solution retenue
 
@@ -38,7 +38,7 @@ On s'intéressera également au verbe **slice()** qui permet de sélectionner de
 
 ### Points de vigilance
 
-Attention, R différencie les minuscules et les majuscules.
+Attention, R différencie les minuscules et les majuscules dans le nom des variables.
 
 Dans le logiciel R, les priorités de calcul ne sont pas forcément les mêmes que dans SAS ou C.
 Il est important de mettre des parenthèses dans les calculs pour ne pas faire confiance aux priorités du langage.
@@ -52,19 +52,19 @@ Les outils préconisés ne demandent pas de formation spécifique pour être ma�
 
 ## Exemples
 
-Vous trouverez également des exemples de la fonction filter() dans le chapitre sur les opérateurs logiques.
+Vous trouverez également des exemples de la fonction filter() dans le chapitre 3.0 sur les opérateurs logiques.
 
 ### Sélectionner un ensemble d'observations selon deux conditions d'égalité cumulatives
 
 Lorsque les deux conditions doivent être vérifiées, on les sépare au choix soit par un "&" soit par une virgule.
 
-Le premier argument indique la base de données.
+On charge la librairie dplyr
 
 ```{r init,echo=FALSE,message=FALSE}
 library("dplyr")
 ```
-
-On sélectionne dans la base de données iris les observations pour lesquelles la variable Species vaut setosa ET la variable Sepal.Length est supérieure à 5.
+Le premier argument indique la base de données.
+On sélectionne dans la base de données iris les observations pour lesquelles la variable Species vaut setosa **ET** la variable Sepal.Length est supérieure à 5.
 
 ```{r filter ET}
 
@@ -77,7 +77,7 @@ iris_1 <- filter(iris, Species == "setosa" , Sepal.Length > 5 )
 ### Sélectionner des observations selon deux conditions non cumulatives
 
 On sépare les conditions par le signe | qui représente le OU logique.
-On sélectionne dans la base de données iris les observations pour lesquelles la variable Species vaut setosa OU la variable Sepal.Length est supérieure à 5.
+On sélectionne dans la base de données iris les observations pour lesquelles la variable Species vaut setosa **OU** la variable Sepal.Length est supérieure à 5.
 
 ```{r filter OU}
 
@@ -103,8 +103,11 @@ On sélectionne dans la base iris les observations pour lesquelles la variable S
 Deux possibilités équivalentes :
 
 ```{r n'est pas}
+Species différent de setosa
 
 iris_4 <- filter(iris, Species != "setosa")
+
+différent de Species vaut setosa
 
 iris_4 <- filter(iris, !(Species == "setosa"))
 
@@ -131,7 +134,9 @@ iris_6 <- slice(iris,2:9)
 
 ## Solutions viables non retenues
 
-Il est possible de sélectionner des observations en utilisant les crochets
+Il est possible de sélectionner des observations en utilisant les crochets.
+Le premier argument entre les crochets correspond à la ligne et le second à la colonne.
+Si le second argument est laissé à blanc cela correspond à la totalité des colonnes de la base de données.
 
 ```{r crochets}
 
