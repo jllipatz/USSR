@@ -52,6 +52,7 @@ Les outils préconisés ne demandent pas de formation spécifique pour être ma�
 
 ## Exemples
 
+Vous trouverez également des exemples de la fonction filter() dans le chapitre sur les opérateurs logiques.
 
 ### Sélectionner un ensemble d'observations selon deux conditions d'égalité cumulatives
 
@@ -62,6 +63,8 @@ Le premier argument indique la base de données.
 ```{r init,echo=FALSE,message=FALSE}
 library("dplyr")
 ```
+
+On sélectionne dans la base de données iris les observations pour lesquelles la variable Species vaut setosa ET la variable Sepal.Length est supérieure à 5.
 
 ```{r filter ET}
 
@@ -74,6 +77,7 @@ iris_1 <- filter(iris, Species == "setosa" , Sepal.Length > 5 )
 ### Sélectionner des observations selon deux conditions non cumulatives
 
 On sépare les conditions par le signe | qui représente le OU logique.
+On sélectionne dans la base de données iris les observations pour lesquelles la variable Species vaut setosa OU la variable Sepal.Length est supérieure à 5.
 
 ```{r filter OU}
 
@@ -83,7 +87,8 @@ iris_2 <- filter(iris, Species == "setosa" | Sepal.Length > 5 )
 
 ### Sélectionner des observations selon deux conditions non cumulatives portant sur la même variable
 
-On privilégie dans ce cas un test logique de sélection dans une liste avec l'opérateur 
+On privilégie dans ce cas un test logique de sélection dans une liste avec l'opérateur.
+On sélectionne dans la base de données iris les observations pour lesquelles la variable Species prend des valeurs dans la liste setosa, versicolor.
 
 ```{r filter dans liste}
 
@@ -91,11 +96,11 @@ iris_3 <- filter (iris, Species %in% c ("setosa", "versicolor"))
 
 ```
 
-
 ### Sélectionner les observations qui ne répondent pas à la condition
 
 On utilise le !
-Deux possibilités équivalentes
+On sélectionne dans la base iris les observations pour lesquelles la variable Species est différente de setosa.  
+Deux possibilités équivalentes :
 
 ```{r n'est pas}
 
