@@ -18,9 +18,9 @@ data(iris)
 
 ## Problématique
 
-Comment sélectionner un champ de variables dans une base de données ?
-
-C'est-à-dire, quel est le verbe clé pour sélectionner certaines variables d'une base de données.
+On s'intéresse ici à comment sélectionner un champ de variables dans une base de données.
+C'est-à-dire, quel est le verbe clé dans le logiciel R pour sélectionner certaines variables d'une base de données.
+On suppose dans les exemples que les variables sont les colonnes de la base de données.
 
 ## Solution retenue
 
@@ -44,6 +44,7 @@ Les outils préconisés ne demandent pas de formation spécifique pour être ma�
 ## Particularités de syntaxe
 
 Le package **dplyr** contient des helpers pour faciliter l'appel des variables dans la fonction select.
+Les helpers sont listés à la fin des exemples.
 
 ## Exemples
 
@@ -55,6 +56,8 @@ Le premier argument représente la base de données, les suivants représentent 
 library("dplyr")
 ```
 
+On sélectionne dans la base de données iris les variables Species, Sepal.Length et Sepal.Width.
+
 ```{r select by name}
 
 iris_1 <- select (iris, Species, Sepal.Length, Sepal.Width)
@@ -63,7 +66,8 @@ iris_1 <- select (iris, Species, Sepal.Length, Sepal.Width)
 
 ### Sélectionner des variables en indiquant les variables que l'on ne souhaite pas conserver
 
-On indique le signe - devant la variable à supprimer
+On indique le signe - devant la variable à ne pas conserver.
+On sélectionne les variables de la base de données iris, excepté la variable Sepal.Length.
 
 ```{r complémentaire}
 
@@ -72,6 +76,8 @@ iris_2 <- select (iris, -Sepal.Length)
 ```
 
 ### Sélectionner toutes les variables qui commencent par une chaine de caractères (helper starts_with) 
+
+On sélectionne dans la base de données iris toutes les variables dont le nom commence par Sepal.
 
 ```{r}
 
@@ -91,9 +97,19 @@ one_of(): liste de variables
 
 everything(): toutes les variables
 
+La fonction select() associée au helper everything(), peut servir à modifier l'ordre des variables.
+Exemple : On souhaite positionner la variable Species en première position.
+```{r}
+
+iris_4 <- select (iris,Species,everything())
+
+```
+
 ## Solutions viables non retenues
 
-Il est possible de sélectionner des variables en utilisant les crochets
+Il est possible de sélectionner des variables en utilisant les crochets.
+Le premier argument entre crochets correspond à la ligne et le second à la colonne.
+Si le premier argument est laissé à blanc, cela correspond à la totalité des lignes.
 
 ```{r crochets}
 
