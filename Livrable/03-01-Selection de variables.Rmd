@@ -18,9 +18,10 @@ data(iris)
 
 ## Problématique
 
-On s'intéresse ici à comment sélectionner un champ de variables dans une base de données.
+On s'intéresse ici à comment sélectionner un champ de variables (une ou plusieurs) dans une base de données.
+
 C'est-à-dire, quel est le verbe clé dans le logiciel R pour sélectionner certaines variables d'une base de données.
-On suppose dans les exemples que les variables sont les colonnes de la base de données.
+On suppose dans les exemples que les variables sont les colonnes de la base de données et les observations les lignes.
 
 ## Solution retenue
 
@@ -35,7 +36,8 @@ C'est dans ce package le verbe **select()** qui permet de sélectionner des vari
 
 ### Points de vigilance
 
-
+Dans le logiciel R, les priorités de calcul ne sont pas forcément les mêmes que dans SAS ou C.
+Il est important de mettre des parenthèses dans les calculs pour ne pas faire confiance aux priorités du langage. 
 
 ## Intégration au dispositif de formation
 
@@ -109,7 +111,7 @@ iris_4 <- select (iris,Species,everything())
 
 Il est possible de sélectionner des variables en utilisant les crochets.
 Le premier argument entre crochets correspond à la ligne et le second à la colonne.
-Si le premier argument est laissé à blanc, cela correspond à la totalité des lignes.
+Si le premier argument est laissé à blanc, cela correspond à la totalité des lignes de la base de données.
 
 ```{r crochets}
 
