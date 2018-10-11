@@ -131,6 +131,16 @@ iris_6 <- slice(iris,2:9)
 
 ```
 
+### La fonction sample_n()
+
+On sélectionne aléatoirement un nombre de lignes.
+ici n = 20
+
+```{r slice}
+
+iris_7 <- sample_n(iris,20)
+
+```
 
 ## Solutions viables non retenues
 
