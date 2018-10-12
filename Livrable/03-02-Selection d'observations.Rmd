@@ -145,6 +145,15 @@ iris_7 <- sample_n(iris,20)
 
 ### Les fonctions filter_all filter_if filter_at
 
+```{r}
+
+filter_all(.tbl, .vars_predicate)
+
+filter_if(.tbl, .predicate, .vars_predicate)
+
+filter_at(.tbl, .vars, .vars_predicate)
+
+```
 
 ## Solutions viables non retenues
 
