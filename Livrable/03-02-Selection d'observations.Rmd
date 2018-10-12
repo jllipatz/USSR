@@ -38,7 +38,8 @@ On s'intéressera également au verbe **slice()** qui permet de sélectionner de
 
 ### Points de vigilance
 
-Attention, R différencie les minuscules et les majuscules dans le nom des variables.
+Attention, R différencie les minuscules et les majuscules.
+En particulier faire attention aux majuscules dans le nom des variables et des fonctions.
 
 Dans le logiciel R, les priorités de calcul ne sont pas forcément les mêmes que dans SAS ou C.
 Il est important de mettre des parenthèses dans les calculs pour ne pas faire confiance aux priorités du langage.
@@ -142,7 +143,7 @@ iris_7 <- sample_n(iris,20)
 
 ```
 
-### Les fonctions Filter_all Filter_if Filter_at
+### Les fonctions filter_all filter_if filter_at
 
 
 ## Solutions viables non retenues
