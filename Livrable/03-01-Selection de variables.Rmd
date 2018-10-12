@@ -122,7 +122,13 @@ select_at(.tbl, .vars, .funs = list())
 
 
 ```
+Exemple mettre tous les noms de variables de la table iris en majuscule 
 
+```{r}
+
+select_all(iris, toupper)
+
+```
 
 ## Solutions viables non retenues
 
