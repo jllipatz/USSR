@@ -142,6 +142,9 @@ iris_7 <- sample_n(iris,20)
 
 ```
 
+### Les fonctions Filter_all Filter_if Filter_at
+
+
 ## Solutions viables non retenues
 
 Il est possible de sélectionner des observations en utilisant les crochets.
