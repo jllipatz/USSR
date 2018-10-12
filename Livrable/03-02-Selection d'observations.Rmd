@@ -154,7 +154,15 @@ filter_if(.tbl, .predicate, .vars_predicate)
 filter_at(.tbl, .vars, .vars_predicate)
 
 ```
-
+```{r}
+filter_all(mtcars, all_vars(. > 150))
+```
+```{r}
+filter_if(mtcars, ~ all(floor(.) == .), all_vars(. != 0))
+```
+```{r}
+filter_at(mtcars, vars(starts_with("d")), any_vars((. %% 2) == 0))
+```
 ## Solutions viables non retenues
 
 Il est possible de sélectionner des observations en utilisant les crochets.
