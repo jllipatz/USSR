@@ -94,9 +94,7 @@ iris_1 <- mutate (iris, cat_Sepal.length = case_when (
                     ))
 
 ```
-
-
-## Solutions viables non retenues
+### Exemple recoder les variables qualitatives R de type Factor.
 
 La manipulation des factor fait intervenir le package forcats, de la librairie tidyverse, qui propose de nombreuses fonctions. Les fonctions de ce package sont reconnaissables à leur préfixe fct_.
 
@@ -112,6 +110,8 @@ A la suite d’une opération de sélection des lignes, certains levels peuvent 
 ```{r fct_drop}
 d %>% pull (ZAU) %>% fct_drop () %>% levels ()
 ```
+
+## Solutions viables non retenues
 
 On peut également utiliser le **ifelse** qui permet d’affecter valeursi ou valeursinon à une variable en fonction du fait que x réponde ou non à une condition.
 
