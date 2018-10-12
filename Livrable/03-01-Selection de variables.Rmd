@@ -129,6 +129,12 @@ Exemple mettre tous les noms de variables de la table iris en majuscule
 select_all(iris, toupper)
 
 ```
+Exemple retenir uniquement dans la table mtcars les variables ayant des valeurs entières
+
+```{r}
+is_whole <- function(x) all(floor(x) == x)
+select_if(mtcars, is_whole)
+```
 
 ## Solutions viables non retenues
 
