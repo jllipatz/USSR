@@ -37,7 +37,8 @@ C'est dans ce package le verbe **select()** qui permet de sélectionner des vari
 
 ### Points de vigilance
 
-Attention, le logiciel R différencie les minuscules et les majuscules dans le nom des variables. 
+Attention, le logiciel R différencie les minuscules et les majuscules.
+En particulier faire attention dans le nom des variables et des fonctions. 
 
 Dans le logiciel R, les priorités de calcul ne sont pas forcément les mêmes que dans SAS ou C.
 Il est important de mettre des parenthèses dans les calculs pour ne pas faire confiance aux priorités du langage. 
@@ -109,7 +110,7 @@ Exemple : On souhaite positionner la variable Species en première position.
 iris_4 <- select (iris,Species,everything())
 
 ```
-### Select_all Select_if Select_at
+### Les fonctions select_all select_if select_at
 
 
 ## Solutions viables non retenues
