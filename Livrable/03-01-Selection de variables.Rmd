@@ -112,6 +112,17 @@ iris_4 <- select (iris,Species,everything())
 ```
 ### Les fonctions select_all select_if select_at
 
+```{r}
+
+select_all(.tbl, .funs = list())
+
+select_if(.tbl, .predicate, .funs = list())
+
+select_at(.tbl, .vars, .funs = list())
+
+
+```
+
 
 ## Solutions viables non retenues
 
