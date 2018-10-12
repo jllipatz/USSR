@@ -109,6 +109,8 @@ Exemple : On souhaite positionner la variable Species en première position.
 iris_4 <- select (iris,Species,everything())
 
 ```
+### Select_all Select_if Select_at
+
 
 ## Solutions viables non retenues
 
