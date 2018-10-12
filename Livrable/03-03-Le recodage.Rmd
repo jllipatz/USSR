@@ -98,7 +98,20 @@ iris_1 <- mutate (iris, cat_Sepal.length = case_when (
 
 ## Solutions viables non retenues
 
-Les fonctions du module **forcats**, non développées ici, permettent notamment de regrouper des modalités d'une variable qualitative.
+La manipulation des factor fait intervenir le package forcats, de la librairie tidyverse, qui propose de nombreuses fonctions. Les fonctions de ce package sont reconnaissables à leur préfixe fct_.
+
+Dans un dataframe contenant une variable de type factor, on filtre comme sur une chaîne de caractère
+
+```{r factor}
+d <- filter (dat, substr (x = ZAU, start = 1, stop = 3) != "120")
+# ou bien :
+d <- filter (dat, ZAU != "111 - Grand pôle (plus de 10 000 emplois)")
+
+```
+A la suite d’une opération de sélection des lignes, certains levels peuvent disparaître. Ils seront toutefois toujours présents dans la liste des modalités de la variables. fct_drop() permet de se débarasser des modalités désormais inutilisées
+```{r fct_drop}
+d %>% pull (ZAU) %>% fct_drop () %>% levels ()
+```
 
 On peut également utiliser le **ifelse** qui permet d’affecter valeursi ou valeursinon à une variable en fonction du fait que x réponde ou non à une condition.
 
