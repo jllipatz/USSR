@@ -13,6 +13,7 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 data(iris)
+data(mtcars)
 ```
 # Sélection de variables
 
