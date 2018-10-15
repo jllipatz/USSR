@@ -2,30 +2,35 @@
 title: "Fichiers Excel"
 author: "NK & SG"
 date: "25 juin 2018"
-output: html_document
+output:
+  html_document:
+    theme: united
+    toc: true
+    toc_depth: 4
+    toc_float: yes
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-### Problématique
+## Problématique
 
-TO DO (SG)
+Manipuler des fichiers "tableurs" dans R, en particulier celui de Microsoft, Excel. L'objectif est de lire les données d'un fichier Excel dans une structure de données R, ou l'inverse, exporter des données R dans Excel
 
-### Solution retenue
+## Solution retenue
 
 Le package `openxlsx` offre un ensemble de fonctions simples et efficaces permettant de lire et écrire des données en Excel au format **xlsx**. Il gère correctement les formats de données notamments les dates, les nombres très proches de zéro et les formats monétaires.
 
 Il n'est pas dépendant d'une installation java sur poste.
 
-### Particularité de syntaxe
+## Particularité de syntaxe
 
 Pour l'instant, aucune. 
 
-### Exemples
+## Exemples
 
-#### Table d'entrainement
+### Table d'entrainement
 
 Cette table contient divers formats de données tels que les dates, les opérateurs logiques, les données monétaires, des nombres négatifs, des liens internet, des pourcentages et des chiffres très petits. 
 
@@ -41,13 +46,13 @@ df <- data.frame("Date" = Sys.Date()-0:4,
                  "TinyNumber" = runif(5) / 1E9, stringsAsFactors = FALSE)
 ```
 
-#### Écriture 
+### Écriture 
 
 ```{r}
 write.xlsx(df, file = "writeXLSX1.xlsx")
 ```
 
-#### Lecture
+### Lecture
 
 ```{r}
 df.excel <- read.xlsx(xlsxFile = "writeXLSX1.xlsx",detectDates = TRUE)
@@ -55,7 +60,7 @@ head(df.excel,n = 2)
 ```
 
 
-#### Ecriture d'un rapport complexe
+### Ecriture d'un rapport complexe
 
 La création d'un classeur comportant plusieurs feuilles, plusieurs tableaux, des titres et des graphiques est possible. Pour cela, il faut créer manuellement une série d'objets intéragissant les uns avec les autres. 
 
@@ -163,7 +168,7 @@ Enregistrement du classeur
 saveWorkbook(wb, "basics.xlsx", overwrite = TRUE)
 ```
 
-#### Plus de détails
+### Plus de détails
 
 Deux très bonnes vignettes sont disponibles sur le CRAN :
 
@@ -171,25 +176,25 @@ Deux très bonnes vignettes sont disponibles sur le CRAN :
 * Exemples complexes : <https://cran.r-project.org/web/packages/openxlsx/vignettes/formatting.pdf>
 
 
-### Solutions viables non retenues
+## Solutions viables non retenues
 
 Les packages `xlsx` et `XLConnect` sont des bonnes alternatives au package `openxlsx`. Néanmoins, ils sont dépendants à une installation java sur poste ce qui peut les rendre inutilisables sous certains systèmes.  
 
-### Solutions à ne pas utiliser
+## Solutions à ne pas utiliser
 
 Les packages `readXl` et `writexl` sont efficaces pour la lecture et l'écriture de fichiers. Cependant, ils disposent de peu de fonctionnalités et ne gèrent pas correctement certains formats de données. D'autres packages tels que `excel.link`, `RODBC`, `RJDBC`, `dataframes2xls`, `WriteXLS`, `RExcel`, `xlsReadWrite` et `gdata` existent mais sont utilisés de manière marginale par la communauté R. 
 
-### Niveau d'intégration à l'USSR
+## Niveau d'intégration à l'USSR
 
-#### Développements préconisés
+### Développements préconisés
 
 Aucun.
 
-#### Points de vigilance
+### Points de vigilance
 
 Ce package ne permet pas de lire et d'écrire des fichiers au format **xls**.
 
-### Intégration au dispositif de formation
+## Intégration au dispositif de formation
 
 TO DO (SG)
 
