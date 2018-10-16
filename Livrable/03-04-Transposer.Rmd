@@ -1,0 +1,152 @@
+---
+title: "Transposer une table"
+author: "JLL"
+date: "16 octobre 2018"
+output:
+  html_document:
+    theme: united
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(stringr)
+library(tidyr)
+pops <- readRDS("donnees/popsR54.RDS")
+pops0 <- pops %>% 
+  select("Commune"="DC",matches("^PMUN")) %>%
+  rename_at(vars(matches("^PMUN")),funs(str_replace(.,"PMUN","20")))
+```
+
+# Transposer
+
+## Problématique : <span style="color: green">PROC TRANSPOSE</span>
+
+En général un "data frame" R est similaire - au moins en apparence - à une table SAS : c'est un ensemble d'observations (en R les lignes) pour lesquelles on dispose d'un ensemble de mesures, les variables (en R les colonnes). Néanmoins, cette distinction entre observations et variables peut parfois s'effacer.<br>
+
+Par exemple si on dispose des populations d'un nombre fixe de communes à différentes dates, on peut considérer que l'observation c'est la commune et que les variables contiennent les données pour les différentes dates : c'est le point de vue des bases de données géographiques. 
+```{r echo=FALSE}
+pops0
+```
+
+### Transposition totale
+
+Mais on peut aussi se placer du point de vue de la collecte : à chaque date on a observé un certain nombre de communes. A chaque date de collecte correspond alors un ensemble de variables contenantt les données pour les différentes communes.
+```{r echo=FALSE}
+pops1 <- as.data.frame(t(pops0[-1]))
+colnames(pops1) <- pops0[[1]]
+tibble::rownames_to_column(pops1,"Date")
+```
+
+### Mise en format pivot (format "long")
+
+On peut enfin considérer que les identifiants de lignes et de colonnes sont en fait les deux coordonnées qui permettent d'accéder à une donnée dans un espace à deux dimensions. Ce format (coordonnées, valeur) est parfois requis pour faire certains traitements sous tableur ou pour échanger des données. Il constitue en effet ce qu'il y a de plus souple en gommant les questions d'implémentation interne propre à chaque logiciel et en faisant disparaître la notion de variable qui, on vient de le voir, est toute relative.
+```{r echo=FALSE}
+pops0 %>% gather("Date","Valeur",-Commune)
+```
+
+## Solution retenue
+
+Dans l'environnement tidyverse, le package **tidyr** offre les fonctionnalité souhaitées par le biais de deux fonctions : `gather` qui permet de passer dans le format pivot (ou "long") et `spread`qui permet de reconstituer le format tabulaire claissique (ou "large").
+
+## Exemples
+
+### Du format large au format long : `gather`
+
+La fonction `gather` prend deux arguments obligatoires, successivement : le nom de la colonne qui contiendra les coordonnées horizontales (les noms de colonnes originaux) puis le nom de la colonne qui recevra les valeurs. Ce qui vient après est la spécification des colonnes d'interêt qu'on peut fournir au moyen des différentes syntaxes autorisées pour la sélection de colonnes (`select` de **dplyr**). Toutes les variables qui ne seront pas citées seront conservées dans le résultat.
+
+
+```{r}
+# Toutes les colonnes sauf "Commune"
+pops0 %>% gather("Date","valeur",-Commune) -> pops1
+pops1
+# Toutes les colonnes dont le nom commence par "20"
+pops0 %>% gather("Date","valeur",matches("^20")) %>% identical(pops1)
+# Les trois colonnes "2015", "2010" et "2006"
+pops0 %>% gather("Date","valeur","2015","2010","2006") %>% identical(pops1)
+pops0 %>% gather("Date","valeur",c("2015","2010","2006")) %>% identical(pops1)
+# Les 2ème à 4ème colonnes (pas très explicite, donc déconseillé)
+pops0 %>% gather("Date","valeur",2:4) %>% identical(pops1)
+```
+
+### Du format long au format large : `spread`
+
+La fonction `spread` prend deux arguments obligatoires : le nom de la colonne qui contient les noms des futures colonnes puis le nom de la colonne qui en contient les valeurs. Les autres colonnes se retrouveront comme identifiants des futures lignes.
+```{r}
+pops1 %>% spread("Date","valeur")
+```
+
+On ne peut pas avoir plusieurs fois le même couple (nom de future colonne, identifiant de la future ligne) :
+```{r eval=FALSE}
+pops1 %>%
+  mutate(R="54") %>% select(-Commune) %>%
+  spread("Date","valeur")
+```
+```{r echo=FALSE}
+tryCatch(
+  pops1 %>%
+    mutate(R="54") %>% select(-Commune) %>%
+    spread("Date","valeur")
+  ,error=function(e) e$message)
+```
+
+### Une transposition totale
+
+Pour faire une transposition classique, il suffit de permutter le rôle des lignes et des colonnes, ce qui est très simple lorsqu'on a mis la table en format "long"" où identifiant de ligne et de colonne jouent le même rôle :
+```{r}
+pops0 %>% gather("Date","valeur",-Commune) %>% spread("Commune","valeur")
+```
+
+### Faire des statistiques sur des données présentées en ligne
+
+Les valeurs minimales et maximales des populations (les minimas et maximas d'un ensemble de colonnes) :
+```{r}
+pops0 %>% 
+  gather("Date","valeur",-Commune) %>%
+  group_by(Commune) %>%
+  summarise(min=min(valeur),max=max(valeur))
+```
+
+L'année où la population est maximale (le nom de la colonne où la donnée est maximale) :
+```{r}
+pops0 %>% 
+  gather("Date","valeur",-Commune) %>%
+  group_by(Commune) %>%
+  filter(valeur==max(valeur)) %>%
+  ungroup %>%
+  mutate(k="annee_max") %>%
+  spread("k","Date")
+```
+
+## Solutions viables non retenues
+
+### R de base
+
+En R de base, la transposition totale peut se faire avec la fonction `t` qui est en fait une fonction travaillant sur des matrices et produisant une matrice. Il faudra donc faire une conversion en data.frame et également introduire des noms pour les nouvelles colonnes. Au final la manipulation est plus compliquée qu'avec le package **tidyr**.<br>
+Les opérations de mise en format long ou large sont réalisables avec la fonction `reshape` qui regroupe les fonctionnalités de `gather`et `spread`et qui a été plus spécifiquement conçue pour la transformation d'ensembles de séries temporelles. Cette fonction n'appartient pas au tidyverse et offre des modes de selection des colonnes bien plus restrictives.
+
+### Le package **reshape2**
+
+Le package **reshape2** offre deux fonctions `melt`et `cast` qui permettent les mêmes transformations que `gather`et `spread` plus des possibilités d'agrégation pour la seconde fonction. A la différence des fonctions de **tidyr** qui se mélangent bien avec les fonctions de **dplyr**, les fonctions de **reshape2** viennent du monde de **data.table** qui a sa propre logique et sa propre syntaxe.
+
+## Solutions à ne pas utiliser
+
+Aucune.
+
+## Niveau d'intégration à l'USSR
+
+### Développements préconisés
+
+Aucun
+
+### Points de vigilance
+
+Aucun.
+
+## Intégration au dispositif de formation
+
+La présentation des outils préconisés forme une séquence de la formation "prise en main rapide de données sous R".
+
