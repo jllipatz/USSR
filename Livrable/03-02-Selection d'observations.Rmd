@@ -14,6 +14,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 data(iris)
 data(mtcars)
+library("dplyr")
 ```
 # Sélection d'observations
 
@@ -67,11 +68,6 @@ Vous trouverez également des exemples de la fonction filter() dans le chapitre 
 
 Lorsque les deux conditions doivent être vérifiées, on les sépare au choix soit par un "&" soit par une virgule.
 
-On charge la librairie dplyr
-
-```{r init,echo=FALSE,message=FALSE}
-library("dplyr")
-```
 Le premier argument indique la base de données, ici iris.
 On sélectionne dans la base de données iris les observations pour lesquelles la variable Species vaut setosa **ET** la variable Sepal.Length est supérieure à 5.
 On affecte ces données à la base de données iris_1.
