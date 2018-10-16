@@ -19,7 +19,8 @@ library(dplyr)
 
 ## Problématique
 
-Pouvoir exprimer une condition logique à partir d'opérateurs, afin par exemple de ne retenir que certaines variables ou certaines observations dans la base de données initiale.
+Présentons les opérateurs permettant d'exprimer une condition logique.
+On pourra les utiliser notament afin de ne retenir que certaines variables ou certaines observations dans la base de données.
 
 ## Solution retenue
 
@@ -72,7 +73,7 @@ On peut combiner plusieurs opérateurs logiques en les séparant par :
 
 On utilise pour les exemples la fonction "filter" qui sera définie au paragraphe 3.2 (sélection d'observations) et qui permet de sélectionner des lignes d'une table en fonction de conditions.
 
-### Test d'égalité
+### Test d'égalité  ==
 
 On sélectionne les lignes pour lesquelles la variable Species prend une valeur égale à la valeur setosa.
 
@@ -82,7 +83,7 @@ iris_1 <- filter(iris,Species == "setosa")
 
 ```
 
-### Test différent de
+### Test différent de  !=
 
 On sélectionne les lignes pour lesquelles la variable Species prend des valeurs différentes de la valeur setosa.
 
@@ -92,7 +93,7 @@ iris_2 <- filter(iris,Species != "setosa")
 
 ```
 
-### Test supérieur à
+### Test supérieur à  >
 
 On sélectionne les lignes pour lesquelles les valeurs de la variable Sepal.Length sont supérieures à 5.
 
@@ -102,7 +103,7 @@ iris_3 <- filter(iris,Sepal.Length > 5)
 
 ```
 
-### Test est dans la liste
+### Test est dans la liste  %in% c(...,...)
 
 On sélectionne les lignes pour lesquelles les valeurs de la variable Species sont dans la liste : setosa, versicolor.
 
@@ -112,7 +113,7 @@ iris_4 <- filter(iris,Species %in% c("setosa","versicolor"))
 
 ```
 
-### Test n'est pas dans la liste
+### Test n'est pas dans la liste  !(variable %in% c(...,...))
 
 On sélectionne les lignes pour lesquelles les valeurs de la variable Species ne sont pas dans la liste : setosa, versicolor.
 
