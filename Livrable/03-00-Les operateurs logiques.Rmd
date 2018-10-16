@@ -43,9 +43,11 @@ Les test logiques sont :
 
 **Ou :**   |
 
+#On sépare les éléments de la liste avec une virgule
+
 **Dans une liste :**   %in% c(…) 
 
-#On sépare les éléments de la liste avec une virgule
+#On combine les opérateurs "different de" et "dans la liste" 
 
 **N'est pas dans la liste :**  !(x %in% c(…))
 
