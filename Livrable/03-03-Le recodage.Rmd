@@ -28,6 +28,7 @@ Cela peut s'avérer util lors de l'import des données.
 Dans un **mutate**, on peut utiliser le **case_when** qui permet d’étendre la logique de **ifelse** à des cas plus complexes. 
 Attention, les conditions mises dans un **case_when** ne sont pas exclusives. 
 De ce fait, il faut pouvoir déterminer l’ordre d’évaluation des conditions qui y sont posées. Cet ordre s’effectue de "bas en haut", c’est à dire que la dernière condition évaluée (celle qui primera sur toutes les autres) sera à écrire en premier en "haut".
+
 Pour modifier le type on utilise les fonctions **as.character()** **as.factor()** ou **as.numeric()**
 Pour connaitre le type d'une variable : **typeof()**
 On pourra renommer une variable avec la fonction **rename()**
@@ -68,6 +69,8 @@ iris <- mutate  (iris, var1 = as.factor (var1))
 
 ### Renommer une variable
 
+Dans la base de données iris, on renomme la variable Species en Especes
+
 ```{r rename}
 
 iris <- rename (iris, Especes = Species)
@@ -75,9 +78,9 @@ iris <- rename (iris, Especes = Species)
 ```
 
 
-### Exemple recoder une variable continue en classes avec case_when
+### Exemple recoder une variable continue en classes avec la fonction case_when
 
-Le premier argument indique la base de données.
+Le premier argument indique la base de données, ici iris.
 Attention, les conditions mises dans un **case_when** ne sont pas exclusives. 
 De ce fait, il faut pouvoir déterminer l’ordre d’évaluation des conditions qui y sont posées. Cet ordre s’effectue de "bas en haut", c’est à dire que la dernière condition évaluée (celle qui primera sur toutes les autres) sera à écrire en premier en "haut".
 
