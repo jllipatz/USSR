@@ -14,6 +14,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 data(iris)
 data(mtcars)
+library("dplyr")
 ```
 # Sélection de variables
 
@@ -65,10 +66,6 @@ La variable d'espèce contient 3 modalités : setosa, versicolor et virginica.
 ### Sélectionner un ensemble de variables en les nommant
 
 Le premier argument représente la base de données, ici iris, et les arguments suivants représentent les variables à conserver.
-
-```{r init,echo=FALSE,message=FALSE}
-library("dplyr")
-```
 
 On sélectionne dans la base de données iris les variables Species, Sepal.Length et Sepal.Width.
 On les affecte à la base de données iris_1 
