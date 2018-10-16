@@ -13,6 +13,7 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 data(iris)
+library("dplyr")
 ```
 # Recoder une variable
 
@@ -59,11 +60,6 @@ Les 5 variables sont la largeur et la longeur du pétale et du sépale et l'esp�
 Les lignes sont les observations, ici les mesures pour une fleur.
 Les variables de longueur et de largeur sont numériques.
 La variable d'espèce contient 3 modalités : setosa, versicolor et virginica.
-
-```{r init,echo=FALSE,message=FALSE}
-library("dplyr")
-```
-
 
 ### Modifier le type d'une variable
 
