@@ -21,7 +21,7 @@ data(mtcars)
 
 On s'intéresse ici à comment sélectionner certaines observations (une ou plusieurs lignes) dans une base de données.
 
-Quel est le verbe clé pour sélectionner certaines observations d'une base de données ?
+Le principal verbe clé pour sélectionner certaines observations d'une base de données est **filter()**.
 
 On suppose dans les exemples que les observations correspondent aux lignes et les variables aux colonnes.
 
@@ -65,8 +65,9 @@ On charge la librairie dplyr
 ```{r init,echo=FALSE,message=FALSE}
 library("dplyr")
 ```
-Le premier argument indique la base de données.
+Le premier argument indique la base de données, ici iris.
 On sélectionne dans la base de données iris les observations pour lesquelles la variable Species vaut setosa **ET** la variable Sepal.Length est supérieure à 5.
+On affecte ces données à la base de données iris_1.
 
 ```{r filter ET}
 
@@ -100,7 +101,7 @@ iris_3 <- filter (iris, Species %in% c ("setosa", "versicolor"))
 
 ### Sélectionner les observations qui ne répondent pas à la condition
 
-On utilise le !
+On utilise le ! qui signifie "different de"
 On sélectionne dans la base iris les observations pour lesquelles la variable Species est différente de setosa.  
 Deux possibilités équivalentes :
 
@@ -125,7 +126,7 @@ iris_5 <- slice(iris,10)
 
 ```
 
-On sélectionne les lignes de la seconde à la neuvième
+On sélectionne les lignes de la deuxième à la neuvième
 
 ```{r slice}
 
@@ -135,8 +136,7 @@ iris_6 <- slice(iris,2:9)
 
 ### La fonction sample_n()
 
-On sélectionne aléatoirement un nombre de lignes.
-ici n = 20
+On sélectionne aléatoirement un certain nombre de lignes, ici n = 20.
 
 ```{r slice}
 
