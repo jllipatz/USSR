@@ -71,6 +71,13 @@ On peut combiner plusieurs opérateurs logiques en les séparant par :
 
 ## Exemples
 
+Pour les exemples nous utilisons la base de données iris présente d'office avec R.
+Cette base de données sur les fleurs contient 5 variables et 150 lignes.
+Les 5 variables sont la largeur et la longeur du pétale et du sépale et l'espèce.
+Les lignes sont les observations, ici les mesures pour une fleur.
+Les variables de longueur et de largeur sont numériques.
+La variable d'espèce contient 3 modalités : setosa, versicolor et virginica.
+
 On utilise pour les exemples la fonction "filter" qui sera définie au paragraphe 3.2 (sélection d'observations) et qui permet de sélectionner des lignes d'une table en fonction de conditions.
 
 ### Test d'égalité  ==
