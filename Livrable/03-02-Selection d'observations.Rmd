@@ -199,4 +199,8 @@ Aucune.
 
 ## Références
 
+Lien internet aide-mémoire, on pourra consulter la fiche dplyr ou les fiches traduites en français, en cliquant sur ce lien :
+https://www.rstudio.com/resources/cheatsheets/
 
+On pourra consulter l'aide en ligne en tapant sous R la commande :
+help(filter)
