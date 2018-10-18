@@ -1,0 +1,245 @@
+---
+title: "Tableaux synthétiques"
+author: "PP+JLL"
+date: "11 octobre 2018"
+output:
+  html_document:
+    theme: united
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+options(width=100)
+```
+
+# Tableaux synthétiques
+
+## Problématique
+
+Produire des tableaux synthétiques prêts à être diffusés combinant divers types de statistiques sur plusieurs variables croisées. Le modèle implicite de tableau est celui des sorties de la 'PROC TABULATE' de SAS. 
+
+## Solution retenue
+
+La solution retenue est la fonction `tabular` du package **tables**. Cette fonction est largement inspirée de la 'PROC TABULATE' de SAS avec une syntaxe compatible avec R.
+
+```{r}
+library("tables")
+```
+```{r echo=FALSE}
+table_options(knit_print = FALSE)
+```
+
+## Particularités de syntaxe
+
+- La fonction `tabular` utilise le principe des **formules** utilisé en R de base assez systématiquement pour décrire les interactions entre variables. Les **formules** sont également utilisées dans le package **ggformula** mis en avant pour les graphiques. Les fonctions utilisant les **formules** ont la particularité de n'avoir la table de données cible qu'en second paramètre, le premier paramètre étant la formule.  Cette particularité provient de la possibilité -qui ne sera pas utilisée ici- de se passer de la mentiòn de la table de données cible en fournissant à l'intérieur de la formule directement des vecteurs R. Malheureusement cela perturbe aussi légèrement l'utilisation du pipe `%>%` pour lequel il faut utiliser une notation un peu plus compliquée.<br>
+
+- Avec `tabular`deux opérateurs jouent un rôle majeur :<br>
+`+` qui juxtapose plusieurs tableaux de résultats<br>
+`*` qui permet de croiser des variables (autant qu'on veut jusqu'à ce que la ligne devienne trop longue pour être lisible), ou une variable et les modalités de calcul (fonction statistique, mode de présentation)<br>
+
+- Il existe deux grands types de données : quantitatives et qualitatives. Pour ces dernères, la fonction `tabular`demande impérativement à ce qu'elle soient codées sous forme de facteur (ni nombre, ni chaîne de caractères).<br>
+Dans l'exemple ci dessous, le sexe est codé numériquement et on cherche à faire une ventilation de la moyenne d'âge et du nombre de personnes par grade selon le sexe. L'appel échoue avec un message peu explicite, mais significatif de l'absence de facteurs là où on devrait en avoir.<br>
+Il faut également mentionner que les facteurs sont pratiques pour réordonner les modalités.
+```{r}
+df <- read.table(text=
+"sexe grade age
+2     A     40
+1     A     50
+2     B     20
+1     C     30",header=TRUE)
+```
+```{r eval=FALSE}
+df %>% tabular(age*mean + grade ~ sexe,  # La formule : deux tableaux juxtaposés
+               .)                        # Pour le pipe : l'endroit où doit "atterrir" le résultat précédent 
+```
+```{r echo=FALSE}
+tryCatch(df %>% tabular(age*mean + grade ~ sexe,.),error=function(e) e$message)
+```
+
+Et en convertissant en facteurs :
+```{r}
+df1 <- df %>% mutate(sexe=as.factor(sexe))
+df1 %>% tabular(age*mean + grade ~ sexe,.)
+```
+
+On peut d'ailleurs aussi en profiter pour associer des libellés plus explicites :
+```{r}
+df1 <- df %>% mutate(sexe=factor(sexe,levels=c(1,2),labels=c("Homme","Femme")))
+df1 %>% tabular(age*mean + grade ~ sexe,.)
+```
+
+
+## Exemples
+
+Les exemples qui suivent utilisent une base inspirée du Système d'Information pour les Ressources Humaines, avec des données générées aléatoirement et sur un champ géographique restreint.
+
+```{r}
+library("openxlsx")
+base <- read.xlsx("donnees/base light.xlsx")
+base %>% 
+  mutate(Direction=as.factor(affectation)     # Direction d'affectation
+    ,Etablissement=as.factor(affectation2)    # Etablissement au sein de la direction d'affectation
+             ,sexe=as.factor(sexe)
+            ,Grade=as.factor(codhie)          # Grade de l'agent
+        ) -> base
+```
+
+### Simples comptages par direction et grade, avec sous totaux
+
+On utilise `1` pour indiquer qu'on veut une totalisation  (en plus de la ventilation, donc `+`). 
+```{r}
+base %>% tabular( (Direction+1)~(Grade+1), . )
+```
+
+### Visualiser les résultats avec `View`
+
+Le résultat de `tabular` n'est pas un data frame, mais une structure complexe qui contient tous les éléments de la mise en page du tableau. Néanmoins le package définit une fonction de conversion en matrice de chaînes de caractères qui peut être visualisée ou transformée en data frame, ou les deux :
+```{r}
+base %>% tabular( (Direction+1)~(Grade+1), . ) %>%
+  as.matrix() %>%
+  as.data.frame() -> t1
+t1
+```
+
+```{r eval=FALSE}
+View(t1)
+```
+
+### Changer les titres avec `Heading`
+
+```{r}
+base %>% tabular( (Direction+Heading("Total")*1)~(Grade+Heading("Tous")*1), . )
+```
+
+### Intégrer un calcul statistique
+
+Sur le seul champ de la Bretagne, on veut le décompte par sexe et la moyenne d'âge :
+```{r}
+base %>% 
+  filter((substr(identi,1,3)=="R35")&(ligne == "ligne L")) %>%
+  tabular( Direction+1 ~ sexe*(1+age*mean)+1,.)
+```
+Les parenthèses règlent la distributivité des calculs. L'exemple précédent était constitué du croisement sur deux variables avec une juxtaposition horizontale de tableaux, ci dessous on obtient une simple juxtaposition horizontale de tableaux faits chacun sur une variable.
+```{r}
+base %>% 
+  filter((substr(identi,1,3)=="R35")&(ligne == "ligne L")) %>%
+  tabular( Direction+1 ~ sexe +1*(1+age*mean),.)
+```
+
+
+### Changer le format des nombres avec `Format`
+
+```{r}
+base %>% 
+  filter((substr(identi,1,3)=="R35")&(ligne == "ligne L")) %>%
+  tabular( Direction+1 ~ sexe*(1+age*mean*Format(digits=0))+1,.)
+```
+
+### Contrôler les modalités utilisées en ligne et colonne
+
+La fonction `tabular` se sert de la définition des facteurs pour savoir quelles sont les modalités à afficher. Dans le cas précédent, le code Direction correspond à deux directions régionales donc deux modalités, même si on n'en a sélectionné qu'une (celle de Bretagne). Pour éliminer la ligne concernant l'autre direction et pour lesquelles on n'a pas d'observation, il faut transformer le facteur pour qu'il ne contienne plus que les seules modalités vraiment présentes.
+```{r}
+base %>% 
+  filter((substr(identi,1,3)=="R35")&(ligne == "ligne L")) %>%
+  mutate(Direction=as.factor(as.character(Direction))) %>%        # Reconstruction du facteur
+  tabular( Direction+1 ~ sexe*(1+age*mean*Format(digits=0))+1,.)
+```
+
+### Croiser les modalités en ligne comme en colonne
+
+On peut croiser les variables utilisées pour les ventilations indiféremment en ligne et en colonne. Ci dessous on cherche une ventilation des effectifs totaux par Direction et Etablissement.
+```{r}
+base %>% 
+  filter(ligne == "ligne L") %>%
+  tabular( (Direction+1)*(Etablissement+1) ~ 1,.)
+```
+
+
+### Retravailler le tableau
+
+Le tableau préédent est plein de lignes superflues car R croise les modalités des deux facteurs sans savoir que certains croisements n'ont pas de sens. Une façon relativement simple de résoudre cette difficulté est de travailler sur le tableau résultat en éliminant les lignes superflues. Celles ci ne sont pas nécessairement repérables par des effectifs à zéro car si on s'interessait à une sous population particulière il pourrait y avoir des établissements où cette population serait absente. On va donc plutôt jouer sur les libellés pour éliminer les lignes superflues en partant de la traduction en data frame du résultat :
+```{r}
+
+base %>% 
+  filter(ligne == "ligne L") %>%
+  tabular( (Direction+1)*(Etablissement+1) ~ 1,.) %>%
+  as.matrix() %>% as.data.frame() -> t2
+
+library("zoo")                                        # pour la fonction 'na.locf'
+
+t2 %>% 
+  mutate(W1=ifelse(V1=="",NA,as.character(V1))) %>%   # Les lignes à blanc dans la colonne Direction deviennent manquantes
+  mutate(W1=na.locf(W1,na.rm=FALSE)) %>%              # On remplace les valeurs manquantes par la modalité non manquante précédente
+  filter(                                             # On se sert de W1 pour garder :
+    is.na(W1)|                                        #    les premières lignes de titre
+    (V2=="All")|                                      #    les totaux partiels
+    ((V1=="All")&(V2=="All"))|                        #    le total général
+    startsWith(as.character(V2),W1)) %>%              #    les établissements dont le nom commence par celui de la Direction
+  select(-W1)
+```
+
+### Intégrer des pondérations avec `Arguments`
+
+Certaines fonctions statistiques ont besoin d'arguments complémentaires : la fonction `quantile` ou les fonctions de statistiques pondérées du package 'Hmisc'. Le passage de ces arguments complémentaires se fait à l'aide du mot clé `Arguments`: 
+
+```{r}
+library("Hmisc")
+base %>%
+  filter(ligne == 'ligne L') %>%
+  tabular(Direction~(sexe*age*(wtd.mean*Arguments(w=poids)+wtd.quantile*Arguments(w=poids,p=.25))) ,.)
+# A comparer avec (en version non pondérée):
+base %>%
+  filter(ligne == 'ligne L') %>%
+  tabular(Direction~(sexe*age*(    mean                   +    quantile*Arguments(        p=.25))) ,.)
+```
+
+### Exporter les résultats
+
+Le passage en mode data frame fournit une première option pour exporter les résultats, par exemple sous un tableur : il suffit d'utiliser une écriture en format XLXS ou ODS.<br>
+Une autre solution consiste à créer un fichier html directement sur les résultats de la fonction `tabular`. L'avantage est alors que le package table offre quelques options permettant d'enjoliver le html produit. Ce dernier est ensuite lisible sous Calc.
+```{r}
+table_options(CSS =
+"<style>
+#ID .center { 
+  text-align: right;
+  background-color: aliceblue;
+}
+</style>", doCSS = TRUE)
+base %>%
+  filter(ligne == 'ligne L') %>%
+  tabular( Direction+1 ~ sexe*(1+age*mean*Format(digits=0))+1,.) %>%
+  html("donnees/tabular1.html")
+```
+
+<img src="donnees/tabular1.png">
+
+
+
+## Solutions viables non retenues
+
+Le package **expss** présente des fonctionnalités similaires à celles de **tables** mais au moyen de fonctions spécialisées et non d'une syntaxe à base de formule. Néanmoins ces fonctions sont assez mal documentées et ne couvrent pas toutes les fonctionnalités de `tabular` en termes de mélanges possibles de statistiques multiples.
+
+## Solutions à ne pas utiliser
+
+Aucune
+
+## Niveau d'intégration à l'USSR
+
+### Développements préconisés
+
+Aucun.
+
+### Points de vigilance
+
+Aucun. 
+
+## Intégration au dispositif de formation
+
+Les tableaux synthétiques et la fonction `tabular` sont abordés dans la formation "prise en main rapide de données sous R".
+
+
+

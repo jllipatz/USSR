@@ -1,5 +1,5 @@
 ---
-title: "La s�lection de variables"
+title: "La sélection de variables"
 author: "CA"
 date: "26 juin 2018"
 output:
@@ -13,46 +13,62 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 data(iris)
-```
-
-### Probl�matique
-
-Comment s�lectionner un champ de variables dans une base de donn�es ?
-
-C'est-�-dire, quel est le verbe cl� pour s�lectionner certaines variables d'une base de donn�es.
-
-### Solution retenue
-
-Le package **dplyr** offre la fonctionnalit� souhait�e.
-C'est dans ce package le verbe **select()** qui permet de s�lectionner des variables. 
-
-### Niveau d'int�gration � l'USSR
-
-#### D�veloppements pr�conis�s
-
-
-
-#### Points de vigilance
-
-
-
-### Int�gration au dispositif de formation
-
-Les outils pr�conis�s ne demandent pas de formation sp�cifique pour �tre ma�tris�s.
-
-### Particularit�s de syntaxe
-
-Le package **dplyr** contient des helpers pour faciliter l'appel des variables dans la fonction select.
-
-### Exemples
-
-#### S�lectionner un ensemble de variables en les nommant
-
-Le premier argument repr�sente la base de donn�es, les suivants repr�sentent les variables � conserver.
-
-```{r init,echo=FALSE,message=FALSE}
+data(mtcars)
 library("dplyr")
 ```
+# Sélection de variables
+
+## Problématique
+
+On s'intéresse ici à comment sélectionner un champ de variables (une ou plusieurs colonnes) dans une base de données.
+
+Le verbe clé dans le logiciel R pour sélectionner certaines variables d'une base de données est **select()**
+
+On suppose dans les exemples que les variables correspondent aux colonnes de la base de données et les observations aux lignes.
+
+## Solution retenue
+
+Le package **dplyr** offre la fonctionnalité souhaitée.
+C'est dans ce package le verbe **select()** qui permet de sélectionner des variables. 
+
+## Niveau d'intégration à l'USSR
+
+### Développements préconisés
+
+
+
+### Points de vigilance
+
+Attention, le logiciel R différencie les minuscules et les majuscules.
+En particulier faire attention dans le nom des variables et des fonctions. 
+
+Dans le logiciel R, les priorités de calcul ne sont pas forcément les mêmes que dans SAS ou C.
+Il est important de mettre des parenthèses dans les calculs pour ne pas faire confiance aux priorités du langage. 
+
+## Intégration au dispositif de formation
+
+Les outils préconisés ne demandent pas de formation spécifique pour être maîtrisés.
+
+## Particularités de syntaxe
+
+Le package **dplyr** contient des helpers pour faciliter l'appel des variables dans la fonction select.
+Ces helpers sont listés à la fin des exemples.
+
+## Exemples
+
+Pour les exemples nous utilisons la base de données iris présente d'office avec R.
+Cette base de données sur les fleurs contient 5 variables et 150 lignes.
+Les 5 variables sont la largeur et la longeur du pétale et du sépale et l'espèce de la fleur.
+Les lignes sont les observations, ici les mesures de largeur et de longueur pour une fleur.
+Les variables de longueur et de largeur sont numériques.
+La variable d'espèce Species contient 3 modalités : setosa, versicolor et virginica.
+
+### Sélectionner un ensemble de variables en les nommant
+
+Le premier argument représente la base de données, ici iris, et les arguments suivants représentent les variables à conserver.
+
+On sélectionne dans la base de données iris les variables Species, Sepal.Length et Sepal.Width.
+On les affecte à la base de données iris_1. 
 
 ```{r select by name}
 
@@ -60,17 +76,22 @@ iris_1 <- select (iris, Species, Sepal.Length, Sepal.Width)
 
 ```
 
-#### S�lectionner des variables en indiquant les variables que l'on ne souhaite pas conserver
+### Sélectionner des variables en indiquant les variables que l'on ne souhaite pas conserver
 
-On indique le signe - devant la variable � supprimer
+On indique le signe "**-**" devant la variable à ne pas conserver.
+On sélectionne les variables de la base de données iris, excepté la variable Sepal.Length.
+On affecte ces données à iris_2.
 
-```{r compl�mentaire}
+```{r complémentaire}
 
 iris_2 <- select (iris, -Sepal.Length)
 
 ```
 
-#### S�lectionner toutes les variables qui commencent par une chaine de caract�res (helper starts_with) 
+### Sélectionner toutes les variables qui commencent par une chaine de caractères (on utilise le helper "starts_with") 
+
+On sélectionne dans la base de données iris toutes les variables dont le nom commence par Sepal.
+On affecte à iris_3.
 
 ```{r}
 
@@ -78,35 +99,75 @@ iris_3 <- select (iris, starts_with ("Sepal"))
 
 ```
 
-#### Exemple des principaux helpers
+### Exemple des principaux helpers
 
-starts_with(): starts with a prefix
-ends_with(): ends with a prefix
-contains(): contains a literal string
-one_of(): variables in character vector
-everything(): all variables
+starts_with(): commence par le préfixe spécifié entre les paraenthèses
 
-### Solutions viables non retenues
+ends_with(): se termine par le suffixe spécifié entre les parenthèses
 
-Il est possible de s�lectionner des variables en utilisant les crochets
+contains(): contient une chaine de texte spécifiée entre les parenthèses
+
+one_of(): liste de variables spécifiée entre les parenthèses
+
+everything(): toutes les variables
+
+La fonction select() associée au helper everything(), peut servir à modifier l'ordre des variables d'une base de données.
+
+Exemple : On souhaite positionner la variable Species en première position.
+```{r}
+
+iris_4 <- select (iris,Species,everything())
+
+```
+### Les fonctions select_all select_if select_at
+
+```{r}
+
+select_all(.tbl, .funs = list())
+
+select_if(.tbl, .predicate, .funs = list())
+
+select_at(.tbl, .vars, .funs = list())
+
+
+```
+Exemple mettre tous les noms de variables de la table iris en majuscule 
+
+```{r}
+
+select_all(iris, toupper)
+
+```
+Exemple retenir uniquement dans la table mtcars les variables ayant des valeurs entières
+
+```{r}
+is_whole <- function(x) all(floor(x) == x)
+select_if(mtcars, is_whole)
+```
+
+## Solutions viables non retenues
+
+Il est possible de sélectionner des variables en utilisant l'écriture avec les crochets.
+Le premier argument entre les crochets correspond à la ligne et le second à la colonne.
+Si le premier argument est laissé à blanc, cela correspond à la totalité des lignes de la base de données.
 
 ```{r crochets}
 
-#S�lection de la J�me variable de la bdd
+#Sélection de la Jème variable de la bdd
 var_j <- iris[,j]
 
-#S�lection de la variable Species
+#Sélection de la variable Species
 var_Species <- iris[,'Species']
 
-#S�lection de la J�me � la K�me variables
+#Sélection de la Jème à la Kème variables
 var_j_k <- iris[,j:k]
 
-#S�lection de la J�me et de la K�me variables
+#Sélection de la Jème et de la Kème variables
 varjk <- iris[,c(j,k)]
 
 ```
 
-On peut �galement utiliser la fonction **pull**
+On peut également utiliser la fonction **pull**
 
 ```{r pull}
 
@@ -117,6 +178,14 @@ extract_var1 <- pull (iris, Species)
 ```
 
 
-### Solutions � ne pas utiliser
+## Solutions à ne pas utiliser
 
 Aucune.
+
+## Références
+
+Lien internet aide-mémoire, on pourra consulter la fiche dplyr ou les fiches traduites en français, en cliquant sur ce lien :
+https://www.rstudio.com/resources/cheatsheets/
+
+On pourra consulter l'aide en ligne en tapant sous R la commande :
+help(select)

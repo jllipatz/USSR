@@ -13,49 +13,66 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 data(iris)
+data(mtcars)
+library("dplyr")
 ```
+# Sélection d'observations
 
-### Problématique
+## Problématique
 
-Comment sélectionner certaines observations dans une base de données ?
+On s'intéresse ici à comment pouvoir sélectionner certaines observations (une ou plusieurs lignes) dans une base de données.
 
-C'est-à-dire, quel est le verbe clé pour sélectionner certaines observations d'une base de données.
+Le principal verbe clé pour sélectionner certaines observations d'une base de données est **filter()**.
 
-### Solution retenue
+On suppose dans les exemples que les observations correspondent aux lignes et les variables aux colonnes.
+
+## Solution retenue
 
 Le package **dplyr** offre la fonctionnalité souhaitée.
-C'est dans ce package le verbe **filter()** qui permet de sélectionner des variables.
+C'est dans ce package le verbe **filter()** qui permet de sélectionner les variables.
 
-### Niveau d'intégration à l'USSR
+On s'intéressera également au verbe **slice()** qui permet de sélectionner des lignes selon leur position dans la base.
 
-#### Développements préconisés
+## Niveau d'intégration à l'USSR
+
+### Développements préconisés
 
 
+### Points de vigilance
 
-#### Points de vigilance
+Attention, R différencie les minuscules et les majuscules.
+En particulier faire attention aux majuscules dans le nom des variables et des fonctions.
 
-Attention, R différencie minuscules et majuscules
+Dans le logiciel R, les priorités de calcul ne sont pas forcément les mêmes que dans SAS ou C.
+Il est important de mettre des parenthèses dans les calculs pour ne pas faire confiance aux priorités du langage.
 
-### Intégration au dispositif de formation
+## Intégration au dispositif de formation
 
 Les outils préconisés ne demandent pas de formation spécifique pour être maîtrisés.
 
-### Particularités de syntaxe
+## Particularités de syntaxe
 
 
-### Exemples
+## Exemples
 
-Certains exemples ont été décrits dans le thème 3.0
+Pour les exemples nous utilisons la base de données iris présente d'office avec R.
+Cette base de données sur les fleurs contient 5 variables et 150 lignes.
+Les 5 variables sont la largeur et la longeur du pétale et du sépale et l'espèce.
+Les lignes sont les observations, ici les mesures de largeur et longueur pour une fleur.
+Les variables de longueur et de largeur sont des variables numériques.
+La variable d'espèce Species contient 3 modalités : setosa, versicolor et virginica.
 
-#### Sélectionner un ensemble d'observations selon deux conditions d'égalité cumulatives
+Vous trouverez également des exemples de la fonction filter() dans le chapitre 3.0 sur les opérateurs logiques.
 
-Lorsque les deux conditions doivent être vérifiées, on les sépare au choix soit par un "&" soit par une virgule. Les deux sont équivalents.
+### Sélectionner un ensemble d'observations selon deux conditions d'égalité cumulatives
 
-Le premier argument indique la base de données.
+Lorsque deux conditions doivent être vérifiées, on les sépare au choix soit par un "&" soit par une virgule.
 
-```{r init,echo=FALSE,message=FALSE}
-library("dplyr")
-```
+Le premier argument indique la base de données, ici iris.
+On sélectionne dans la base de données iris les observations pour lesquelles la variable Species vaut setosa 
+**ET** 
+la variable Sepal.Length est supérieure à 5.
+On affecte ces données à la base de données iris_1.
 
 ```{r filter ET}
 
@@ -65,9 +82,13 @@ iris_1 <- filter(iris, Species == "setosa" , Sepal.Length > 5 )
 
 ```
 
-#### Sélectionner des observations selon deux conditions non cumulatives
+### Sélectionner des observations selon deux conditions non cumulatives
 
-On sépare les conditions par le signe | qui représente le OU logique.
+On sépare les conditions par le signe **|** qui représente le OU logique.
+On sélectionne dans la base de données iris les observations pour lesquelles la variable Species vaut setosa 
+**OU** 
+la variable Sepal.Length est supérieure à 5.
+On affecte ces données à iris_2.
 
 ```{r filter OU}
 
@@ -75,9 +96,11 @@ iris_2 <- filter(iris, Species == "setosa" | Sepal.Length > 5 )
 
 ```
 
-#### Sélectionner des observations selon deux conditions non cumulatives portant sur la même variable
+### Sélectionner des observations selon deux conditions non cumulatives portant sur la même variable
 
-On privilégie dans ce cas un test logique de sélection dans une liste avec l'opérateur 
+On privilégie dans ce cas un test logique de sélection dans une liste avec l'opérateur.
+On sélectionne dans la base de données iris les observations pour lesquelles la variable Species prend des valeurs dans la liste setosa, versicolor.
+On affecte ces données à iris_3.
 
 ```{r filter dans liste}
 
@@ -85,25 +108,76 @@ iris_3 <- filter (iris, Species %in% c ("setosa", "versicolor"))
 
 ```
 
+### Sélectionner les observations qui ne répondent pas à la condition
 
-#### Sélectionner les observations qui ne répondent pas à la condition
-
-On utilise le !
-Deux possibilités équivalentes
+On utilise le ! qui signifie "different de".
+On sélectionne dans la base iris les observations pour lesquelles la variable Species est différente de setosa.  
+Deux possibilités équivalentes :
 
 ```{r n'est pas}
+Species différent de setosa
 
 iris_4 <- filter(iris, Species != "setosa")
+
+différent de Species vaut setosa
 
 iris_4 <- filter(iris, !(Species == "setosa"))
 
 ```
 
+### La fonction slice()
 
+On utilise la fonction slice pour sélectionner la dixième ligne de notre base de données. 
 
-### Solutions viables non retenues
+```{r slice}
 
-Il est possible de sélectionner des observations en utilisant les crochets
+iris_5 <- slice(iris,10)
+
+```
+
+On utilise la fonction slice pour sélectionner de la deuxième à la neuvième lignes de notre base de données.
+
+```{r slice}
+
+iris_6 <- slice(iris,2:9)
+
+```
+
+### La fonction sample_n()
+
+On utilise la fonction sample_n pour sélectionner aléatoirement un certain nombre de lignes, ici n = 20.
+
+```{r slice}
+
+iris_7 <- sample_n(iris,20)
+
+```
+
+### Les fonctions filter_all filter_if filter_at
+
+```{r}
+
+filter_all(.tbl, .vars_predicate)
+
+filter_if(.tbl, .predicate, .vars_predicate)
+
+filter_at(.tbl, .vars, .vars_predicate)
+
+```
+```{r}
+filter_all(mtcars, all_vars(. > 150))
+```
+```{r}
+filter_if(mtcars, ~ all(floor(.) == .), all_vars(. != 0))
+```
+```{r}
+filter_at(mtcars, vars(starts_with("d")), any_vars((. %% 2) == 0))
+```
+## Solutions viables non retenues
+
+Il est possible de sélectionner des observations en utilisant les crochets.
+Le premier argument entre les crochets correspond à la ligne et le second à la colonne.
+Si le second argument est laissé à blanc cela correspond à la totalité des colonnes de la base de données.
 
 ```{r crochets}
 
@@ -119,6 +193,14 @@ iris[c(i,j),]
 ```
 
 
-### Solutions à ne pas utiliser
+## Solutions à ne pas utiliser
 
 Aucune.
+
+## Références
+
+Lien internet aide-mémoire, on pourra consulter la fiche dplyr ou les fiches traduites en français, en cliquant sur ce lien :
+https://www.rstudio.com/resources/cheatsheets/
+
+On pourra consulter l'aide en ligne en tapant sous R la commande :
+help(filter)

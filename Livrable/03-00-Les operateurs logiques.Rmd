@@ -13,17 +13,20 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 data(iris)
+library(dplyr)
 ```
+# Opérateurs logiques
 
-### Problématique
+## Problématique
 
-Pouvoir exprimer une condition logique à partir d'opérateurs, afin par exemple de ne retenir que certaines variables ou certaines observations dans la base de données initiale.
+Nous présentons ici les opérateurs permettant d'exprimer une condition logique (égal à, différent de, supérieur, et, ou...).
+On pourra utiliser ces conditions entre autres afin de sélectionner certaines variables ou certaines observations de notre base de données.
 
-### Solution retenue
+## Solution retenue
 
 Les tests logiques sont intégrés au logiciel R, ils ne nécessitent pas l'installation d'un package particulier.
 
-Les test logiques sont :
+Les test logiques et leur écriture en R sont :
 
 **Egalite :**  ==
 
@@ -41,34 +44,46 @@ Les test logiques sont :
 
 **Ou :**   |
 
-**Dans une liste :**   %in% c(…) 
+Pour l'opérateur "dans la liste", on sépare les différents éléments de la liste avec une virgule
 
-#On sépare les éléments de la liste avec une virgule
+**Dans une liste :**   %in% c(a,b,c,d…) 
 
-**N'est pas dans la liste :**  !(x %in% c(…))
+Pour l'opérateur "n'est pas dans la liste", on combine les opérateurs "different de" et "dans la liste" 
 
-### Niveau d'intégration à l'USSR
+**X N'est pas dans la liste :**  !(x %in% c(a,b,c,d…))
 
-#### Développements préconisés
+## Niveau d'intégration à l'USSR
+
+### Développements préconisés
 
 
-#### Points de vigilance
+### Points de vigilance
 
 
-### Intégration au dispositif de formation
+## Intégration au dispositif de formation
 
 Les outils préconisés ne demandent pas de formation spécifique pour être maîtrisés.
 
-### Particularités de syntaxe
+## Particularités de syntaxe
 
 On peut combiner plusieurs opérateurs logiques en les séparant par :
-"&" (et) ou "|"" (ou).
+"&" (et) ou "|" (ou).
 
-### Exemples
+## Exemples
 
-On utilise pour les exemples la fonction "filter" qui sera définie au paragraphe 3.2 (sélection d'observations).
+Pour les exemples nous utilisons la base de données iris présente d'office avec R.
+Cette base de données sur les fleurs contient 5 variables et 150 lignes.
+Les 5 variables sont la largeur et la longeur du pétale et du sépale et l'espèce de la fleur.
+Les lignes correspodent aux observations, ici les mesures de largeur et longueur pour une fleur.
+Les variables de longueur et de largeur sont numériques.
+La variable d'espèce "Species" contient 3 modalités : setosa, versicolor et virginica.
 
-#### Test d'égalité 
+On utilise pour les exemples la fonction "filter" qui sera définie au paragraphe 3.2 (sélection d'observations) et qui permet de sélectionner des lignes d'une table en fonction de conditions logiques.
+
+### Test d'égalité  ==
+
+On sélectionne les lignes pour lesquelles la variable Species prend une valeur égale à la valeur setosa.
+On affecte ces données à la base de données iris_1.
 
 ```{r égalité}
 
@@ -76,7 +91,10 @@ iris_1 <- filter(iris,Species == "setosa")
 
 ```
 
-#### Test différent de
+### Test différent de  !=
+
+On sélectionne les lignes pour lesquelles la variable Species prend des valeurs différentes de la valeur setosa.
+On affecte ces données à la base de données iris_2.
 
 ```{r different}
 
@@ -84,7 +102,10 @@ iris_2 <- filter(iris,Species != "setosa")
 
 ```
 
-#### Test supérieur à
+### Test supérieur à  >
+
+On sélectionne les lignes pour lesquelles les valeurs de la variable Sepal.Length sont supérieures à 5.
+On affecte ces données à la base de données iris_3.
 
 ```{r supérieur}
 
@@ -92,7 +113,10 @@ iris_3 <- filter(iris,Sepal.Length > 5)
 
 ```
 
-#### Test est dans la liste
+### Test est dans la liste  %in% c(...,...)
+
+On sélectionne les lignes pour lesquelles la valeur de la variable Species est dans la liste : setosa, versicolor.
+On affecte ces données à la base de données iris_4.
 
 ```{r dans liste}
 
@@ -100,7 +124,10 @@ iris_4 <- filter(iris,Species %in% c("setosa","versicolor"))
 
 ```
 
-#### Test n'est pas dans la liste
+### Test n'est pas dans la liste  !(variable %in% c(...,...))
+
+On sélectionne les lignes pour lesquelles la valeur de la variable Species n'appartient pas à la liste : setosa, versicolor.
+On affecte ces données à la base de données iris_5.
 
 ```{r pas dans liste}
 
@@ -108,7 +135,12 @@ iris_5 <- filter(iris,!(Species %in% c("setosa","versicolor")))
 
 ```
 
-#### Test avec la condition & (ET)
+### Test avec la condition & (ET)
+
+On sélectionne les lignes pour lesquelles la valeur de la variable Species est égale à setosa
+**ET**
+la valeur de la variable Sepal.Length est supérieure à 5.
+On affecte ces données à la base de données iris_6.
 
 ```{r et}
 
@@ -116,7 +148,12 @@ iris_6 <- filter(iris,Species == "setosa" &  Sepal.Length > 5)
 
 ```
 
-#### Test avec la condition | (OU)
+### Test avec la condition | (OU)
+
+On sélectionne les lignes pour lesquelles la valeur de la variable Species est égale à setosa
+**OU**
+la valeur de la variable Sepal.Length est supérieure à 5.
+On affecte ces données à la base de données iris_7.
 
 ```{r ou}
 
@@ -125,11 +162,11 @@ iris_7 <- filter(iris, Species == "setosa" | Sepal.Length > 5)
 ```
 
 
-### Solutions viables non retenues
+## Solutions viables non retenues
 
 Aucune.
 
 
-### Solutions à ne pas utiliser
+## Solutions à ne pas utiliser
 
 Aucune.
