@@ -52,23 +52,23 @@ Les outils préconisés ne demandent pas de formation spécifique pour être ma�
 ## Particularités de syntaxe
 
 Le package **dplyr** contient des helpers pour faciliter l'appel des variables dans la fonction select.
-Les helpers sont listés à la fin des exemples.
+Ces helpers sont listés à la fin des exemples.
 
 ## Exemples
 
 Pour les exemples nous utilisons la base de données iris présente d'office avec R.
 Cette base de données sur les fleurs contient 5 variables et 150 lignes.
-Les 5 variables sont la largeur et la longeur du pétale et du sépale et l'espèce.
-Les lignes sont les observations, ici les mesures pour une fleur.
+Les 5 variables sont la largeur et la longeur du pétale et du sépale et l'espèce de la fleur.
+Les lignes sont les observations, ici les mesures de largeur et de longueur pour une fleur.
 Les variables de longueur et de largeur sont numériques.
-La variable d'espèce contient 3 modalités : setosa, versicolor et virginica.
+La variable d'espèce Species contient 3 modalités : setosa, versicolor et virginica.
 
 ### Sélectionner un ensemble de variables en les nommant
 
 Le premier argument représente la base de données, ici iris, et les arguments suivants représentent les variables à conserver.
 
 On sélectionne dans la base de données iris les variables Species, Sepal.Length et Sepal.Width.
-On les affecte à la base de données iris_1 
+On les affecte à la base de données iris_1. 
 
 ```{r select by name}
 
@@ -80,6 +80,7 @@ iris_1 <- select (iris, Species, Sepal.Length, Sepal.Width)
 
 On indique le signe "**-**" devant la variable à ne pas conserver.
 On sélectionne les variables de la base de données iris, excepté la variable Sepal.Length.
+On affecte ces données à iris_2.
 
 ```{r complémentaire}
 
@@ -87,9 +88,10 @@ iris_2 <- select (iris, -Sepal.Length)
 
 ```
 
-### Sélectionner toutes les variables qui commencent par une chaine de caractères (helper starts_with) 
+### Sélectionner toutes les variables qui commencent par une chaine de caractères (on utilise le helper "starts_with") 
 
 On sélectionne dans la base de données iris toutes les variables dont le nom commence par Sepal.
+On affecte à iris_3.
 
 ```{r}
 
@@ -109,7 +111,8 @@ one_of(): liste de variables spécifiée entre les parenthèses
 
 everything(): toutes les variables
 
-La fonction select() associée au helper everything(), peut servir à modifier l'ordre des variables.
+La fonction select() associée au helper everything(), peut servir à modifier l'ordre des variables d'une base de données.
+
 Exemple : On souhaite positionner la variable Species en première position.
 ```{r}
 
@@ -178,3 +181,11 @@ extract_var1 <- pull (iris, Species)
 ## Solutions à ne pas utiliser
 
 Aucune.
+
+## Références
+
+Lien internet aide-mémoire, on pourra consulter la fiche dplyr ou les fiches traduites en français, en cliquant sur ce lien :
+https://www.rstudio.com/resources/cheatsheets/
+
+On pourra consulter l'aide en ligne en tapant sous R la commande :
+help(select)
