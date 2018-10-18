@@ -20,7 +20,7 @@ library("dplyr")
 
 ## Problématique
 
-On s'intéresse ici à comment sélectionner certaines observations (une ou plusieurs lignes) dans une base de données.
+On s'intéresse ici à comment pouvoir sélectionner certaines observations (une ou plusieurs lignes) dans une base de données.
 
 Le principal verbe clé pour sélectionner certaines observations d'une base de données est **filter()**.
 
@@ -29,9 +29,9 @@ On suppose dans les exemples que les observations correspondent aux lignes et le
 ## Solution retenue
 
 Le package **dplyr** offre la fonctionnalité souhaitée.
-C'est dans ce package le verbe **filter()** qui permet de sélectionner des variables.
+C'est dans ce package le verbe **filter()** qui permet de sélectionner les variables.
 
-On s'intéressera également au verbe **slice()** qui permet de sélectionner des lignes selon leur position.
+On s'intéressera également au verbe **slice()** qui permet de sélectionner des lignes selon leur position dans la base.
 
 ## Niveau d'intégration à l'USSR
 
@@ -58,18 +58,20 @@ Les outils préconisés ne demandent pas de formation spécifique pour être ma�
 Pour les exemples nous utilisons la base de données iris présente d'office avec R.
 Cette base de données sur les fleurs contient 5 variables et 150 lignes.
 Les 5 variables sont la largeur et la longeur du pétale et du sépale et l'espèce.
-Les lignes sont les observations, ici les mesures pour une fleur.
-Les variables de longueur et de largeur sont numériques.
-La variable d'espèce contient 3 modalités : setosa, versicolor et virginica.
+Les lignes sont les observations, ici les mesures de largeur et longueur pour une fleur.
+Les variables de longueur et de largeur sont des variables numériques.
+La variable d'espèce Species contient 3 modalités : setosa, versicolor et virginica.
 
 Vous trouverez également des exemples de la fonction filter() dans le chapitre 3.0 sur les opérateurs logiques.
 
 ### Sélectionner un ensemble d'observations selon deux conditions d'égalité cumulatives
 
-Lorsque les deux conditions doivent être vérifiées, on les sépare au choix soit par un "&" soit par une virgule.
+Lorsque deux conditions doivent être vérifiées, on les sépare au choix soit par un "&" soit par une virgule.
 
 Le premier argument indique la base de données, ici iris.
-On sélectionne dans la base de données iris les observations pour lesquelles la variable Species vaut setosa **ET** la variable Sepal.Length est supérieure à 5.
+On sélectionne dans la base de données iris les observations pour lesquelles la variable Species vaut setosa 
+**ET** 
+la variable Sepal.Length est supérieure à 5.
 On affecte ces données à la base de données iris_1.
 
 ```{r filter ET}
@@ -82,8 +84,11 @@ iris_1 <- filter(iris, Species == "setosa" , Sepal.Length > 5 )
 
 ### Sélectionner des observations selon deux conditions non cumulatives
 
-On sépare les conditions par le signe | qui représente le OU logique.
-On sélectionne dans la base de données iris les observations pour lesquelles la variable Species vaut setosa **OU** la variable Sepal.Length est supérieure à 5.
+On sépare les conditions par le signe **|** qui représente le OU logique.
+On sélectionne dans la base de données iris les observations pour lesquelles la variable Species vaut setosa 
+**OU** 
+la variable Sepal.Length est supérieure à 5.
+On affecte ces données à iris_2.
 
 ```{r filter OU}
 
@@ -95,6 +100,7 @@ iris_2 <- filter(iris, Species == "setosa" | Sepal.Length > 5 )
 
 On privilégie dans ce cas un test logique de sélection dans une liste avec l'opérateur.
 On sélectionne dans la base de données iris les observations pour lesquelles la variable Species prend des valeurs dans la liste setosa, versicolor.
+On affecte ces données à iris_3.
 
 ```{r filter dans liste}
 
@@ -104,7 +110,7 @@ iris_3 <- filter (iris, Species %in% c ("setosa", "versicolor"))
 
 ### Sélectionner les observations qui ne répondent pas à la condition
 
-On utilise le ! qui signifie "different de"
+On utilise le ! qui signifie "different de".
 On sélectionne dans la base iris les observations pour lesquelles la variable Species est différente de setosa.  
 Deux possibilités équivalentes :
 
@@ -121,7 +127,7 @@ iris_4 <- filter(iris, !(Species == "setosa"))
 
 ### La fonction slice()
 
-On sélectionne la dixième ligne 
+On utilise la fonction slice pour sélectionner la dixième ligne de notre base de données. 
 
 ```{r slice}
 
@@ -129,7 +135,7 @@ iris_5 <- slice(iris,10)
 
 ```
 
-On sélectionne les lignes de la deuxième à la neuvième
+On utilise la fonction slice pour sélectionner de la deuxième à la neuvième lignes de notre base de données.
 
 ```{r slice}
 
@@ -139,7 +145,7 @@ iris_6 <- slice(iris,2:9)
 
 ### La fonction sample_n()
 
-On sélectionne aléatoirement un certain nombre de lignes, ici n = 20.
+On utilise la fonction sample_n pour sélectionner aléatoirement un certain nombre de lignes, ici n = 20.
 
 ```{r slice}
 
@@ -190,3 +196,7 @@ iris[c(i,j),]
 ## Solutions à ne pas utiliser
 
 Aucune.
+
+## Références
+
+
