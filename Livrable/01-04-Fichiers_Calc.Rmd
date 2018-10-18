@@ -89,7 +89,7 @@ Le package `openxlsx` ne lit que les fichiers au format **xlsx**. Il faut donc c
 
 ## Intégration au dispositif de formation
 
-TO DO (SG)
+La question est abordée dans la formation "Prise en main rapide de données sous R", lors de la séquence 9 ("formats de fichiers d'échange").
 
 
 

@@ -196,6 +196,5 @@ Ce package ne permet pas de lire et d'écrire des fichiers au format **xls**.
 
 ## Intégration au dispositif de formation
 
-TO DO (SG)
-
+La question est abordée dans la formation "Prise en main rapide de données sous R", lors de la séquence 9 ("formats de fichiers d'échange").
 
