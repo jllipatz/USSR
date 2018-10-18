@@ -19,14 +19,14 @@ library("dplyr")
 
 ## Problématique
 
-Comment recoder une variable ?
+On s'intéresse ici à comment pouvoir recoder une variable avec le logiciel R.
 C'est-à-dire par exemple créer des classes pour une variable continue.
 Il peut aussi s'agir de modifier le type d'une variable.
 Cela peut s'avérer util lors de l'import des données.
 
 ## Solution retenue
 
-Dans un **mutate**, on peut utiliser le **case_when** qui permet d’étendre la logique de **ifelse** à des cas plus complexes. 
+Dans une fonction **mutate**, on peut utiliser le **case_when** qui permet d’étendre la logique de **ifelse** à des cas plus complexes. 
 Attention, les conditions mises dans un **case_when** ne sont pas exclusives. 
 De ce fait, il faut pouvoir déterminer l’ordre d’évaluation des conditions qui y sont posées. Cet ordre s’effectue de "bas en haut", c’est à dire que la dernière condition évaluée (celle qui primera sur toutes les autres) sera à écrire en premier en "haut".
 
@@ -42,7 +42,7 @@ On pourra renommer une variable avec la fonction **rename()**
 
 ### Points de vigilance
 
-Attention, les conditions mises dans un **case_when** ne sont pas exclusives. 
+Attention, rappel les conditions mises dans un **case_when** ne sont pas exclusives. 
 De ce fait, il faut pouvoir déterminer l’ordre d’évaluation des conditions qui y sont posées. Cet ordre s’effectue de "bas en haut", c’est à dire que la dernière condition évaluée (celle qui primera sur toutes les autres) sera à écrire en premier en "haut".
 
 ## Intégration au dispositif de formation
@@ -57,16 +57,18 @@ Les outils préconisés ne demandent pas de formation spécifique pour être ma�
 Pour les exemples nous utilisons la base de données iris présente d'office avec R.
 Cette base de données sur les fleurs contient 5 variables et 150 lignes.
 Les 5 variables sont la largeur et la longeur du pétale et du sépale et l'espèce.
-Les lignes sont les observations, ici les mesures pour une fleur.
+Les lignes sont les observations, ici les mesures de largeur et de longueur pour une fleur.
 Les variables de longueur et de largeur sont numériques.
-La variable d'espèce contient 3 modalités : setosa, versicolor et virginica.
+La variable d'espèce Species contient 3 modalités : setosa, versicolor et virginica.
 
 ### Modifier le type d'une variable
 
 ```{r modif type}
-
+Convertir en caractere
 iris <- mutate  (iris, var1 = as.character (var1))
+Convertir en numerique
 iris <- mutate  (iris, var1 = as.numeric (var1))
+Convertir en facteur
 iris <- mutate  (iris, var1 = as.factor (var1))
 ```
 
@@ -107,14 +109,13 @@ La manipulation des factor fait intervenir le package forcats, de la librairie t
 Dans un dataframe contenant une variable de type factor, on filtre comme sur une chaîne de caractère
 
 ```{r factor}
-d <- filter (dat, substr (x = ZAU, start = 1, stop = 3) != "120")
-# ou bien :
-d <- filter (dat, ZAU != "111 - Grand pôle (plus de 10 000 emplois)")
+
+d <- filter (iris, Species != "setosa")
 
 ```
 A la suite d’une opération de sélection des lignes, certains levels peuvent disparaître. Ils seront toutefois toujours présents dans la liste des modalités de la variables. fct_drop() permet de se débarasser des modalités désormais inutilisées
 ```{r fct_drop}
-d %>% pull (ZAU) %>% fct_drop () %>% levels ()
+d %>% pull (Species) %>% fct_drop () %>% levels ()
 ```
 
 ## Solutions viables non retenues
@@ -131,3 +132,10 @@ iris_2 <- mutate (iris, Espece_setosa = ifelse (Species == "setosa", val1 = TRUE
 ## Solutions à ne pas utiliser
 
 Aucune.
+
+## Références
+
+On pourra consulter les aide-mémoires en cliquant sur le lien :
+
+https://www.rstudio.com/resources/cheatsheets/
+
