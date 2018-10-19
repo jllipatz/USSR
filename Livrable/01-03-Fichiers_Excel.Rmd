@@ -1,7 +1,7 @@
 ---
 title: "Fichiers Excel"
 author: "NK & SG"
-date: "25 juin 2018"
+date: "octobre 2018"
 output:
   html_document:
     theme: united
@@ -127,7 +127,7 @@ addWorksheet(wb,"Graphique")
 
 Création d'un graphique avec la library ggplot2
 
-```{r}
+```{r,warning=FALSE}
 library(ggplot2)
 
 data("midwest", package = "ggplot2")
@@ -168,13 +168,6 @@ Enregistrement du classeur
 saveWorkbook(wb, "basics.xlsx", overwrite = TRUE)
 ```
 
-### Plus de détails
-
-Deux très bonnes vignettes sont disponibles sur le CRAN :
-
-* Exemples basics : <https://cran.r-project.org/web/packages/openxlsx/vignettes/Introduction.pdf>
-* Exemples complexes : <https://cran.r-project.org/web/packages/openxlsx/vignettes/formatting.pdf>
-
 
 ## Solutions viables non retenues
 
@@ -194,7 +187,30 @@ Aucun.
 
 Ce package ne permet pas de lire et d'écrire des fichiers au format **xls**.
 
+#### Lecture des fichiers au format xls
+
+Pour lire un fichier au format **xls**, une solution est d'utiliser le package `readxl` développé par Hadley Wickham. Ce package ne dépend d'aucune installation java sur poste. 
+
+Par exemple, le fichier des populations des quartiers de la politique de la ville 2015 est disponible sur le site insee.fr à l'adresse suivante : <https://insee.fr/fr/statistiques/fichier/2500431/pop_qp_2013.xls>
+
+Dans un premier temps, il faut enregistrer le fichier puis le lire avec la fonction `read_xls` du package `readxl`.
+
+```{r,eval=FALSE}
+library(readxl)
+
+pop_qpv15 <- read_xls(path = "pop_qp_2013.xls",skip = 8)
+```
+
+> L'option `skip` permet de ne pas lire les 8 premières lignes du fichier.
+
 ## Intégration au dispositif de formation
 
 La question est abordée dans la formation "Prise en main rapide de données sous R", lors de la séquence 9 ("formats de fichiers d'échange").
+
+## Pour aller plus loin
+
+Deux vignettes :
+
+* Exemples basics : <https://cran.r-project.org/web/packages/openxlsx/vignettes/Introduction.pdf>
+* Exemples complexes : <https://cran.r-project.org/web/packages/openxlsx/vignettes/formatting.pdf>
 

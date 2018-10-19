@@ -1,8 +1,13 @@
 ---
-title: "Export vers la PAO"
+title: "Export des données vers la PAO"
 author: "NK"
-date: "23/07/2018"
-output: html_document
+date: "octobre 2018"
+output:
+  html_document:
+    theme: united
+    toc: true
+    toc_depth: 4
+    toc_float: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -17,7 +22,7 @@ Exporter des données sous forme de tableaux et de graphiques dans un format uti
 
 Les tableaux et les graphiques (au format image) sont exportés directement dans un tableur contenant autant de feuilles que nécessaire. Le format **image** étant limité en terme de retouches, les graphiques sont exportés une seconde fois dans un format **vectoriel** pouvant ensuite être retravaillé par la PAO. 
 
-### Solution retenue
+## Solution retenue
 
 Le package `openxlsx` permet de construire des classeurs complexes contenant notamment des tableaux, du texte et des graphiques (au format image **png**). 
 
@@ -29,12 +34,12 @@ Les classeurs sont exportés au format **xlsx**, format lisible par le tableur *
 
 Les graphiques sont exportés au format **pdf** qui est un format vectoriel.
 
-### Exemples
+## Exemples
 
 
 #### Graphique
 
-```{r}
+```{r,warning=FALSE,}
 library(ggplot2)
 theme_set(theme_bw())
 data("midwest", package = "ggplot2")
@@ -50,7 +55,6 @@ figure_1 <- ggplot(midwest, aes(x=area, y=poptotal)) +
        x="Area", 
        title="Scatterplot", 
        caption = "Source: midwest")
-
 ```
 
 
@@ -190,24 +194,31 @@ saveWorkbook(wb, "exportPao_exemple.xlsx", overwrite = TRUE)
 > Remarque : il est possible de visualiser une version temporaire du classeur en utilisant la commande `openXL(wb)`. 
 
 
-### Solutions viables non retenues
+## Solutions viables non retenues
 
 Les packages `xlsx` et `XLConnect` sont des bonnes alternatives au package `openxlsx`. Néanmoins, ils sont dépendants d'une installation java sur poste ce qui peut les rendre inutilisables sous certains systèmes.
 
-### Solutions à ne pas utiliser
+## Solutions à ne pas utiliser
 
 Les packages `readXl` et `writexl` sont efficaces pour la lecture et l'écriture de fichiers. Cependant, ils disposent de peu de fonctionnalités et ne gèrent pas correctement certains formats de données. D'autres packages tels que `excel.link`, `RODBC`, `RJDBC`, `dataframes2xls`, `WriteXLS`, `RExcel`, `xlsReadWrite` et `gdata` existent mais sont utilisés de manière marginale par la communauté R.
 
-### Niveau d'intégration à l'USSR
+## Niveau d'intégration à l'USSR
 
-#### Développements préconisés
+### Développements préconisés
 
 Aucun.
 
-#### Points de vigilance
+### Points de vigilance
 
 Le package `openxlsx` n'exporte qu'au format **xlsx**.
 
-### Intégration au dispositif de formation
+## Intégration au dispositif de formation
 
 À déterminer.
+
+## Pour aller plus loin
+
+Deux vignettes du package `openxlsx` : 
+
+* Exemples basics : <https://cran.r-project.org/web/packages/openxlsx/vignettes/Introduction.pdf>
+* Exemples complexes : <https://cran.r-project.org/web/packages/openxlsx/vignettes/formatting.pdf>

@@ -1,7 +1,7 @@
 ---
 title: "Theme1.4_format_ods"
 author: "NK & SG"
-date: "25 juin 2018"
+date: "octobre 2018"
 output:
   html_document:
     theme: united
@@ -23,7 +23,7 @@ Manipuler des fichiers "tableurs" dans R, en particulier celui de Libre Office, 
 
 Le package `openxlsx` est la meilleure solution actuellement. Elle présente une contrainte importante : ce package ne lit pas directement les fichiers au format **ods**. Il faut les convertir au préalable (via calc par exemple) au format **xlsx**. De plus, ce package ne permet d'écrire directement au format **ods**.
 
-# Particularité de syntaxe
+## Particularité de syntaxe
 
 Pour l'instant, aucune. 
 
@@ -90,6 +90,8 @@ Le package `openxlsx` ne lit que les fichiers au format **xlsx**. Il faut donc c
 ## Intégration au dispositif de formation
 
 La question est abordée dans la formation "Prise en main rapide de données sous R", lors de la séquence 9 ("formats de fichiers d'échange").
+
+
 
 
 
