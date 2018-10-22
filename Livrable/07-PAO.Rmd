@@ -1,0 +1,243 @@
+---
+title: "Export des données vers la PAO"
+author: "NK"
+date: "octobre 2018"
+output:
+  html_document:
+    theme: united
+    toc: true
+    toc_depth: 4
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+## Problématique
+
+Exporter des données sous forme de tableaux et de graphiques dans un format utilisable par la PAO. 
+
+À l'heure actuelle, les données sont envoyées à la PAO dans un tableur **calc**. Ils doivent respecter un certain style de mise en forme et les graphiques doivent être générés par calc. L’inconvénient de cette méthode est qu'il est difficile d'automatiser la création de ce fichier et des graphiques correspondants. Au moindre changement en amont, il faut mettre à jour le fichier manuellement ce qui occasionne une perte de temps et l'apparition de coquilles (erreur de copier-coller par exemple). Ce document présente une méthode spécifique permettant d'automatiser la chaîne de production des fichiers à destination de la PAO. Les graphiques sont réalisés directement sous R ce qui permet de profiter des fonctionnalités de packages tel que `ggformula` et `ggplot2`. 
+
+Les tableaux et les graphiques (au format image) sont exportés directement dans un tableur contenant autant de feuilles que nécessaire. Le format **image** étant limité en terme de retouches, les graphiques sont exportés une seconde fois dans un format **vectoriel** pouvant ensuite être retravaillé par la PAO. 
+
+## Solution retenue
+
+Le package `openxlsx` permet de construire des classeurs complexes contenant notamment des tableaux, du texte et des graphiques (au format image **png**). 
+
+Les graphiques sont exportés une seconde fois au format vectoriel **pdf** via la fonction `dev.print` disponible dans **R de base**.
+
+## Particularité de la syntaxe
+
+Les classeurs sont exportés au format **xlsx**, format lisible par le tableur **calc**. 
+
+Les graphiques sont exportés au format **pdf** qui est un format vectoriel.
+
+## Exemple
+
+Cet exemple présente un cas pratique d'utilisation de données disponibles sur le site <https://insee.fr>.  
+
+### Taux de pauvreté en condition de vie selon le sexe
+
+Les indicateurs pour le suivi national des objectifs du développement durable sont publiés sur Insee.fr et contiennent notamment des indicateurs sur la pauvreté (objectif n°1 : éradication de la pauvreté). Les données sont disponibles à l'adresse suivante : 
+<https://insee.fr/fr/statistiques/fichier/2654940/indicateursODD1.xls>
+
+Les données ci-dessous ont été extraites du tableur. Il s'agit du taux de pauvreté français en condition de vie selon le sexe. 
+```{r}
+IndPauv <- data.frame(An = c("2010","2011","2012","2013","2014","2015","2016"),
+                      Ensemble = c(12.6,12.4,12.8,12,11.9,11.1,11),
+                      Femmes = c(13.1,13,13.2,12.9,12.9,11.9,11.6),
+                      Hommes = c(12.1,11.8,12.2,11,10.9,10.1,10.4),
+                      stringsAsFactors = FALSE)
+```
+
+
+Graphique du taux de pauvreté en condition de vie selon le sexe
+
+```{r,warning=FALSE,message=FALSE}
+library(ggformula)
+figure_1 <- IndPauv %>% 
+  gather("Indicateur","Tx_pauv_cv",2:4) %>% 
+  gf_line(Tx_pauv_cv~ An,color = ~Indicateur,group = ~ Indicateur) %>% 
+  gf_labs(x = "Année" , y = "%",
+          caption = str_wrap("Source : Insee, indicateurs pour le suivi national des objectifs de développement durable 2018",50),
+          title = "Taux de pauvreté en condition de vie français par sexe"
+          )
+
+figure_1
+```
+
+
+### Export du graphique au format vectoriel
+
+Il faut d'abord afficher le graphique avec la fonction `plot` dans RStudio. Ensuite, la fonction `dev.print` va enregistrer le graphique dans un fichier au format **pdf** (possibilité d'enregistrer dans d'autres formats également). 
+
+```{r,eval=FALSE}
+plot(figure_1)
+dev.print(device = pdf, file = "figure_1.pdf")
+```
+
+### Export vers un tableur
+
+Pour exporter les données au format **xlsx**, il faut créer plusieurs objets en R interagissant les uns avec les autres.
+
+Dans cet exemple, on cherche à exporter deux graphiques ainsi que leurs titres, les tableaux de données correspondant et les sources. 
+
+**Étape 1** : Création du classeur. Le principe est d'ajouter au fur et à mesure des éléments à cet objet. 
+
+```{r}
+library(openxlsx)
+wb <- createWorkbook()
+```
+
+**(Étape facultative)** Création d'un style spécifique aux titres et aux sources de données.
+
+```{r}
+titre.style <- createStyle(fontSize=14, textDecoration=c("bold", "italic"))
+source.style <- createStyle(fontSize=9, textDecoration=c("italic"))
+```
+
+**Étape 2** : Ajout d'une feuille dans le classeur contenant le titre, le tableau de données, la source et la première figure. 
+
+```{r}
+sheet <- "Fig1"
+addWorksheet(wb, sheet)
+```
+
+Ajout du titre mis en forme.
+```{r}
+writeData(wb,sheet = sheet, x = "Taux de pauvreté en condition de vie français par sexe", startRow = 1)
+addStyle(wb, sheet, style = titre.style, rows= 1,cols = 1)
+```
+
+Ajout du tableau de données. On choisit de n'afficher que les 10 premières lignes.
+
+```{r}
+writeData(wb,sheet = sheet, x = IndPauv, startRow = 3, borders = "all")
+```
+
+Ajout de la source mise en forme.
+
+```{r}
+writeData(wb,sheet = sheet, x = "Source : Insee, indicateurs pour le suivi national des objectifs de développement durable 2018", startRow = 11)
+addStyle(wb, sheet, style = source.style, rows= 11,cols = 1)
+```
+
+Ajout du graphique. 
+```{r,eval=FALSE}
+plot(figure_1)
+insertPlot(wb, sheet = "Fig1", xy = c("F", 3))
+```
+
+> Remarque : il faut obligatoirement afficher le graphique (par exemple via la fonction `plot`) avant de l'inserer dans le classeur
+
+**Étape 3** : Ajout d'un second graphique au classeur
+
+Ajout d'une seconde feuille.
+```{r}
+sheet <- "Fig2"
+addWorksheet(wb, sheet)
+```
+
+Les données ci-dessous sont disponibles à l'adresse suivante :
+<https://insee.fr/fr/statistiques/fichier/2500431/pop_qp_2013.xls>
+
+Il s'agit des populations municipales 2013 des quartiers prioritaires de la politique de la ville en Martinique. 
+
+```{r}
+pop_qpv13 <- data.frame(qp = c("QP972001","QP972002","QP972003","QP972004","QP972005","QP972006","QP972007"),
+                        nom_qp = c("Quartiers Ouest","Quartiers Sainte-Thérèse – Bon Air","Quartier Volga Plage","Quartier Haut Dillon",
+                        "Frange Ouest Du Centre-Ville Aggloméré","Zone De Cité Lacroix Trou Terre Pointe Lynch","Tombolo City"),
+                        liste_des_communes = c("Fort-de-France","Fort-de-France","Fort-de-France","Fort-de-France","Le Lamentin","Le Robert","Sainte-Marie"),
+                        population_municipale_2013 = c(12062,4721,3276,2237,1840,1748,1432))
+```
+
+
+Création d'un second graphique.
+
+```{r,warning=FALSE}
+# Graphique avec ggformula
+library(ggformula)
+figure_2 <- pop_qpv13 %>%
+  gf_barh(str_wrap(nom_qp,10) ~ population_municipale_2013,stat = "identity",fill = ~liste_des_communes ,
+          alpha = 0.80) %>%
+  gf_labs(x = "" , y = "Quartiers prioritaires",
+          title = str_wrap("Population municipale martiniquaise des quartiers la politique de la ville en 2013",40),
+          fill = "Communes",
+          caption = "Source : Recensement de la population 2013"
+  )
+plot(figure_2)
+```
+
+> La fonciton `str_wrap` force le retour à la ligne à partir d'un certain nombre de caractères.
+
+Enregistrement de la figure au format vectoriel.
+
+```{r,eval=FALSE}
+dev.print(device = pdf, file = "figure_2.pdf")
+```
+
+Ajout du graphique au classeur.
+
+```{r}
+insertPlot(wb, sheet = "Fig2", xy = c("A", 18))
+```
+
+Ajout du titre mis en forme.
+
+```{r}
+writeData(wb,sheet = sheet, x = "Population municipale martiniquaise des quartiers la politique de la ville en 2013", startRow = 1)
+addStyle(wb, sheet, style = titre.style, rows= 1,cols = 1)
+```
+
+Ajout du tableau de données. 
+
+```{r}
+writeData(wb,sheet = sheet, x = pop_qpv13, startRow = 3, borders = "all",rowNames = FALSE)
+```
+
+Ajout de la source.
+
+```{r}
+writeData(wb,sheet = sheet, x = "Source : Recensement de la population 2013", startRow = 11)
+addStyle(wb, sheet, style = source.style, rows= 11,cols = 1)
+```
+
+**Étape 4** : Enregistrement du classeur
+
+```{r}
+saveWorkbook(wb, "exportPao_exemple.xlsx", overwrite = TRUE)
+```
+
+> Remarque : il est possible de visualiser une version temporaire du classeur en utilisant la commande `openXL(wb)`. 
+
+## Solutions viables non retenues
+
+Les packages `xlsx` et `XLConnect` sont des bonnes alternatives au package `openxlsx`. Néanmoins, ils sont dépendants d'une installation java sur poste ce qui peut les rendre inutilisables sous certains systèmes.
+
+## Solutions à ne pas utiliser
+
+Les packages `readXl` et `writexl` sont efficaces pour la lecture et l'écriture de fichiers. Cependant, ils disposent de peu de fonctionnalités et ne gèrent pas correctement certains formats de données. D'autres packages tels que `excel.link`, `RODBC`, `RJDBC`, `dataframes2xls`, `WriteXLS`, `RExcel`, `xlsReadWrite` et `gdata` existent mais sont utilisés de manière marginale par la communauté R.
+
+## Niveau d'intégration à l'USSR
+
+### Développements préconisés
+
+Aucun.
+
+### Points de vigilance
+
+Le package `openxlsx` n'exporte qu'au format **xlsx**.
+
+## Intégration au dispositif de formation
+
+À déterminer.
+
+## Pour aller plus loin
+
+Deux vignettes du package `openxlsx` : 
+
+* Exemples simples : <https://cran.r-project.org/web/packages/openxlsx/vignettes/Introduction.pdf>
+* Exemples complexes : <https://cran.r-project.org/web/packages/openxlsx/vignettes/formatting.pdf>

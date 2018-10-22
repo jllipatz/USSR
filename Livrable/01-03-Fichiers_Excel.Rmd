@@ -18,15 +18,21 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Manipuler des fichiers "tableurs" dans R, en particulier celui de Microsoft, Excel. L'objectif est de lire les données d'un fichier Excel dans une structure de données R, ou l'inverse, exporter des données R dans Excel
 
-## Solution retenue
+## Solutions retenues
 
-Le package `openxlsx` offre un ensemble de fonctions simples et efficaces permettant de lire et écrire des données en Excel au format **xlsx**. Il gère correctement les formats de données notamments les dates, les nombres très proches de zéro et les formats monétaires.
+### Format **xlsx**
 
-Il n'est pas dépendant d'une installation java sur poste.
+Le package `openxlsx` offre un ensemble de fonctions simples et efficaces permettant de lire et écrire des données en Excel au format **xlsx** compatible avec le tableur `calc`. Il gère correctement les formats de données notamment les dates, les nombres très proches de zéro et les formats monétaires. Ce package ne permet pas de lire et écrire au format **xls**.
+
+### Format **xls**
+
+La fonction `read_xls` du package `readxl` développé par Hadley Wickham permet de lire des fichiers au format **xls**. 
+
+> Les packages `openxlsx` et `readxl` ne présente aucune dépendance avec une installation java sur poste. 
 
 ## Particularité de syntaxe
 
-Pour l'instant, aucune. 
+Aucune. 
 
 ## Exemples
 
@@ -46,13 +52,13 @@ df <- data.frame("Date" = Sys.Date()-0:4,
                  "TinyNumber" = runif(5) / 1E9, stringsAsFactors = FALSE)
 ```
 
-### Écriture 
+### Écriture au format **xlsx**
 
 ```{r}
 write.xlsx(df, file = "writeXLSX1.xlsx")
 ```
 
-### Lecture
+### Lecture au format **xlsx**
 
 ```{r}
 df.excel <- read.xlsx(xlsxFile = "writeXLSX1.xlsx",detectDates = TRUE)
@@ -60,9 +66,40 @@ head(df.excel,n = 2)
 ```
 
 
+### Lecture au format **xls**
+
+Le fichier des populations 2013 des quartiers de la politique de la ville est disponible sur le site insee.fr à l'adresse suivante : <https://insee.fr/fr/statistiques/fichier/2500431/pop_qp_2013.xls>
+
+
+**Étape 1** : téléchargement et enregistrement du fichier sur poste
+```{r}
+target = "https://insee.fr/fr/statistiques/fichier/2500431/pop_qp_2013.xls"
+destination = 'Qpv_pop.xls'
+download.file(url = target, destfile = destination, mode='wb')
+```
+
+**Étape 2** : lecture du fichier
+```{r}
+library(readxl)
+pop_qpv13<- read_xls(path = destination,skip = 8)
+```
+
+> L'option `skip` permet de ne pas lire les 8 premières lignes du fichier.
+
+**Étape 3** : transformation des données
+```{r,message=FALSE,warning=FALSE}
+library(tidyverse)
+pop_qpv13 <- pop_qpv13 %>% 
+  filter(reg == "02") %>% 
+  select(qp,nom_qp,liste_des_communes,population_municipale_2013)
+
+head(pop_qpv13)
+```
+
+
 ### Ecriture d'un rapport complexe
 
-La création d'un classeur comportant plusieurs feuilles, plusieurs tableaux, des titres et des graphiques est possible. Pour cela, il faut créer manuellement une série d'objets intéragissant les uns avec les autres. 
+La création d'un classeur comportant plusieurs feuilles, plusieurs tableaux, des titres et des graphiques est possible. Pour cela, il faut créer manuellement une série d'objets interagissant les uns avec les autres. 
 
 La syntaxe est présentée dans l'exemple suivant : 
 
@@ -125,30 +162,23 @@ writeData(wb, sheet = "Tableau mis en forme", iris, startRow = 16, startCol = 10
 addWorksheet(wb,"Graphique")
 ```
 
-Création d'un graphique avec la library ggplot2
+Création d'un graphique 
 
-```{r,warning=FALSE}
-library(ggplot2)
+```{r,message=FALSE,warning=FALSE}
+library(ggformula)
+figure <- pop_qpv13 %>%
+  gf_barh(str_wrap(nom_qp,10) ~ population_municipale_2013,stat = "identity",fill = ~liste_des_communes ,
+         alpha = 0.80) %>%
+  gf_labs(x = "" , y = "Quartiers prioritaires",
+          title = str_wrap("Population municipale martiniquaise des quartiers la politique de la ville en 2013",40),
+          fill = "Communes",
+          caption = "Source : Recensement de la population 2013"
+          )
 
-data("midwest", package = "ggplot2")
-
-# Scatterplot
-gg <- ggplot(midwest, aes(x=area, y=poptotal)) + 
-  geom_point(aes(col=state, size=popdensity)) + 
-  geom_smooth(method="loess", se=F) + 
-  xlim(c(0, 0.1)) + 
-  ylim(c(0, 500000)) + 
-  labs(subtitle="Area Vs Population", 
-       y="Population", 
-       x="Area", 
-       title="Scatterplot", 
-       caption = "Source: midwest")
+plot(figure)
 ```
 
-
-```{r,echo=FALSE,warning=FALSE}
-gg
-```
+> La fonction `str_wrap` force le retour à la ligne à partir d'un certain nombre de caractères.
 
 Insertion du graphique dans la feuille **Graphique**.
 
@@ -165,7 +195,7 @@ openXL(wb)
 Enregistrement du classeur
 
 ```{r}
-saveWorkbook(wb, "basics.xlsx", overwrite = TRUE)
+saveWorkbook(wb, "Exemple_tableur_complexe.xlsx", overwrite = TRUE)
 ```
 
 
@@ -175,7 +205,7 @@ Les packages `xlsx` et `XLConnect` sont des bonnes alternatives au package `open
 
 ## Solutions à ne pas utiliser
 
-Les packages `readXl` et `writexl` sont efficaces pour la lecture et l'écriture de fichiers. Cependant, ils disposent de peu de fonctionnalités et ne gèrent pas correctement certains formats de données. D'autres packages tels que `excel.link`, `RODBC`, `RJDBC`, `dataframes2xls`, `WriteXLS`, `RExcel`, `xlsReadWrite` et `gdata` existent mais sont utilisés de manière marginale par la communauté R. 
+Le package `writexl` est efficace pour la lecture et l'écriture de fichiers. Cependant, il dispose de peu de fonctionnalités et ne gère pas correctement certains formats de données. D'autres packages tels que `excel.link`, `RODBC`, `RJDBC`, `dataframes2xls`, `WriteXLS`, `RExcel`, `xlsReadWrite` et `gdata` existent mais sont utilisés de manière marginale par la communauté R. 
 
 ## Niveau d'intégration à l'USSR
 
@@ -187,21 +217,6 @@ Aucun.
 
 Ce package ne permet pas de lire et d'écrire des fichiers au format **xls**.
 
-#### Lecture des fichiers au format xls
-
-Pour lire un fichier au format **xls**, une solution est d'utiliser le package `readxl` développé par Hadley Wickham. Ce package ne dépend d'aucune installation java sur poste. 
-
-Par exemple, le fichier des populations des quartiers de la politique de la ville 2015 est disponible sur le site insee.fr à l'adresse suivante : <https://insee.fr/fr/statistiques/fichier/2500431/pop_qp_2013.xls>
-
-Dans un premier temps, il faut enregistrer le fichier puis le lire avec la fonction `read_xls` du package `readxl`.
-
-```{r,eval=FALSE}
-library(readxl)
-
-pop_qpv15 <- read_xls(path = "pop_qp_2013.xls",skip = 8)
-```
-
-> L'option `skip` permet de ne pas lire les 8 premières lignes du fichier.
 
 ## Intégration au dispositif de formation
 
@@ -211,6 +226,6 @@ La question est abordée dans la formation "Prise en main rapide de données sou
 
 Deux vignettes :
 
-* Exemples basics : <https://cran.r-project.org/web/packages/openxlsx/vignettes/Introduction.pdf>
+* Exemples simples : <https://cran.r-project.org/web/packages/openxlsx/vignettes/Introduction.pdf>
 * Exemples complexes : <https://cran.r-project.org/web/packages/openxlsx/vignettes/formatting.pdf>
 

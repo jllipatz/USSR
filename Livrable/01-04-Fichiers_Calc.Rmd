@@ -71,13 +71,13 @@ Les packages `xlsx` et `XLConnect` sont des alternatives efficaces. Ils présent
 
 ## Solutions à ne pas utiliser
 
-Le package `readODS` n'est pas recommandé. La fonction `read_ods` de ce package permet de lire un fichier au format **ods**. La fonction `write_ods` ne fonctionne pas. De plus, le développement et la maintenance du package semblent interrompus : la derniere mis à jour remonte à fin 2016. 
+Le package `readODS` n'est pas recommandé. La fonction `read_ods` de ce package permet de lire un fichier au format **ods**. La fonction `write_ods` ne fonctionne pas. De plus, le développement et la maintenance du package semblent interrompus : la dernière mis à jour remonte à fin 2016. 
 
 ## Niveau d'intégration à l'USSR
 
 ### Développements préconisés
 
-La position de l'Insee est de favoriser l'utilisation du tableur libre **calc**. À l'heure actuelle, aucune solution n'est complètement satisfaisante pour faire intérargir **calc** et **R**. Le développement d'un package spécifique à la lecture et l'écriture de fichier au format **ods** devrait être envisagé. Le package `readODS` pourrait être le point de départ de ce nouveau package. 
+La position de l'Insee est de favoriser l'utilisation du tableur libre **calc**. À l'heure actuelle, aucune solution n'est complètement satisfaisante pour faire interagir **calc** et **R**. Le développement d'un package spécifique à la lecture et l'écriture de fichier au format **ods** devrait être envisagé. Le package `readODS` pourrait être le point de départ de ce nouveau package. 
 
 Le code du package `readODS` est disponible sur github : <https://github.com/chainsawriot/readODS>.
 
