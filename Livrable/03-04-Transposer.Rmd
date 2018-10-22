@@ -50,7 +50,7 @@ pops0 %>% gather("Date","Valeur",-Commune)
 
 ## Solution retenue
 
-Dans l'environnement tidyverse, le package **tidyr** offre les fonctionnalité souhaitées par le biais de deux fonctions : `gather` qui permet de passer dans le format pivot (ou "long") et `spread`qui permet de reconstituer le format tabulaire claissique (ou "large").
+Dans l'environnement tidyverse, le package **tidyr** offre les fonctionnalités souhaitées par le biais de deux fonctions : `gather` qui permet de passer dans le format pivot (ou "long") et `spread`qui permet de reconstituer le format tabulaire classique (ou "large").
 
 ## Exemples
 
@@ -63,6 +63,9 @@ La fonction `gather` prend deux arguments obligatoires, successivement : le nom 
 # Toutes les colonnes sauf "Commune"
 pops0 %>% gather("Date","valeur",-Commune) -> pops1
 pops1
+```
+Les appels à `gather`qui suivent donnent le même résultat. Plutôt que d'afficher celui ci on le passe à la fonction `identical` qui teste si deux objets R ont le même contenu.
+```{r}
 # Toutes les colonnes dont le nom commence par "20"
 pops0 %>% gather("Date","valeur",matches("^20")) %>% identical(pops1)
 # Les trois colonnes "2015", "2010" et "2006"
@@ -82,13 +85,13 @@ pops1 %>% spread("Date","valeur")
 On ne peut pas avoir plusieurs fois le même couple (nom de future colonne, identifiant de la future ligne) :
 ```{r eval=FALSE}
 pops1 %>%
-  mutate(R="54") %>% select(-Commune) %>%
+  add_row(Commune="16015", Date="2006", valeur=0) %>%
   spread("Date","valeur")
 ```
 ```{r echo=FALSE}
 tryCatch(
   pops1 %>%
-    mutate(R="54") %>% select(-Commune) %>%
+    add_row(Commune="16015", Date="2006", valeur=0) %>%
     spread("Date","valeur")
   ,error=function(e) e$message)
 ```

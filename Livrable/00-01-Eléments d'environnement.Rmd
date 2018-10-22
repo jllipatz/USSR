@@ -1,0 +1,75 @@
+---
+title: "Elements d'environnement"
+author: "JLL"
+date: "15 octobre 2018"
+output:
+  html_document:
+    theme: united
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+options(width=100)
+```
+
+# Elements d'environnement
+
+## Chargement
+
+Travailler confortablement sous R nécessite l'installation, puis le chargement de nombreux packages. Un package **USSR** a été construit dont l'appel unique suffit à installer un premier ensemble. Les commandes suivantes permettent cette installation. [Le chemin d'accès sera spécifié ultérieurement]
+```{r eval=FALSE}
+install.packages("devtools")
+devtools::install_local(choose.dir(),force=TRUE)
+```
+L'installation n'est à faire qu'une seule fois. Pour disposer des fonctions contenues dans les différents packages, il suffit d'invoquer la fonction `library` à chaque nouvelle session :
+```{r}
+library(USSR)
+```
+
+
+## Le pipe : `%>%`
+
+Tout ce qui se fait sous R est réalisé par l'appel de fonctions souvent assez élémentaires et devant donc être combinées pour réaliser les tâches nécessaires. <br>
+Supposons par exemple que nous voulions obtenir les nombres de voitures de la table *mtcars* par cylindrée, triés par effectif décroissant. Ceci peut se faire à l'aide des fonctions importées du package **dyplyr** : on regroupe la table *mtcars*  par modalité de la variable *cyl*, on somme ce regroupement puis on trie les valeurs sommées. Cela donne l'imbrication de fonctions suivante :
+```{r}
+arrange(summarise(group_by(mtcars,cyl),n=n()),desc(n))
+```
+Le code obtenu a été construit par ajout successifs d'appel de fonction autour d'autres appels de fonctions. Le résultat est d'une lisibilité douteuse : <br>
+- le fait qu'on travaille sur la table *mtcars* ne saute pas aux yeux,<br>
+- pas plus que la destination des arguments : `desc(n)`se retrouve bien loin du nom de la fonction `arrange`auquel il se rapporte,<br>
+- les opérations sont écrites dans l'ordre inverse de celui de l'exécution,<br>
+- enfin les parenthèses sont suffisamment nombreuses pour que l'on risque de mal les positionner.<br>
+
+Avec le package **dplyr** vient le package **margittr** qui introduit une toute autre notation pour ces appels de fonction imbriqués. L'opérateur `%>%` permet de spécifier une cascade d'appels de fonction dans l'ordre où les opérations vont être réalisées. Il suffit juste d'indiquer quel rôle va jouer le résultat d'un calcul dans l'opération suivante et de préciser les différents appels dans l'ordre chronologique :
+```{r}
+mtcars %>% group_by(.,cyl) %>% summarise(.,n=n()) %>% arrange(.,desc(n))
+```
+Un petit raffinemment peut être apporté quand le résultat d'un calcul va devenir le remier argument pour le calcul suivant. Dans ce cas les points sont facultatifs et on peut écrire :
+```{r}
+mtcars %>% group_by(cyl) %>% summarise(n=n()) %>% arrange(desc(n))
+```
+On peut noter le gain de lisibilité par rapport à l'écriture standard : chaque étape se détache bien ce qui, d'ailleurs, peut être très utile pour tester une séquence d'appels de fonctions en sélectionnant et exécutant seulement les première étapes pour vérfier que le résultat obtenu est conforme avant de prendre en compte l'étape suivante.
+
+La notation avec le point est néanmoins nécessaire pour certaines fonctions qui attendent la table sur laquelle elles travaillent alleurs que dans le premier paramètre :
+```{r echo=FALSE}
+table_options(knit_print = FALSE)
+```
+```{r}
+mtcars %>% mutate(cyl=factor(cyl)) %>% tabular(cyl ~ 1,.)
+```
+
+
+## L'affectation bavarde : `:=`
+
+Lorsqu'on enchaîne plusieurs opérations, il peut être de bonne pratique de vérifier que ce qu'on obtient correspond, au moins en volume, à ce qu'on souhaite. Cette information est affichée dans le volet supérieur gauche de RStudio, mais uniquement sur le dernier résultat obtenu. Une trace plus complète peut être obtenue en séparant cahque étape et en utilisant l'opérateur `:=` spécifique à USSR pour faire les affectations : 
+```{r}
+df := mtcars
+df := df %>% filter(cyl==4)
+df := df %>% select(cyl,mpg)
+```
+
+
