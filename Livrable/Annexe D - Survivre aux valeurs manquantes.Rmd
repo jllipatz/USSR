@@ -1,0 +1,98 @@
+---
+title: "Survivre aux valeurs manquantes"
+author: "JLL"
+date: "24 octobre 2018"
+output:
+  html_document:
+    theme: united
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+options(width=100)
+```
+
+# Les valeurs manquantes en R
+
+## Problématique
+
+Pour celui qui passe de SAS à R, la gestion des valeurs manquantes est un piège des plus efficace. Derrière une dénomination commune, les deux systèmes ont en effet une approche suffisamment différente pour que traduire un programme SAS travaillant avec des données manquantes demande une ré-analyse complète, toute traduction automatique étant inévitablement vouée à l'échec.
+
+**En R** | **En SAS**
+----------------------------------------------------- + -----------------------------------------------------
+En R, valeur manquante ce dit `NA`. | En SAS, valeur manquante se dit `.`
+En R, il n'y a qu'une valeur manquante `NA`. | En SAS on peut avoir plusieurs modalités différentes de valeur manquante en faisant suivre le point par une lettre de "a" à "z". Par exemple `.s`peut signifier secret statistique. 
+En R, il y a autant de valeurs manquantes que de types de données. Il y a donc une valeur manquante spécifique pour le type `character`, distincte de la chaîne vide, et une valeur manquante pour le type `logical`, distincte  de TRUE et FALSE. | En SAS, il n'y a de valeurs manquantes que pour le type numérique. La chaîne vide joue souvent le rôle de valeur manquante pour les chaînes de caractères, mais ce n'est qu'une convention.
+En R, les opérations numériques invalides ne produisent pas de valeur manquante, mais des objets numériques hors standard : des "Not A Number", `NaN`. Par ailleurs R connaît les nombres complexes. | En SAS, tout calcul numérique n'aboutissant pas donne valeur manquante.
+En R, toute opération impliquant une valeur manquante donne valeur manquante. Ceci est en particulier vrai pour le test d'égalité `==` qui restitue la valeur logique "valeur manquante" dès qu'un des termes est à valeur manquante, y compris quand les deux le sont. On ne peut donc pas tester si une valeur est manquante avec `==`, il faut utiliser une fonction spécifique : `is.na`. | En SAS, toute opération arithmétique impliquant une valeur manquante donne "valeur manquante". Par contre les opérateurs logiques ne peuvent restituer que les deux modalités "vrai" et "faux" et peuvent donc être utilisés pour tester la présence de valeurs manquantes.
+En conséquence de ce qui précède, les valeurs manquantes ne sont pas ordonnées en R : elles ne sont ni plus petites, ni plus grandes que les valeurs non manquantes. | En SAS, valeur manquante est aussi le plus petit nombre.
+```{r}
+1/0
+sqrt(-1)
+NA==NA
+```
+
+## Calculer des statistiques sur des colonnes contenant des valeurs manquantes : `na.rm` et `na.omit`
+
+Le code suivant crée une table de trois colonnes respectivement caractère et numériques, où se trouvent des valeurs manquantes. La fonction `read.table` interprète la chaine "NA" comme la volonté de créer une modalité valeur manquante pour la première variable qui est de type caractère (si "NA"" signifiait quelque chose d'autre, on pourrait paramètrer le fonctionnement de `read.table`)
+```{r}
+df <- read.table(text=
+"X  Y Z
+ A NA 1
+NA  2 1
+ C  1 2
+ D NA 2
+ E NA 3",header=TRUE,stringsAsFactors=FALSE)
+str(df)
+```
+
+Conventionnellement, les fonctions qui travaillent sur l'ensemble d'une colonne ont presque toutes un paramètre `na.rm` pour dire quoi faire des données manquantes : `TRUE` signifie qu'on les retire du calcul, `FALSE`qu'on les conserve et que donc le résulat sera à valeur manquante. Malheureusement la valeur par défaut dépend des packages. Il est donc conseillé d'inclure systématiquement le paramètre dès que le jeu de données contient des valeurs manquantes :
+
+```{r}
+df %>% summarise(X=paste(X,collapse=","),Y1=first(Y),Y2=last(Y),Y=sum(Y),Z=sum(Z))
+df %>% summarise(X=paste(X,collapse=","),Y=sum(Y,na.rm=TRUE),Z=sum(Z))
+```
+
+Le cas de `first` et `last`est plus compliqué : en l'absence de paramètre `na.rm` il faut les forcer à travailler sur des colonnes d'où on a enlevé les valeurs manquantes avec `na.omit`:
+```{r}
+df %>% summarise(X=paste(X,collapse=","),Y1=first(na.omit(Y)),Y2=last(na.omit(Y)))
+```
+L'apparition de "NA" dans la colonne X n'est pas contournable directement : l'apparition de valeurs manquantes ne perturbe pas la fonction `paste` mais son comportement ne peut pas être modifié. Il va falloir modifier le contenu de la table comme suit.
+
+
+## Remplacer les valeurs manquantes par une constante
+
+Pour changer les valeurs manquantes en chaînes vides dans la variable X, il suffit de faire le test :
+```{r}
+df %>% mutate(X=ifelse(is.na(X),"",X))
+```
+
+La package **dplyr** apporte la fonction `coalesce`, inspirée par SQL, qui permet une écriture plus courte :
+```{r}
+df %>% mutate(X=coalesce(X,""))
+df %>% summarise(X=paste(coalesce(X,""),collapse=","))
+```
+
+
+## Remplacer les valeurs manquantes par la dernière valeur non manquante
+
+La technique du 'hot deck' consiste à remplacer les valeurs manquantes par la dernière valeur rencontrée pour une observation ayant les mêmes caractéristiques. Le package **zoo** destiné au traitement des séries temporelles apporte une fonction `na.locf`qui permet de réaliser ce genre d'imputation :
+```{r}
+library(zoo)
+df %>% mutate(Y=na.locf(Y,na.rm=FALSE))
+df %>% mutate(Y=na.locf(Y,na.rm=FALSE,fromLast=TRUE))
+```
+NOTE : Le paramètre `na.rm=FALSE` est rendu nécessaire par la présence de valeurs manquantes aux deux bouts de la colonne `Y`. Dans chaque cas ci dessus, il y a un bout où aucune valeur non manquante ne précède une valeur manquante. Le paramètre permet de conserver ces cas.
+
+Et pour faire un 'hot deck' par modalité de la troisième variable :
+```{r}
+df %>% group_by(Z) %>% arrange(Y) %>% mutate(Y2=na.locf(Y,na.rm=FALSE))
+```
+NOTE: On utilise une particularité de **dplyr** sur les valeurs manquantes : en cas de tri, elles sont systématiquement conservées en fin, alors qu'en bonne logique elles auraient pu être abandonnées puisque non ordonnées. 
+```{r}
+df %>% mutate(A=Y>Z)
+```
