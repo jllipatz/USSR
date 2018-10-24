@@ -1488,15 +1488,22 @@ div.tocify {
 </div>
 <div id="solutions-retenues" class="section level2">
 <h2>Solutions retenues</h2>
-<div id="format-xlsx" class="section level3">
-<h3>Format <strong>xlsx</strong></h3>
-<p>Le package <code>openxlsx</code> offre un ensemble de fonctions simples et efficaces permettant de lire et écrire des données en Excel au format <strong>xlsx</strong> compatible avec le tableur <code>calc</code>. Il gère correctement les formats de données notamment les dates, les nombres très proches de zéro et les formats monétaires. Ce package ne permet pas de lire et écrire au format <strong>xls</strong>.</p>
-</div>
 <div id="format-xls" class="section level3">
 <h3>Format <strong>xls</strong></h3>
-<p>La fonction <code>read_xls</code> du package <code>readxl</code> développé par Hadley Wickham permet de lire des fichiers au format <strong>xls</strong>.</p>
+<p>La fonction <code>read_xls</code> du package <code>readxl</code> développé par Hadley Wickham permet de lire des fichiers au format <strong>xls</strong>. L’écriture des données au format <strong>xls</strong>, format ancien de données, n’est pas abordée dans ce document.</p>
+</div>
+<div id="format-xlsx" class="section level3">
+<h3>Format <strong>xlsx</strong></h3>
+<p>Le package <code>openxlsx</code> offre un ensemble de fonctions simples et efficaces permettant de lire et écrire des données en Excel au format <strong>xlsx</strong> compatible avec Calc.</p>
+<p>Pour l’écriture, deux fonctions sont disponibles :</p>
+<ul>
+<li><code>write.xlsx</code> : écriture d’une ou plusieurs tables de données dans un fichier avec une mise en forme sommaire. Une seule ligne de commande est nécessaire pour exporter les données.</li>
+<li><code>saveWorkbook</code> : écriture de table de données, de textes et de graphiques avec une mise en page personnalisée. La syntaxe est plus complexe : il faut plusieurs lignes de commande avant l’export. L’avantage de cette méthode est de créer des rapports entièrement personnalisés.</li>
+</ul>
+<p>Pour la lecture, il faut utiliser la fonction <code>read.xlsx</code>.</p>
+<p>Ce package ne permet pas de lire et écrire au format <strong>xls</strong>.</p>
 <blockquote>
-<p>Les packages <code>openxlsx</code> et <code>readxl</code> ne présente aucune dépendance avec une installation java sur poste.</p>
+<p>Les packages <code>openxlsx</code> et <code>readxl</code> ne présentent aucune dépendance avec une installation java sur poste.</p>
 </blockquote>
 </div>
 </div>
@@ -1506,80 +1513,84 @@ div.tocify {
 </div>
 <div id="exemples" class="section level2">
 <h2>Exemples</h2>
-<div id="table-dentrainement" class="section level3">
-<h3>Table d’entrainement</h3>
-<p>Cette table contient divers formats de données tels que les dates, les opérateurs logiques, les données monétaires, des nombres négatifs, des liens internet, des pourcentages et des chiffres très petits.</p>
-<pre class="r"><code>library(openxlsx)
-
-df &lt;- data.frame(&quot;Date&quot; = Sys.Date()-0:4,
-                 &quot;Logical&quot; = c(TRUE, FALSE, TRUE, TRUE, FALSE),
-                 &quot;Currency&quot; = paste(&quot;$&quot;,-2:2),
-                 &quot;Accounting&quot; = -2:2,
-                 &quot;hLink&quot; = &quot;https://CRAN.R-project.org/&quot;,
-                 &quot;Percentage&quot; = seq(-1, 1, length.out=5),
-                 &quot;TinyNumber&quot; = runif(5) / 1E9, stringsAsFactors = FALSE)</code></pre>
-</div>
-<div id="ecriture-au-format-xlsx" class="section level3">
-<h3>Écriture au format <strong>xlsx</strong></h3>
-<pre class="r"><code>write.xlsx(df, file = &quot;writeXLSX1.xlsx&quot;)</code></pre>
-</div>
-<div id="lecture-au-format-xlsx" class="section level3">
-<h3>Lecture au format <strong>xlsx</strong></h3>
-<pre class="r"><code>df.excel &lt;- read.xlsx(xlsxFile = &quot;writeXLSX1.xlsx&quot;,detectDates = TRUE)
-head(df.excel,n = 2)</code></pre>
-<pre><code>##         Date Logical Currency Accounting                       hLink
-## 1 2018-10-22    TRUE     $ -2         -2 https://CRAN.R-project.org/
-## 2 2018-10-21   FALSE     $ -1         -1 https://CRAN.R-project.org/
-##   Percentage   TinyNumber
-## 1       -1.0 4.992636e-10
-## 2       -0.5 5.875513e-10</code></pre>
-</div>
-<div id="lecture-au-format-xls" class="section level3">
-<h3>Lecture au format <strong>xls</strong></h3>
+<div id="lecture-au-format-xls-package-readxl" class="section level3">
+<h3>Lecture au format <strong>xls</strong> (package <code>readxl</code>)</h3>
 <p>Le fichier des populations 2013 des quartiers de la politique de la ville est disponible sur le site insee.fr à l’adresse suivante : <a href="https://insee.fr/fr/statistiques/fichier/2500431/pop_qp_2013.xls" class="uri">https://insee.fr/fr/statistiques/fichier/2500431/pop_qp_2013.xls</a></p>
 <p><strong>Étape 1</strong> : téléchargement et enregistrement du fichier sur poste</p>
 <pre class="r"><code>target = &quot;https://insee.fr/fr/statistiques/fichier/2500431/pop_qp_2013.xls&quot;
 destination = 'Qpv_pop.xls'
 download.file(url = target, destfile = destination, mode='wb')</code></pre>
+<p>La fonction <code>download.file</code> télécharge automatiquement un fichier sur internet et l’enregistre sur le poste à un endroit spécifique (paramètre <code>destfile</code>).</p>
+<blockquote>
+<p>La fonction <code>download.file</code> est inopérante sous AUS.</p>
+</blockquote>
 <p><strong>Étape 2</strong> : lecture du fichier</p>
 <pre class="r"><code>library(readxl)
-pop_qpv13&lt;- read_xls(path = destination,skip = 8)</code></pre>
+pop_qpv13 &lt;- read_xls(path = destination,skip = 8)</code></pre>
+<p>Le paramètre <code>path</code> contient le chemin d’accès vers le fichier au format <strong>xls</strong>.</p>
 <blockquote>
 <p>L’option <code>skip</code> permet de ne pas lire les 8 premières lignes du fichier.</p>
 </blockquote>
-<p><strong>Étape 3</strong> : transformation des données</p>
-<pre class="r"><code>library(tidyverse)
-pop_qpv13 &lt;- pop_qpv13 %&gt;% 
-  filter(reg == &quot;02&quot;) %&gt;% 
-  select(qp,nom_qp,liste_des_communes,population_municipale_2013)
-
-head(pop_qpv13)</code></pre>
-<pre><code>## # A tibble: 6 x 4
-##   qp       nom_qp                   liste_des_commun~ population_municipa~
-##   &lt;chr&gt;    &lt;chr&gt;                    &lt;chr&gt;                            &lt;dbl&gt;
-## 1 QP972001 Quartiers Ouest          Fort-de-France                   12062
-## 2 QP972002 Quartiers Sainte-Thérès~ Fort-de-France                    4721
-## 3 QP972003 Quartier Volga Plage     Fort-de-France                    3276
-## 4 QP972004 Quartier Haut Dillon     Fort-de-France                    2237
-## 5 QP972005 Frange Ouest Du Centre-~ Le Lamentin                       1840
-## 6 QP972006 Zone De Cité Lacroix Tr~ Le Robert                         1748</code></pre>
 </div>
-<div id="ecriture-dun-rapport-complexe" class="section level3">
-<h3>Ecriture d’un rapport complexe</h3>
-<p>La création d’un classeur comportant plusieurs feuilles, plusieurs tableaux, des titres et des graphiques est possible. Pour cela, il faut créer manuellement une série d’objets interagissant les uns avec les autres.</p>
-<p>La syntaxe est présentée dans l’exemple suivant :</p>
+<div id="ecriture-au-format-xlsx-package-openxlsx" class="section level3">
+<h3>Écriture au format <strong>xlsx</strong> (package <code>openxlsx</code>)</h3>
+<p>Deux fonctions permettent d’écrire au format <strong>xlsx</strong> :</p>
+<ul>
+<li><code>write.xlsx</code> : écriture de table de données dans une ou plusieurs feuilles avec une mise en page simple ;</li>
+<li><code>saveWorkbook</code> : écriture de table de données, de texte et de graphiques avec une mise en page personnalisée.</li>
+</ul>
+<div id="fonction-write.xlsx" class="section level4">
+<h4>Fonction <code>write.xlsx</code></h4>
+<p>Écrit un tableau ou une liste de tableaux de données dans un tableur au format <strong>xlsx</strong>.</p>
+<p>Les données ci-dessous sont disponibles à l’adresse suivante : <a href="https://insee.fr/fr/statistiques/fichier/3615185/t_pib_val.xls" class="uri">https://insee.fr/fr/statistiques/fichier/3615185/t_pib_val.xls</a></p>
+<p>Il s’agit du PIB, des importations (P3) et des exportations (P6) à prix courant sur la période 2007-2018</p>
+<pre class="r"><code>pibFr &lt;- data.frame(an = c(2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018),
+                    trimestre = c(&quot;T1&quot;,&quot;T1&quot;,&quot;T1&quot;,&quot;T1&quot;,&quot;T1&quot;,&quot;T1&quot;,&quot;T1&quot;,&quot;T1&quot;,&quot;T1&quot;,&quot;T1&quot;,&quot;T1&quot;,&quot;T1&quot;),
+                    PIB = c( 477,499,484,491,511,520,526,535,547,557,566,583),
+                    P3 = c(364,381,382,392,405,409,415,419,426,432,442,452),
+                    P6 = c(132,143,120,127,143,151,153,158,166,167,173,181))</code></pre>
+<p><strong>Exemple 1</strong> : Écriture d’un tableau de données au format <strong>xlsx</strong>.</p>
+<pre class="r"><code>library(openxlsx)
+write.xlsx(pibFr, file = &quot;writeXLSX1.xlsx&quot;)</code></pre>
+<p><strong>Exemple 2</strong> : Écriture d’une liste de tableaux au format <strong>xlsx</strong>.</p>
+<pre class="r"><code>liste_tableau &lt;- list(tableau1 = pibFr, tableau2 = pop_qpv13 )
+write.xlsx(liste_tableau, file = &quot;writeXLSX2.xlsx&quot;)</code></pre>
+<blockquote>
+<p>Chaque tableau est inscrit dans une feuille séparée.</p>
+</blockquote>
+<p>Pour plus d’options de personnalisation, se référer à la documentation disponible : <a href="https://cran.r-project.org/web/packages/openxlsx/openxlsx.pdf" class="uri">https://cran.r-project.org/web/packages/openxlsx/openxlsx.pdf</a></p>
+</div>
+<div id="rapport-complexe-fonction-saveworkbook" class="section level4">
+<h4>Rapport complexe : fonction <code>saveWorkbook</code></h4>
+<p>Il est possible de créer des rapports contenant des tables de données, du texte et des graphiques. La syntaxe est plus complexe : il faut créer manuellement un ensemble d’objets interagissant les uns avec les autres.</p>
+<p>Voici un bref aperçu des principales fonctions :</p>
+<ul>
+<li><code>createWorkbook</code> : création d’un classeur ;</li>
+<li><code>addWorksheet</code> : ajout d’un feuille à un classeur ;</li>
+<li><code>writeData</code>: écriture d’une table de données ou d’un texte dans une feuille d’un classeur ;</li>
+<li><code>insertPlot</code>: ajoute un graphique dans une feuille d’un classeur ;</li>
+<li><code>openXL</code> : prévisualisation d’un classeur sans l’enregistrer ;</li>
+<li><code>saveWorkbook</code>: enregistrement d’un classeur sur le poste.</li>
+</ul>
+<p>De plus, il existe des fonctions de personnalisation des cellules :</p>
+<ul>
+<li><code>createStyle</code> : création d’un style de mise en forme ;</li>
+<li><code>addStyle</code> : application d’un style à une cellule ou à une plage de cellule.</li>
+</ul>
+<p>En pratique, le rapport commence par la création d’un classeur qui est ensuite alimenté par une ou plusieurs feuilles. Dans chaque feuille, il faut préciser le contenu (texte, table de données ou graphiques) à l’emplacement souhaité. Une fois le classeur et les feuilles correctement alimentés, Ces objets sont ensuite compilés dans un tableur au format <strong>xlsx</strong> à l’aide de la fonction <code>saveWorkbook</code>.</p>
+<p><strong>Exemple</strong></p>
 <p><strong>Étape 1</strong> : Création du classeur</p>
 <pre class="r"><code>wb &lt;- createWorkbook()</code></pre>
 <p><strong>(Étape facultative)</strong> : création d’un style de mis en forme pour les titres</p>
 <pre class="r"><code>titre.style &lt;- createStyle(fontSize=14, textDecoration=c(&quot;bold&quot;, &quot;italic&quot;))</code></pre>
-<p><strong>Étape 2</strong> : Ajout d’une feuille au classeur qui contient deux tableaux de données dont l’un mis en forme.</p>
+<p><strong>Étape 2</strong> : Ajout d’une feuille au classeur (wb) qui contient deux tableaux de données dont l’un mis en forme.</p>
 <pre class="r"><code>addWorksheet(wb, &quot;Tableau&quot;)</code></pre>
 <p>Ajout d’un titre mis en forme</p>
 <pre class="r"><code>writeData(wb,sheet = &quot;Tableau&quot;, x = &quot;Exemple de tableaux de données contenant différents types de variables&quot;, startRow = 1)
 addStyle(wb, &quot;Tableau&quot;, style = titre.style, rows= 1,cols = 1)</code></pre>
 <p>Ajout de deux tableaux de données dans la feuille <strong>Tableau</strong>. Les délimitations de colonnes sont tracées pour le second tableau.</p>
-<pre class="r"><code>writeData(wb, 1, df, startRow = 2, startCol = 2)
-writeData(wb, 1, mtcars, startRow = 9, startCol = 2, borders =&quot;all&quot;)</code></pre>
+<pre class="r"><code>writeData(wb, 1, pibFr, startRow = 2, startCol = 1)
+writeData(wb, 1, pop_qpv13, startRow = 9, startCol = 1, borders =&quot;all&quot;)</code></pre>
 <p><strong>Étape 3</strong> : Ajout d’une feuille supplémentaire contenant un tableau mis en forme</p>
 <pre class="r"><code>addWorksheet(wb, &quot;Tableau mis en forme&quot;)</code></pre>
 <p>Création d’un style de mise en forme pour le tableau</p>
@@ -1610,8 +1621,31 @@ plot(figure)</code></pre>
 <pre class="r"><code>insertPlot(wb, sheet = &quot;Graphique&quot;, xy = c(&quot;J&quot;, 3))</code></pre>
 <p>Ouverture d’un version temporaire du classeur.</p>
 <pre class="r"><code>openXL(wb)</code></pre>
-<p>Enregistrement du classeur</p>
+<p><strong>Étape 5</strong> : Enregistrement du classeur sur poste</p>
 <pre class="r"><code>saveWorkbook(wb, &quot;Exemple_tableur_complexe.xlsx&quot;, overwrite = TRUE)</code></pre>
+</div>
+</div>
+<div id="lecture-au-format-xlsx-package-openxlsx" class="section level3">
+<h3>Lecture au format <strong>xlsx</strong> (package <code>openxlsx</code>)</h3>
+<p>La fonction <code>read.xlsx</code> permet la lecture de tableur au format <strong>xlsx</strong> uniquement.</p>
+<pre class="r"><code>df.excel &lt;- read.xlsx(xlsxFile = &quot;writeXLSX2.xlsx&quot;,sheet = 2)
+head(df.excel,n = 5)</code></pre>
+<pre><code>##         qp                                 nom_qp liste_des_communes
+## 1 QP972001                        Quartiers Ouest     Fort-de-France
+## 2 QP972002     Quartiers Sainte-Thérèse – Bon Air     Fort-de-France
+## 3 QP972003                   Quartier Volga Plage     Fort-de-France
+## 4 QP972004                   Quartier Haut Dillon     Fort-de-France
+## 5 QP972005 Frange Ouest Du Centre-Ville Aggloméré        Le Lamentin
+##   population_municipale_2013
+## 1                      12062
+## 2                       4721
+## 3                       3276
+## 4                       2237
+## 5                       1840</code></pre>
+<blockquote>
+<p>L’option <code>sheet</code>permet de choisir la feuille qui sera importée dans R</p>
+</blockquote>
+<p>D’autres paramètres existent pour faciliter l’importation des données notamment l’option <code>startrow</code> qui précise le numéro de la ligne à partir duquel la lecture des cellules commence.</p>
 </div>
 </div>
 <div id="solutions-viables-non-retenues" class="section level2">
@@ -1620,7 +1654,7 @@ plot(figure)</code></pre>
 </div>
 <div id="solutions-a-ne-pas-utiliser" class="section level2">
 <h2>Solutions à ne pas utiliser</h2>
-<p>Le package <code>writexl</code> est efficace pour la lecture et l’écriture de fichiers. Cependant, il dispose de peu de fonctionnalités et ne gère pas correctement certains formats de données. D’autres packages tels que <code>excel.link</code>, <code>RODBC</code>, <code>RJDBC</code>, <code>dataframes2xls</code>, <code>WriteXLS</code>, <code>RExcel</code>, <code>xlsReadWrite</code> et <code>gdata</code> existent mais sont utilisés de manière marginale par la communauté R.</p>
+<p>Le package <code>writexl</code> est efficace pour l’écriture de fichiers. Cependant, il dispose de peu de fonctionnalités et ne gère pas correctement certains formats de données. D’autres packages tels que <code>excel.link</code>, <code>RODBC</code>, <code>RJDBC</code>, <code>dataframes2xls</code>, <code>WriteXLS</code>, <code>RExcel</code>, <code>xlsReadWrite</code> et <code>gdata</code> existent mais sont utilisés de manière marginale par la communauté R.</p>
 </div>
 <div id="niveau-dintegration-a-lussr" class="section level2">
 <h2>Niveau d’intégration à l’USSR</h2>
@@ -1639,10 +1673,15 @@ plot(figure)</code></pre>
 </div>
 <div id="pour-aller-plus-loin" class="section level2">
 <h2>Pour aller plus loin</h2>
-<p>Deux vignettes :</p>
+<p>Vignettes du package <code>openxlsx</code> :</p>
 <ul>
 <li>Exemples simples : <a href="https://cran.r-project.org/web/packages/openxlsx/vignettes/Introduction.pdf" class="uri">https://cran.r-project.org/web/packages/openxlsx/vignettes/Introduction.pdf</a></li>
 <li>Exemples complexes : <a href="https://cran.r-project.org/web/packages/openxlsx/vignettes/formatting.pdf" class="uri">https://cran.r-project.org/web/packages/openxlsx/vignettes/formatting.pdf</a></li>
+</ul>
+<p>Documentation du package <code>readxl</code> :</p>
+<ul>
+<li>Tutoriel de base : <a href="https://readxl.tidyverse.org/" class="uri">https://readxl.tidyverse.org/</a></li>
+<li>Options de lecture de colonnes et de cellules : <a href="https://cran.r-project.org/web/packages/readxl/vignettes/cell-and-column-types.html" class="uri">https://cran.r-project.org/web/packages/readxl/vignettes/cell-and-column-types.html</a></li>
 </ul>
 </div>
 
