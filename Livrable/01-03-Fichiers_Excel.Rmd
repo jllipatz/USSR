@@ -151,7 +151,7 @@ En pratique, le rapport commence par la création d'un classeur qui est ensuite 
 wb <- createWorkbook()
 ```
 
-**(Étape facultative)** : création d'un style de mis en forme pour les titres
+**(Étape facultative)** : création d'un style de mise en forme pour les titres
 ```{r}
 titre.style <- createStyle(fontSize=14, textDecoration=c("bold", "italic"))
 ```
@@ -227,7 +227,7 @@ Insertion du graphique dans la feuille **Graphique**.
 insertPlot(wb, sheet = "Graphique", xy = c("J", 3))
 ```
 
-Ouverture d'un version temporaire du classeur. 
+Ouverture d'une version temporaire du classeur. 
 
 ```{r,eval=FALSE}
 openXL(wb)
