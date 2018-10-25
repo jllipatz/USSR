@@ -1,0 +1,250 @@
+---
+title: "Le recodage"
+author: "CA & JLL"
+date: "25 octobre 2018"
+output:
+  html_document:
+    theme: united
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library("dplyr")
+library("stringr")
+library("tables")
+library("foreign")
+options(width=100)
+table_options(knit_print = FALSE)
+```
+
+# Recoder une variable
+
+## Problématique
+
+On s'intéresse ici à comment pouvoir recoder une variable avec le logiciel R. Le recodage peut recouvrir plusieurs formes : changer ses modalités, la représentation de ses modalités (son type R) ou le nombre de ses modalités (notamment en passant du continu au discret). <br>
+Le recodage des données est souvent la première étape à la lecture d'un fichier externe.
+
+## Solution retenue
+
+Le package **dplyr** offre une fonction de création de colonne `mutate`qui peut faire intervenir n'importe quelle expression de calcul incluant les données originales. Il existe aussi des possibilités d'enrichissement par des tables de passage présentes ailleurs : les facteurs sont développés ici, mais la jointure peut être également une solution (voir chapitre).<br>
+Les modifications de type de représentation interne (par exemple passage de numérique en caractère) se font à l'aide des fonctions standard de conversion de type, en particulier : `as.character`, `as.factor`  ou `as.numeric`
+
+## Particularités de syntaxe
+
+Aucune.
+
+## Exemples
+
+Le fichier de démonstration est un petit extrait du fichier des naissances de 2016, restreint à quelques variables : le sexe de l'enfant, l'âge et la catégorie socio-professionnelle de la mère et l'année de mariage.
+```{r echo=FALSE}
+n <- structure(list(sexe = c("2", "1", "2", "1", "1", "1", "1", "1", 
+"2", "2", "2", "2", "2", "2", "1", "2", "1"), agemere = c(25, 
+34, 23, 26, 22, 22, 28, 34, 37, 25, 34, 32, 30, 33, 27, 36, 26
+), csm = c("46", "", "99", "99", "", "56", "", "46", "35", "", 
+"46", "37", "22", "", "43", "43", "43"), amar = c("0000", "0000", 
+"0000", "0000", "0000", "0000", "2013", "0000", "2016", "0000", 
+"2008", "2013", "2014", "0000", "0000", "2003", "0000")), label = "TAB_NAISSANCES5", row.names = c(NA, 
+-17L), class = c("tbl_df", "tbl", "data.frame"))
+str(n)
+```
+
+### Changer le type d'une variable
+
+L'année de mariage est stockée sous forme caractère. Si on la veut en numérique et entière:
+```{r}
+n %>% mutate(amar=as.integer(amar))
+```
+Ou sous forme de facteur, pour pouvoir utiliser la fonction `tabular` (voir chapitre 6.1) et produire un tableau croisé de nombre d’enfants par sexe et année de mariage :
+```{r}
+n %>% mutate(amar=as.factor(amar),
+             sexe=as.factor(sexe)) %>%
+  tabular(sexe ~ amar, .)
+```
+
+### Recalculer une variable
+
+L'expression utilisée dans un `mutate` peut être arbitrairement compliquée. Par exemple, à partir de l'année de mariage numérique on peut calculer le nombre d'années écoulées depuis le mariage, en faisant en sorte que les années non renseignées ('0000' : naissances hors mariage) ne produisent pas de valeur :
+```{r}
+n %>% mutate(ans=2016-as.integer(str_extract(amar,"(19|20)\\d{2}")))
+```
+
+### Changer une modalité d'une variable : `ìfelse`
+
+Dans l'exemple précédent on se sert de `str_extract` pour forcer une valeur manquante pour ce qui ne ressemble pas à une date valide. On pourrait aussi faire le calcul de façon explicite en distinguant le cas des naissances hors mariage et en utilisant `ifelse` qui, suivant le résultat d'un calcul logique, retourne l'un ou l'autre de deux autres calculs :
+```{r}
+n %>% mutate(amar=ifelse(amar=='0000',       # La condition à tester
+                         NA,                 # Le résultat si la condition est vraie
+                         as.integer(amar)),  # Le résultat si la condition est fausse
+              ans=2016-amar)
+```
+
+### Construire une variable à plusieurs modalités : `case_when`
+
+La structure `case_when`de **dplyr** offre les mêmes fonctionnalités que le `case.. when` de SQL. La structure est constituée de couples condition - valeur séparés par des virgules avec un tilde entre les deux membres du couple. En général la structure est terminée par une ligne avec la condition `TRUE`toujours vraie qui sert de "voiture balai" (le `otherwise` du `select... when` de l'étape data de SAS)
+```{r}
+n %>% mutate(cs1 = 
+  case_when(
+		substr(csm, 1, 1) == '1' ~ "agricultrice",
+		substr(csm, 1, 1) == '2' ~ "chef d'entreprise",
+		substr(csm, 1, 1) == '3' ~ "cadre",
+		substr(csm, 1, 1) == '4' ~ "profession intermédiaire",
+		substr(csm, 1, 1) == '5' ~ "employée",
+		substr(csm, 1, 1) == '6' ~ "ouvrière",      # les modalités 1 à 6 sont recodées explicitement
+		TRUE                     ~ "sans activité") # et si tout échoue...
+)
+```
+
+### Discrétiser une variable avec `case_when`
+
+Les différents couples du `case_when` sont en fait explorés séquentiellement, l'un après l'autre, et l'exploration cesse dès qu'une condition est réalisée. D'où la justification de la forme de la dernière ligne : si on arrive là c'est que tout ce qui a précédé a échoué et il faut bien un résultat (du moins si on veut pas récupérer de valeur manquante!).<br> On peut utiliser ce fonctionnement pour discrétiser l'âge de la mère sans avoir à tester les deux bornes de chaque intervalle :
+```{r}
+n %>% mutate(age =
+  case_when(
+		agemere<18 ~ "moins de 18",
+		agemere<25 ~ "de 18 à moins de 25",
+		agemere<35 ~ "de 25 à moins de 35",
+		agemere<45 ~ "de 35 à moins de 45",
+		TRUE       ~ "45 et plus")
+) -> n1
+n1
+n1 %>% group_by(age) %>% summarise(n=n())
+```
+
+### Discrétiser une variable avec `cut`
+
+Le recodage précédent peut se faire avec la transformation en facteurs que réalise la fonction `cut`. Pour celle ci il suffit préciser les points où doit se faire la séparation des différentes tranches d'âge.
+```{r}
+n %>% mutate(age=cut(agemere,c(0,18,25,35,45,150),right=FALSE)) -> n1
+n1
+n1 %>% group_by(age) %>% summarise(n=n())
+```
+NOTES :<br>
+- On précise `right=FALSE`pour que la valeur droite (borne supérieure) de chaque intervalle ne soit pas incluse.<br>
+- Il est impératif de préciser les bornes inférieure de la première tranche et supérieure de la dernière : tout ce qui ne serait pas entre la valeur minimale et la valeur maximale de la liste fournie serait recodé à valeur manquante.
+
+### Changer de nomenclature
+
+Dans l'exemple qui suit on va utiliser une table de passage entre les différents niveaux de code de catégorie socio-professionnelle issue d'insee.fr. Cette table est d'abord téléchargée puis chargée en mémoire.<br>
+On transforme ensuite le code CS fourni en nomenclature sur 42 postes (niveau "N3") en un code plus condensé sur 8 postes (niveau "N1").
+
+> Cette possibilité n'est ouverte qu'à partir de la version 3.5 de R qui autorise des labels identiques pour des levels différents.
+
+```{r}
+download.file(url="https://www.insee.fr/fr/statistiques/fichier/2400059/pcs2003_c_n4_n1.dbf",
+         destfile="donnees/pcs2003_c_n4_n1.dbf",
+             mode="wb")
+pcs <- read.dbf("donnees/pcs2003_c_n4_n1.dbf")
+n %>% mutate(cs8=factor(csm,
+                   levels=pcs$N3,
+                   labels=pcs$N1)) -> n1
+n1
+n1 %>% tabular(cs8 ~ 1, .)
+
+```
+
+### Changer de nomenclature avec une table de passage externe
+
+Dans l'exemple qui suit on va utiliser une table de passage code - libellé issue d'insee.fr. Cette table est d'abord téléchargée puis chargée en mémoire. Malheureusement la mise à disposition sur internet s'est accompagnée de quelques petits défaut qu'il faut ensuite corriger : l'intitulé de colonne pour les libellés est incompatible avec R qui le ctraduit automatiquement, et le mode d'encodage des caractères accentués est hérité d'un ancien système d'exploitation et doit être transformé manuellement au format standard (fonction `iconv`).<br>
+On transforme ensuite le code caractère en facteur en utilisant les modalités présentes dans la table ainsi que les libellés en clair. Dans le résultat un certain nombre de valeurs manquantes sont comptabilisées : elles proviennent des modalités '99' et '' présentes dans la table de naissances mais absentes de la table de passage.
+
+```{r}
+download.file(url="https://www.insee.fr/fr/statistiques/fichier/2400059/pcs2003_liste_n3.dbf",
+         destfile="donnees/pcs2003_liste_n3.dbf",
+             mode="wb")
+pcs42 <- read.dbf("donnees/pcs2003_liste_n3.dbf") %>%
+  mutate(LIBELL.=iconv(LIBELL.,from="850",to="UTF-8"))
+n %>% mutate(cs=factor(csm,
+                   levels=pcs42$CODE,
+                   labels=pcs42$LIBELL.)) -> n2
+n2 %>% group_by(csm,cs) %>% summarise(n=n())
+
+```
+A la suite d’une opération de sélection des lignes, certains levels peuvent disparaître (notre extrait ne contient pas toutes les modalités possibles de CS présentes dans la table de passage). Ils seront toutefois toujours présents dans la liste des modalités de la variable. La fonction `fct_drop` du package **forcats** permet de se débarasser des modalités désormais inutilisées.
+```{r}
+n2 %>% tabular(cs ~ 1, .)
+```
+Mais :
+```{r}
+library(forcats)
+n2 %>% mutate(cs=fct_drop(cs)) %>% tabular(cs ~ 1, .)
+```
+
+### Transformer un ensemble de variables identifiées par leur contenu
+
+Les variables de type "énumération" qui sont dans notre table sont codées en caractère, ceci est contre-indiqué pour une utilisation de `tabular`. On peut faire des conversions de groupe, avec des variantes de la fonction `mutate`, par exemple passer en facteur toutes les variables caractère :
+```{r}
+n %>% mutate_if(is.character,as.factor) %>% tabular (sexe ~ amar, .)
+```
+Les chaînes vides indiquent en fait une valeur manquante (par exemple dans la catégorie socio-professionnelle), on peut faire une substitution générale, de sorte que les observations correspondantes ne soient pas décomptées :
+```{r}
+n %>% mutate_if(is.character,funs(as.factor(ifelse(.=="",NA,.)))) -> n1
+n1 %>% tabular (sexe ~ csm, .)
+```
+> La notation avec `funs`indique la construction d'une fonction dont le paramètre est noté par un point et recevra ensuite successivement toutes les colonnes selectionnées par `is.character`. Cette notation est nécessaire quand on appelle une expression un peu compliquée et non une fonction comme `as.factor`précédemment. Des alternatives (équivalentes en résultat comme `identical`permet de le vérifier) seraient de définir une fonction :
+
+```{r}
+# définition dynamique (la fonction n'existe que pour l'appel)
+n %>% mutate_if(is.character, function(x) as.factor(ifelse(x=="",NA,x))) %>% identical(n1)
+# définition statique (la fonction f va se rajouter à toutes les fonctions connues)
+f <- function(x) ifelse(x=="",NA,x) %>% as.factor
+n %>% mutate_if(is.character, f) %>% identical(n1)
+```
+
+### Transformer un ensemble de variables identifiées par leur nom
+
+La fonction `mutate_at` permet également de faire des transformations d'ensemble de colonnes mais en spécifiant, non une proprété mais une liste de variables qu'on peut préciser de différentes manières :
+
+- Par énumération :
+```{r}
+n %>% mutate_at(c("sexe","csm","amar"),as.factor) -> n1 
+n1 %>% str
+```
+- Par énumération sur condition, à la mode de la fonction `select'. On utilise alors la notation `vars` :
+```{r}
+n %>% mutate_at(vars(-agemere),as.factor) %>% identical(n1)
+n %>% mutate_at(vars(-matches("mere$")),as.factor) %>% identical(n1)
+```
+
+### Transformer toutes les variables
+
+Le code suivant remplace toutes les occurrences d'une chaîne vide par valeur manquante, sans même tester si la variable est numérique. Le résultat est correct car R fait les conversions nécessaires pour que le test ait un sens.
+
+```{r}
+n %>% mutate_all(funs(ifelse(.=="",NA,.))) %>% str
+```
+
+
+## Solutions viables non retenues
+
+L'utilisation du R de base n'est pas décrite ici car impliquant la connaissance d'une syntaxe différente.
+
+
+## Solutions à ne pas utiliser
+
+Aucune.
+
+
+## Niveau d'intégration à l'USSR
+
+### Développements préconisés
+
+Aucun.
+
+### Points de vigilance
+
+Aucun.
+
+## Intégration au dispositif de formation
+
+La question est développée dans la formation "prise en main rapide de données sous R".
+
+
+## Références
+
+On pourra consulter les aide-mémoires en cliquant sur le lien :
+
+https://www.rstudio.com/resources/cheatsheets/
+
