@@ -34,7 +34,7 @@ pops0
 
 ### Transposition totale
 
-Mais on peut aussi se placer du point de vue de la collecte : à chaque date on a observé un certain nombre de communes. A chaque date de collecte correspond alors un ensemble de variables contenant les données pour les différentes communes.
+Mais on peut aussi se placer du point de vue de la collecte : à chaque date on a observé un certain nombre de communes. A chaque date de collecte correspond alors un ensemble de variables contenantt les données pour les différentes communes.
 ```{r echo=FALSE}
 pops1 <- as.data.frame(t(pops0[-1]))
 colnames(pops1) <- pops0[[1]]
@@ -51,6 +51,7 @@ pops0 %>% gather("Date","Valeur",-Commune)
 ## Solution retenue
 
 Dans l'environnement tidyverse, le package **tidyr** offre les fonctionnalités souhaitées par le biais de deux fonctions : `gather` qui permet de passer dans le format pivot (ou "long") et `spread`qui permet de reconstituer le format tabulaire classique (ou "large").
+<img src="images/Transpositions-1.png">
 
 ## Exemples
 
